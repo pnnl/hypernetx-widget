@@ -20,7 +20,3 @@ class ReactJupyterWidget(widgets.DOMWidget):
         self.component = self.__class__.__name__
         self.props = kwargs
 
-@widgets.register
-class Example(ReactJupyterWidget):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)

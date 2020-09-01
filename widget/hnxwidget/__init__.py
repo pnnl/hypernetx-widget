@@ -1,6 +1,6 @@
 from ._version import version_info, __version__
 
-from .react_jupyter_widget import *
+from .hypernetx_widget import *
 
 def _jupyter_nbextension_paths():
     """Called by Jupyter Notebook Server to detect if it is a valid nbextension and
