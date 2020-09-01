@@ -1,11 +1,13 @@
 import React from 'react';
 
+import {HypernetxWidget} from '..'
+
 import props from './data/props.json'
+
 
 export default {
   title: 'HNX Widget/Button',
 };
 
 export const Test = () =>
-  console.log(props) ||
-  <div>Test</div>
+  <HypernetxWidget {...props} />

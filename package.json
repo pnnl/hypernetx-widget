@@ -47,6 +47,8 @@
     "react-component"
   ],
   "dependencies": {
+    "d3-hierarchy": "^2.0.0",
+    "d3-selection": "^2.0.0",
     "imp-redux": "^1.0.1"
   }
 }
