@@ -36,5 +36,8 @@
   "repository": "",
   "keywords": [
     "react-component"
-  ]
+  ],
+  "dependencies": {
+    "imp-redux": "^1.0.1"
+  }
 }
