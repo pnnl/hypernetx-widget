@@ -10,3 +10,5 @@ hnxwidget/static/
 
 # OS X
 .DS_Store
+lib
+es
