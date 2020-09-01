@@ -1,0 +1,2 @@
+recursive-include hnxwidget/static *.*
+include hnx-widget.json

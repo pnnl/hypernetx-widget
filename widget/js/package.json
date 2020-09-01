@@ -1,0 +1,40 @@
+{
+  "name": "hnx-widget",
+  "version": "0.1.0",
+  "description": "A widget for interractive visualization of the hypernetx package.",
+  "author": "Dustin Arendt",
+  "main": "lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PNNL/hnx-widget.git"
+  },
+  "keywords": [
+    "jupyter",
+    "widgets",
+    "ipython",
+    "ipywidgets",
+    "jupyterlab-extension"
+  ],
+  "files": [
+    "lib/**/*.js",
+    "dist/*.js"
+  ],
+  "scripts": {
+    "clean": "rimraf dist/",
+    "prepublish": "webpack",
+    "build": "webpack",
+    "watch": "webpack --watch -d",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "webpack": "^3.5.5",
+    "rimraf": "^2.6.1"
+  },
+  "dependencies": {
+    "@jupyter-widgets/base": "^1.1 || ^2 || ^3",
+    "lodash": "^4.17.4"
+  },
+  "jupyterlab": {
+    "extension": "lib/labplugin"
+  }
+}

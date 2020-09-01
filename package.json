@@ -1,0 +1,40 @@
+{
+  "name": "hnx-widget",
+  "version": "1.0.0",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "files": [
+    "css",
+    "es",
+    "lib",
+    "umd"
+  ],
+  "scripts": {
+    "build": "nwb build-react-component",
+    "build:watch": "nodemon -w src -x 'nwb build-react-component --no-demo'",
+    "clean": "nwb clean-module && nwb clean-demo",
+    "start": "nwb serve-react-demo",
+    "test": "nwb test-react",
+    "test:coverage": "nwb test-react --coverage",
+    "test:watch": "nwb test-react --server"
+  },
+  "peerDependencies": {
+    "react": "16.x"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "babel-loader": "^8.0.4",
+    "extract-text-webpack-plugin": "^4.0.0-beta.0",
+    "nwb": "0.21.x",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "nodemon": "^2.0.4"
+  },
+  "author": "",
+  "homepage": "",
+  "license": "MIT",
+  "repository": "",
+  "keywords": [
+    "react-component"
+  ]
+}
