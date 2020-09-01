@@ -16,19 +16,28 @@
     "start": "nwb serve-react-demo",
     "test": "nwb test-react",
     "test:coverage": "nwb test-react --coverage",
-    "test:watch": "nwb test-react --server"
+    "test:watch": "nwb test-react --server",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "peerDependencies": {
     "react": "16.x"
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
+    "@storybook/addon-actions": "^6.0.21",
+    "@storybook/addon-essentials": "^6.0.21",
+    "@storybook/addon-links": "^6.0.21",
+    "@storybook/react": "^6.0.21",
     "babel-loader": "^8.0.4",
+    "core-js": "^3.6.5",
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
+    "nodemon": "^2.0.4",
     "nwb": "0.21.x",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
-    "nodemon": "^2.0.4"
+    "react-is": "^16.13.1",
+    "webpack": "^4.44.1"
   },
   "author": "",
   "homepage": "",
