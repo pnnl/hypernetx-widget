@@ -6,6 +6,74 @@ import {select} from 'd3-selection'
 import {forceSimulation, forceLink, forceManyBody, forceCenter, forceCollide} from 'd3-force'
 import {polygonHull} from 'd3-polygon'
 
+const Nodes = ({data, simulation}) =>
+  <g ref={ele => {
+    const groups = select(ele)
+      .selectAll('g')
+        .data(data)
+          .join('g');
+
+    groups.selectAll('circle')
+      .data(d => d.children)
+        .join('circle')
+          .attr('cx', d => d.x)
+          .attr('cy', d => d.y)
+          .attr('r', d => d.r);
+
+    simulation.on('tick.nodes', d => {
+      groups.attr('transform', d => `translate(${d.x},${d.y})`);
+    });
+  }}/>
+
+const HyperEdges = ({data, simulation, nControlPoints=24}) =>
+  <g ref={ele => {
+    const controlPoints = range(nControlPoints)
+      .map((d, i, a) => {
+        const theta = 2*Math.PI*i/a.length
+        return [Math.cos(theta), Math.sin(theta)];
+      });
+
+    const hulls = select(ele)
+      .selectAll('path')
+        .data(data)
+          .join('path')
+            .attr('stroke', 'black')
+            .attr('fill', 'none');
+
+    simulation.on('tick.hulls', d =>
+      hulls
+        .attr('d', d => {
+          const points = [];
+          d.elements.forEach(({r, x, y}) => {
+            controlPoints.forEach(([cx, cy]) =>
+              points.push([r*cx + x, r*cy + y])
+            )
+          });
+
+          return 'M' + polygonHull(points).map(d => d.join(',')).join('L')
+        })
+    );
+  }}/>
+
+
+const DebugLinks = ({data, simulation}) =>
+  <g ref={ele => {
+    const lines = select(ele)
+      .selectAll('line')
+        .data(data)
+          .join('line')
+            .style('stroke', 'black');
+
+    simulation.on('tick.debug-lines', d => {
+      lines
+        .attr('x1', d => d.source.x)
+        .attr('y1', d => d.source.y)
+        .attr('x2', d => d.target.x)
+        .attr('y2', d => d.target.y);
+    });
+
+  }}/>
+
 export const HypernetxWidget = ({fill='black', size=[800, 600], debug, ...props}) => {
 
   // construct a simple hierarchy out of the nodes
@@ -61,72 +129,8 @@ export const HypernetxWidget = ({fill='black', size=[800, 600], debug, ...props}
     .force('collide', forceCollide().radius(d => 2*d.r || 0));
 
   return <svg style={{width, height}}>
-    <g ref={ele => {
-      const groups = select(ele)
-        .selectAll('g')
-          .data(internals)
-            .join('g');
-
-      groups.selectAll('circle')
-        .data(d => d.children)
-          .join('circle')
-            .attr('cx', d => d.x)
-            .attr('cy', d => d.y)
-            .attr('r', d => d.r);
-
-      simulation.on('tick.nodes', d => {
-        groups.attr('transform', d => `translate(${d.x},${d.y})`);
-      });
-    }}/>
-
-    <g ref={ele => {
-      const controlPoints = range(24)
-        .map((d, i, a) => {
-          const theta = 2*Math.PI*i/a.length
-          return [Math.cos(theta), Math.sin(theta)];
-        });
-
-      const hulls = select(ele)
-        .selectAll('path')
-          .data(edges)
-            .join('path')
-              .attr('stroke', 'black')
-              .attr('fill', 'none');
-
-      simulation.on('tick.hulls', d =>
-        hulls
-          .attr('d', d => {
-            const points = [];
-            d.elements.forEach(({r, x, y}) => {
-              controlPoints.forEach(([cx, cy]) =>
-                points.push([r*cx + x, r*cy + y])
-              )
-            });
-
-            return 'M' + polygonHull(points).map(d => d.join(',')).join('L')
-          })
-      );
-
-    }}/>
-
-    { debug &&
-      <g ref={ele => {
-        const lines = select(ele)
-          .selectAll('line')
-            .data(links)
-              .join('line')
-                .style('stroke', 'black');
-
-        simulation.on('tick.debug-lines', d => {
-          lines
-            .attr('x1', d => d.source.x)
-            .attr('y1', d => d.source.y)
-            .attr('x2', d => d.target.x)
-            .attr('y2', d => d.target.y);
-        });
-
-      }}/>
-    }
-
+    <Nodes data={internals} simulation={simulation} />
+    <HyperEdges data={edges} simulation={simulation} />
+    { debug && <DebugLinks data={links} simulation={simulation} /> }
   </svg>
 }
