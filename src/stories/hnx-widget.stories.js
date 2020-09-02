@@ -10,4 +10,4 @@ export default {
 };
 
 export const Test = () =>
-  <HypernetxWidget {...props} />
+  <HypernetxWidget debug {...props} />
