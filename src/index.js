@@ -53,7 +53,7 @@ export const HypernetxWidget = ({fill='black', size=[800, 600], debug, ...props}
 
 
   let simulation = forceSimulation([...tree.children, ...edges])
-    .force('charge', forceManyBody(-1500).distanceMax(200))
+    .force('charge', forceManyBody().strength(-150).distanceMax(300))
     .force('link', forceLink(links).distance(30))
     .force('center', forceCenter(width/2, height/2))
     .force('collide', forceCollide().radius(d => d.r || 0));
