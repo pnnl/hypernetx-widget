@@ -74,23 +74,20 @@ const DebugLinks = ({data, simulation}) =>
 
   }}/>
 
-export const HypernetxWidget = ({fill='black', size=[800, 600], debug, ...props}) => {
+export const HypernetxWidget = ({nodes, edges, size=[800, 600], debug, ...props}) => {
+  const [width, height] = size;
 
   // construct a simple hierarchy out of the nodes
-  // replace node ids with references to actual nodes
-  let {nodes, edges} = props;
-
   const tree = hierarchy({elements: nodes}, d => d.elements)
     .sum(d => d.value);
 
+  // replace node ids with references to actual nodes
   edges = edges.map(({elements, ...rest}) => ({
     elements: elements.map(v => tree.children[v]),
     ...rest
   }));
 
   //
-
-  const [width, height] = size;
 
   const radius = d => Math.sqrt(d.value/Math.PI);
 
