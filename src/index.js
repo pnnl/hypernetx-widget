@@ -43,14 +43,17 @@ const HyperEdges = ({data, simulation, nControlPoints=24}) =>
     simulation.on('tick.hulls', d =>
       hulls
         .attr('d', d => {
-          const points = [];
+          let points = [];
           d.elements.forEach(({r, x, y}) => {
             controlPoints.forEach(([cx, cy]) =>
               points.push([r*cx + x, r*cy + y])
             )
           });
 
-          return 'M' + polygonHull(points).map(d => d.join(',')).join('L')
+          points = polygonHull(points);
+          points.push(points[0]);
+
+          return 'M' + points.map(d => d.join(',')).join('L')
         })
     );
   }}/>
