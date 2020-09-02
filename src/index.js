@@ -25,11 +25,11 @@ const Nodes = ({data, simulation}) =>
     });
   }}/>
 
-const HyperEdges = ({data, simulation, nControlPoints=24}) =>
+const HyperEdges = ({data, simulation, dr=5, nControlPoints=24}) =>
   <g ref={ele => {
     const controlPoints = range(nControlPoints)
-      .map((d, i, a) => {
-        const theta = 2*Math.PI*i/a.length
+      .map(i => {
+        const theta = 2*Math.PI*i/nControlPoints;
         return [Math.cos(theta), Math.sin(theta)];
       });
 
@@ -42,15 +42,19 @@ const HyperEdges = ({data, simulation, nControlPoints=24}) =>
 
     simulation.on('tick.hulls', d =>
       hulls
-        .attr('d', d => {
+        .attr('d', ({level, elements}) => {
           let points = [];
-          d.elements.forEach(({r, x, y}) => {
-            controlPoints.forEach(([cx, cy]) =>
-              points.push([r*cx + x, r*cy + y])
-            )
+
+          elements.forEach(({r, x, y, ...rest}) => {
+            controlPoints.forEach(([cx, cy]) => {
+              const radius = r + dr*(1 + level);
+              return points.push([radius*cx + x, radius*cy + y]);
+            })
           });
 
           points = polygonHull(points);
+
+          // add the first point to the end to close the path
           points.push(points[0]);
 
           return 'M' + points.map(d => d.join(',')).join('L')
