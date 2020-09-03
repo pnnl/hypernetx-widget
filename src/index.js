@@ -1,5 +1,6 @@
 import React, {useMemo} from 'react'
 
+import {drag} from 'd3-drag'
 import {range} from 'd3-array'
 import {pack, hierarchy} from 'd3-hierarchy'
 import {select} from 'd3-selection'
@@ -8,10 +9,32 @@ import {polygonHull} from 'd3-polygon'
 
 const Nodes = ({internals, simulation}) =>
   <g ref={ele => {
+    function dragstarted(event) {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+      event.subject.fx = event.subject.x;
+      event.subject.fy = event.subject.y;
+    }
+    
+    function dragged(event) {
+      event.subject.fx = event.x;
+      event.subject.fy = event.y;
+    }
+    
+    function dragended(event) {
+      if (!event.active) simulation.alphaTarget(0);
+      event.subject.fx = null;
+      event.subject.fy = null;
+    }
+
     const groups = select(ele)
       .selectAll('g')
         .data(internals)
-          .join('g');
+          .join('g')
+            .call(drag()
+              .on('start', dragstarted)
+              .on('drag', dragged)
+              .on('end', dragended)
+            );
 
     groups.selectAll('circle')
       .data(d => d.children)
