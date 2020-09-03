@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useMemo} from 'react'
 
 import {range} from 'd3-array'
 import {pack, hierarchy} from 'd3-hierarchy'
@@ -6,11 +6,11 @@ import {select} from 'd3-selection'
 import {forceSimulation, forceLink, forceManyBody, forceCenter, forceCollide} from 'd3-force'
 import {polygonHull} from 'd3-polygon'
 
-const Nodes = ({data, simulation}) =>
+const Nodes = ({internals, simulation}) =>
   <g ref={ele => {
     const groups = select(ele)
       .selectAll('g')
-        .data(data)
+        .data(internals)
           .join('g');
 
     groups.selectAll('circle')
@@ -25,7 +25,7 @@ const Nodes = ({data, simulation}) =>
     });
   }}/>
 
-const HyperEdges = ({data, simulation, dr=5, nControlPoints=24}) =>
+const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24}) =>
   <g ref={ele => {
     const controlPoints = range(nControlPoints)
       .map(i => {
@@ -35,7 +35,7 @@ const HyperEdges = ({data, simulation, dr=5, nControlPoints=24}) =>
 
     const hulls = select(ele)
       .selectAll('path')
-        .data(data)
+        .data(edges)
           .join('path')
             .attr('stroke', 'black')
             .attr('fill', 'none');
@@ -63,11 +63,11 @@ const HyperEdges = ({data, simulation, dr=5, nControlPoints=24}) =>
   }}/>
 
 
-const DebugLinks = ({data, simulation}) =>
+const DebugLinks = ({links, simulation}) =>
   <g ref={ele => {
     const lines = select(ele)
       .selectAll('line')
-        .data(data)
+        .data(links)
           .join('line')
             .style('stroke', 'black');
 
@@ -81,60 +81,74 @@ const DebugLinks = ({data, simulation}) =>
 
   }}/>
 
-export const HypernetxWidget = ({nodes, edges, size=[800, 600], debug, ...props}) => {
-  const [width, height] = size;
 
-  // construct a simple hierarchy out of the nodes
-  const tree = hierarchy({elements: nodes}, d => d.elements)
-    .sum(d => d.value);
+// const HypernetxWidgetWrapper = ({internals, edges, links, simulation, debug}) =>
 
-  // replace node ids with references to actual nodes
-  edges = edges.map(({elements, ...rest}) => ({
-    elements: elements.map(v => tree.children[v]),
-    ...rest
-  }));
+// const compute
 
-  //
+export const HypernetxWidget = ({nodes, edges, width=800, height=600, debug, ...props}) => {
+  const derivedProps = useMemo(
+    () => {
+      // construct a simple hierarchy out of the nodes
+      const tree = hierarchy({elements: nodes}, d => d.elements)
+        .sum(d => d.value);
 
-  const radius = d => Math.sqrt(d.value/Math.PI);
+      // replace node ids with references to actual nodes
+      edges = edges.map(({elements, ...rest}) => ({
+        elements: elements.map(v => tree.children[v]),
+        ...rest
+      }));
 
-  const rootRadius = radius(tree);
-  const scale = Math.min(width, height)/(10*rootRadius);
+      //
 
-  const layout = pack()
-    .radius(d => scale*radius(d))
-    .size(size)
-    (tree);
+      const radius = d => Math.sqrt(d.value/Math.PI);
 
-  // adjust position of the children relative to their parents
+      const rootRadius = radius(tree);
+      const scale = Math.min(width, height)/(10*rootRadius);
 
-  tree.leaves().forEach(d => {
-    d.x -= d.parent.x;
-    d.y -= d.parent.y;
-  });
+      const layout = pack()
+        .radius(d => scale*radius(d))
+        .size([width, height])
+        (tree);
 
-  const internals = tree.descendants()
-    .filter(d => d.height > 0 && d.depth > 0);
+      // adjust position of the children relative to their parents
 
-  // setup the force simulation
-  
-  const links = [];
-  edges.forEach(source =>
-    source.elements.forEach(target =>
-      links.push({source, target})
-    )
+      tree.leaves().forEach(d => {
+        d.x -= d.parent.x;
+        d.y -= d.parent.y;
+      });
+
+      const internals = tree.descendants()
+        .filter(d => d.height > 0 && d.depth > 0);
+
+      // setup the force simulation
+      
+      const links = [];
+      edges.forEach(source =>
+        source.elements.forEach(target =>
+          links.push({source, target})
+        )
+      );
+
+      let simulation = forceSimulation([...tree.children, ...edges])
+        .force('charge', forceManyBody().strength(-150).distanceMax(300))
+        .force('link', forceLink(links).distance(30))
+        .force('center', forceCenter(width/2, height/2))
+        .force('collide', forceCollide().radius(d => 2*d.r || 0));
+
+      return {links, edges, internals, simulation};
+    },
+    [nodes, edges, width, height]
   );
 
-
-  let simulation = forceSimulation([...tree.children, ...edges])
-    .force('charge', forceManyBody().strength(-150).distanceMax(300))
-    .force('link', forceLink(links).distance(30))
-    .force('center', forceCenter(width/2, height/2))
-    .force('collide', forceCollide().radius(d => 2*d.r || 0));
-
   return <svg style={{width, height}}>
-    <Nodes data={internals} simulation={simulation} />
-    <HyperEdges data={edges} simulation={simulation} />
-    { debug && <DebugLinks data={links} simulation={simulation} /> }
+    <Nodes {...derivedProps} />
+    <HyperEdges {...derivedProps}  />
+    { debug && <DebugLinks {...derivedProps}  /> }
   </svg>
 }
+
+// todo:
+//   node, edge styling (color, size/thickness)
+//   labels, tooltips (data)
+//   make consistent with hnx.draw()
