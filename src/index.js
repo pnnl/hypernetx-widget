@@ -36,12 +36,17 @@ const Nodes = ({internals, simulation}) =>
               .on('end', dragended)
             );
 
-    groups.selectAll('circle')
+    const circles = groups.selectAll('circle')
       .data(d => d.children)
         .join('circle')
           .attr('cx', d => d.x)
           .attr('cy', d => d.y)
           .attr('r', d => d.r);
+
+
+    Object.keys(internals[0].data.elements[0].style).forEach(k =>
+      circles.attr(k, d => d.data.style[k])
+    )
 
     simulation.on('tick.nodes', d => {
       groups.attr('transform', d => `translate(${d.x},${d.y})`);

@@ -4,10 +4,17 @@ import ipywidgets as widgets
 
 from hypernetx.drawing.util import get_set_layering
 
+NODE_DEFAULT_STYLES = {
+    'fill': 'black',
+    'stroke': 'black',
+    'strokeWidth': 0
+}
+
 @widgets.register
 class HypernetxWidget(ReactJupyterWidget):
     def __init__(self, H,
         node_size=None,
+        node_styles={},
         **kwargs
     ):
         # will break if already collapsed
@@ -27,13 +34,15 @@ class HypernetxWidget(ReactJupyterWidget):
             {
                 'elements': [
                     {
-                        'uid': v,
-                        'value': get_property(v, node_size, 1),
+                        'uid': uid,
+                        'value': get_property(uid, node_size, 1),
                         'style': {
-
+                            k: get_property(uid, node_styles.get(k), v)
+                            for k, v in NODE_DEFAULT_STYLES.items()
+                            if k in node_styles
                         }
                     }
-                    for v in entity.uid
+                    for uid in entity.uid
                 ]
             }
             for i, entity in enumerate(self.H.nodes())
