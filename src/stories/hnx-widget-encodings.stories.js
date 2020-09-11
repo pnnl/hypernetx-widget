@@ -6,8 +6,11 @@ import props from './data/props.json'
 
 
 export default {
-  title: 'HNX Widget/Button',
+  title: 'HNX Widget SVG/Encodings',
 };
 
-export const Test = () =>
-  <HypernetxWidget debug {...props} />
+console.log(props)
+
+export const Radius = () =>
+  <HypernetxWidget {...props} />
+
