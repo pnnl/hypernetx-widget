@@ -13,13 +13,13 @@ class HypernetxWidget(ReactJupyterWidget):
         # will break if already collapsed
         self.H = H.collapse_nodes_and_edges()
 
-        def get_node_size(v):
-            if node_size is None:
-                return 1
-            elif hasattr(node_size, 'get'):
-                return node_size.get(v, 1)
+        def get_property(id, value, default):
+            if value is None:
+                return default
+            elif hasattr(value, 'get'):
+                return value.get(id, default)
             else:
-                return node_size
+                return value
         
         levels = get_set_layering(self.H)
         
@@ -28,7 +28,10 @@ class HypernetxWidget(ReactJupyterWidget):
                 'elements': [
                     {
                         'uid': v,
-                        'value': get_node_size(v)
+                        'value': get_property(v, node_size, 1),
+                        'style': {
+
+                        }
                     }
                     for v in entity.uid
                 ]
