@@ -68,6 +68,10 @@ const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24}) =>
             .attr('stroke', 'black')
             .attr('fill', 'none');
 
+    Object.keys(edges[0].style).forEach(k =>
+      hulls.attr(k, d => d.style[k])
+    );
+
     simulation.on('tick.hulls', d =>
       hulls
         .attr('d', ({level, elements}) => {
@@ -170,8 +174,8 @@ export const HypernetxWidget = ({nodes, edges, width=800, height=600, debug, ...
   );
 
   return <svg style={{width, height}}>
-    <Nodes {...derivedProps} />
     <HyperEdges {...derivedProps}  />
+    <Nodes {...derivedProps} />
     { debug && <DebugLinks {...derivedProps}  /> }
   </svg>
 }
