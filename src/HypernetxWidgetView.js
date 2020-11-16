@@ -7,7 +7,7 @@ import {select} from 'd3-selection'
 import {forceSimulation, forceLink, forceManyBody, forceCenter, forceCollide} from 'd3-force'
 import {polygonHull} from 'd3-polygon'
 
-const Nodes = ({internals, simulation}) =>
+const Nodes = ({internals, simulation, onClickNodes=Object}) =>
   <g ref={ele => {
     function dragstarted(event) {
       if (!event.active) simulation.alphaTarget(0.3).restart();
@@ -30,6 +30,7 @@ const Nodes = ({internals, simulation}) =>
       .selectAll('g')
         .data(internals)
           .join('g')
+            // .on('click', (e, d) => console.log('group', d))
             .call(drag()
               .on('start', dragstarted)
               .on('drag', dragged)
@@ -39,6 +40,7 @@ const Nodes = ({internals, simulation}) =>
     const circles = groups.selectAll('circle')
       .data(d => d.children)
         .join('circle')
+          .on('click', onClickNodes)
           .attr('cx', d => d.x)
           .attr('cy', d => d.y)
           .attr('r', d => d.r);
@@ -52,7 +54,7 @@ const Nodes = ({internals, simulation}) =>
     });
   }}/>
 
-const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24}) =>
+const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24, onClickEdges=Object}) =>
   <g ref={ele => {
     const controlPoints = range(nControlPoints)
       .map(i => {
@@ -64,6 +66,7 @@ const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24}) =>
       .selectAll('path')
         .data(edges)
           .join('path')
+            .on('click', onClickEdges)
             .attr('stroke', 'black')
             .attr('fill', 'none');
 
@@ -173,9 +176,9 @@ export const HypernetxWidgetView = ({nodes, edges, width=800, height=600, debug,
   );
 
   return <svg style={{width, height}}>
-    <HyperEdges {...derivedProps}  />
-    <Nodes {...derivedProps} />
-    { debug && <DebugLinks {...derivedProps}  /> }
+    <HyperEdges {...derivedProps}  {...props} />
+    <Nodes {...derivedProps} {...props} />
+    { debug && <DebugLinks {...derivedProps} {...props} /> }
   </svg>
 }
 
