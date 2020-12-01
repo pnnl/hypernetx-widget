@@ -32,21 +32,30 @@ const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill}) =>
     }
     
     function dragged(event) {
+      select(this).classed('fixed', true);
       event.subject.fx = event.x;
       event.subject.fy = event.y;
     }
     
     function dragended(event) {
+      // if (!event.active) simulation.alphaTarget(0);
+      // event.subject.fx = null;
+      // event.subject.fy = null;
+    }
+
+    function unfix(event, d) {
+      select(this).classed('fixed', false);
+      d.fx = null;
+      d.fy = null;
+
       if (!event.active) simulation.alphaTarget(0);
-      event.subject.fx = null;
-      event.subject.fy = null;
     }
 
     const groups = select(ele)
       .selectAll('g')
         .data(internals)
           .join('g')
-            // .on('click', (e, d) => console.log('group', d))
+            .on('dblclick', unfix)
             .call(drag()
               .on('start', dragstarted)
               .on('drag', dragged)
