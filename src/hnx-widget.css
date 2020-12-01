@@ -1,0 +1,9 @@
+.hnx-widget-view .nodes .fixed circle.internal {
+	stroke: gray;
+	stroke-width: 3;
+	stroke-dasharray: 6,3;
+}
+
+.hnx-widget-view .nodes circle.internal {
+	fill-opacity: 0;
+}

@@ -7,6 +7,8 @@ import {select} from 'd3-selection'
 import {forceSimulation, forceLink, forceManyBody, forceCenter, forceCollide} from 'd3-force'
 import {polygonHull} from 'd3-polygon'
 
+import './hnx-widget.css'
+
 const styleEncodings = {
   Stroke: 'stroke',
   StrokeWidth: 'stroke-width',
@@ -24,7 +26,7 @@ const encodeProps = (selection, props) => {
 }
 
 const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill}) =>
-  <g ref={ele => {
+  <g className='nodes' ref={ele => {
     function dragstarted(event) {
       if (!event.active) simulation.alphaTarget(0.3).restart();
       event.subject.fx = event.subject.x;
@@ -63,11 +65,12 @@ const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill}) =>
             );
 
     const circles = groups.selectAll('circle')
-      .data(d => d.children)
+      .data(d => d.descendants())
         .join('circle')
           .on('click', onClickNodes)
-          .attr('cx', d => d.x)
-          .attr('cy', d => d.y)
+          .classed('internal', d => d.height > 0)
+          .attr('cx', d => d.height === 0 ? d.x : 0)
+          .attr('cy', d => d.height === 0 ? d.y : 0)
           .attr('r', d => d.r);
 
     // Object.keys(internals[0].data.elements[0].style).forEach(k =>
@@ -168,6 +171,7 @@ export const HypernetxWidgetView = ({nodes, edges, width=800, height=600, debug,
       const scale = Math.min(width, height)/(10*rootRadius);
 
       const layout = pack()
+        .padding(2)
         .radius(d => scale*radius(d))
         .size([width, height])
         (tree);
@@ -202,7 +206,7 @@ export const HypernetxWidgetView = ({nodes, edges, width=800, height=600, debug,
     [nodes, edges, width, height]
   );
 
-  return <svg style={{width, height}}>
+  return <svg style={{width, height}} className='hnx-widget-view'>
     <HyperEdges {...derivedProps}  {...props} />
     <Nodes {...derivedProps} {...props} />
     { debug && <DebugLinks {...derivedProps} {...props} /> }
