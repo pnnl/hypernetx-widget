@@ -3,15 +3,59 @@ from .react_jupyter_widget import ReactJupyterWidget
 import ipywidgets as widgets
 
 import matplotlib.pyplot as plt
-from matplotlib.colors import to_hex
+from matplotlib.colors import to_rgba_array, to_hex
+import numpy as np
 
-from hypernetx.drawing.util import get_set_layering
+from hypernetx.drawing.util import get_set_layering, inflate_kwargs
 
-NODE_DEFAULT_STYLES = {
-    'fill': 'black',
-    'stroke': 'black',
-    'stroke-width': 0
+converters = {
+    'edgecolor': 'Stroke',
+    'edgecolors': 'Stroke',
+    'facecolor': 'Fill',
+    'facecolors': 'Fill',
+    'color': 'Fill',
+    'colors': 'Fill',
+    'linewidths': 'StrokeWidth',
+    'linewidth': 'StrokeWidth'
 }
+
+def prepare_kwargs(items, kwargs, prefix=''):
+    return {
+        prefix + converters.get(k, k):
+            dict(zip(items, hex_array(v) if 'color' in k else v))
+        for k, v in inflate_kwargs(items, kwargs).items()
+    }
+
+def hex_array(values):
+    return [
+        to_hex(c, keep_alpha=True)
+        for c in to_rgba_array(values)
+    ]
+
+def hnx_kwargs_to_props(H,
+    nodes_kwargs={},
+    edges_kwargs={},
+    node_labels_kwargs={},
+    edge_labels_kwargs={},
+    **kwargs
+):
+    # reproduce default hnx coloring behaviors
+    edges_kwargs = edges_kwargs.copy()
+    edges_kwargs.setdefault('edgecolors', plt.cm.tab10(np.arange(len(H.edges))%10))
+    edges_kwargs.setdefault('facecolors', 'white')
+    
+    # props = kwargs.copy()
+    props = {}
+    props.update(prepare_kwargs(H.nodes, nodes_kwargs, prefix='node'))
+    props.update(prepare_kwargs(H.nodes, node_labels_kwargs, prefix='nodeLabel'))
+    props.update(prepare_kwargs(H.edges, edges_kwargs, prefix='edge'))
+    props.update(prepare_kwargs(H.edges, edge_labels_kwargs, prefix='edgeLabel'))
+    
+    # if not otherwise specified, set the edge label color
+    # to be the same as the edge color
+    props.setdefault('edgeLabelColor', props['edgeStroke'])
+    
+    return props
 
 @widgets.register
 class HypernetxWidget(ReactJupyterWidget):
@@ -39,12 +83,7 @@ class HypernetxWidget(ReactJupyterWidget):
                 'elements': [
                     {
                         'uid': uid,
-                        'value': get_property(uid, node_size, 1),
-                        'style': {
-                            k: get_property(uid, node_styles.get(k), v)
-                            for k, v in NODE_DEFAULT_STYLES.items()
-                            if k in node_styles
-                        }
+                        'value': get_property(uid, node_size, 1)
                     }
                     for uid in entity.uid
                 ]
@@ -57,27 +96,18 @@ class HypernetxWidget(ReactJupyterWidget):
             for i, entity in enumerate(self.H)
         }
 
-        def edge_color(i):
-            return to_hex(plt.cm.tab10(i%10)) if with_color else 'black'
-
         # js friendly representation of the hypergraph
         edges = [
             {
                 'uid': list(entity.uid),
                 'elements': [nodes_dict[v] for v in entity.elements],
-                'level': levels[entity.uid],
-                'style': {
-                    'stroke-width': len(entity.elements)**.5,
-                    'stroke': edge_color(i),
-                    'fill': edge_color(i),
-                    'fill-opacity': .1
-                }
+                'level': levels[entity.uid]
             }
             for i, entity in enumerate(self.H.edges())
         ]
-        
+
         super().__init__(
             nodes=nodes,
             edges=edges,
-            **kwargs
+            **hnx_kwargs_to_props(H, **kwargs)
         )

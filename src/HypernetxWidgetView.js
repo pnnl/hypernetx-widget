@@ -7,7 +7,23 @@ import {select} from 'd3-selection'
 import {forceSimulation, forceLink, forceManyBody, forceCenter, forceCollide} from 'd3-force'
 import {polygonHull} from 'd3-polygon'
 
-const Nodes = ({internals, simulation, onClickNodes=Object}) =>
+const styleEncodings = {
+  Stroke: 'stroke',
+  StrokeWidth: 'stroke-width',
+  Fill: 'fill'
+}
+
+const encodeProps = (selection, props) => {
+  Object.entries(props).forEach(([k, encoding]) => {
+    const style = styleEncodings[k.replace(/edge|node|edgeLabel|nodeLabel/, '')]
+    if (style && encoding) {
+      selection.attr(style, d => encoding[d.data.uid]);
+    }
+  })
+  
+}
+
+const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill}) =>
   <g ref={ele => {
     function dragstarted(event) {
       if (!event.active) simulation.alphaTarget(0.3).restart();
@@ -45,9 +61,11 @@ const Nodes = ({internals, simulation, onClickNodes=Object}) =>
           .attr('cy', d => d.y)
           .attr('r', d => d.r);
 
-    Object.keys(internals[0].data.elements[0].style).forEach(k =>
-      circles.attr(k, d => d.data.style[k])
-    )
+    // Object.keys(internals[0].data.elements[0].style).forEach(k =>
+    //   circles.attr(k, d => d.data.style[k])
+    // )
+    encodeProps(circles, {nodeFill});
+
 
     simulation.on('tick.nodes', d => {
       groups.attr('transform', d => `translate(${d.x},${d.y})`);
@@ -70,9 +88,10 @@ const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24, onClickEdges=Ob
             .attr('stroke', 'black')
             .attr('fill', 'none');
 
-    Object.keys(edges[0].style).forEach(k =>
-      hulls.attr(k, d => d.style[k])
-    );
+
+    // Object.keys(edges[0].style).forEach(k =>
+    //   hulls.attr(k, d => d.style[k])
+    // );
 
     simulation.on('tick.hulls', d =>
       hulls
@@ -95,7 +114,6 @@ const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24, onClickEdges=Ob
         })
     );
   }}/>
-
 
 const DebugLinks = ({links, simulation}) =>
   <g ref={ele => {
