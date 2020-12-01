@@ -15,11 +15,11 @@ const styleEncodings = {
   Fill: 'fill'
 }
 
-const encodeProps = (selection, props) => {
+const encodeProps = (selection, key, props) => {
   Object.entries(props).forEach(([k, encoding]) => {
     const style = styleEncodings[k.replace(/edge|node|edgeLabel|nodeLabel/, '')]
     if (style && encoding) {
-      selection.attr(style, d => encoding[d.data.uid]);
+      selection.attr(style, d => encoding[key(d)]);
     }
   })
   
@@ -71,20 +71,15 @@ const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill}) =>
           .classed('internal', d => d.height > 0)
           .attr('cx', d => d.height === 0 ? d.x : 0)
           .attr('cy', d => d.height === 0 ? d.y : 0)
-          .attr('r', d => d.r);
-
-    // Object.keys(internals[0].data.elements[0].style).forEach(k =>
-    //   circles.attr(k, d => d.data.style[k])
-    // )
-    encodeProps(circles, {nodeFill});
-
+          .attr('r', d => d.r)
+          .call(encodeProps, d => d.data.uid, {nodeFill});
 
     simulation.on('tick.nodes', d => {
       groups.attr('transform', d => `translate(${d.x},${d.y})`);
     });
   }}/>
 
-const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24, onClickEdges=Object}) =>
+const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24, edgeStroke, edgeStrokeWidth, edgeFill, onClickEdges=Object}) =>
   <g ref={ele => {
     const controlPoints = range(nControlPoints)
       .map(i => {
@@ -98,12 +93,8 @@ const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24, onClickEdges=Ob
           .join('path')
             .on('click', onClickEdges)
             .attr('stroke', 'black')
-            .attr('fill', 'none');
-
-
-    // Object.keys(edges[0].style).forEach(k =>
-    //   hulls.attr(k, d => d.style[k])
-    // );
+            .attr('fill', 'none')
+            .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth, edgeFill});
 
     simulation.on('tick.hulls', d =>
       hulls
