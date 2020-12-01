@@ -40,17 +40,13 @@ const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill}) =>
     }
     
     function dragended(event) {
-      // if (!event.active) simulation.alphaTarget(0);
-      // event.subject.fx = null;
-      // event.subject.fy = null;
+      if (!event.active) simulation.alphaTarget(0);
     }
 
     function unfix(event, d) {
       select(this).classed('fixed', false);
       d.fx = null;
       d.fy = null;
-
-      if (!event.active) simulation.alphaTarget(0);
     }
 
     const groups = select(ele)
