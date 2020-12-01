@@ -136,11 +136,6 @@ const DebugLinks = ({links, simulation}) =>
 
   }}/>
 
-
-// const HypernetxWidgetWrapper = ({internals, edges, links, simulation, debug}) =>
-
-// const compute
-
 export const HypernetxWidgetView = ({nodes, edges, width=800, height=600, debug, ...props}) => {
   const derivedProps = useMemo(
     () => {
@@ -207,13 +202,7 @@ export const HypernetxWidgetView = ({nodes, edges, width=800, height=600, debug,
 export default HypernetxWidgetView
 
 // todo:
-//   node, edge styling (color, size/thickness)
 //   labels, tooltips (data)
-//   make consistent with hnx.draw()
-//   interaction: tooltips, dragging, selection
 //   move drag handling to individual nodes
 //   change DOM order of super-node groups
-//   CSS styling
-//   add styling for nodes and edges
 //   convex hull test to decollide nodes and hulls that shouldn't intersect
-//   pinning
