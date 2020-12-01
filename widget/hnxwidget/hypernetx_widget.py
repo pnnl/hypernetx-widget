@@ -42,7 +42,7 @@ def hnx_kwargs_to_props(H,
     # reproduce default hnx coloring behaviors
     edges_kwargs = edges_kwargs.copy()
     edges_kwargs.setdefault('edgecolors', plt.cm.tab10(np.arange(len(H.edges))%10))
-    edges_kwargs.setdefault('facecolors', 'white')
+    edges_kwargs.setdefault('linewidths', 2)
     
     # props = kwargs.copy()
     props = {}
