@@ -7,3 +7,19 @@
 .hnx-widget-view .nodes circle.internal {
 	fill-opacity: 0;
 }
+
+.hnx-widget-view .nodes circle:hover {
+	stroke: black;
+	stroke-width: 2;
+	fill: white;
+}
+
+.hnx-widget-view .edges path {
+	fill: white;
+	fill-opacity: 0;
+}
+
+.hnx-widget-view .edges path:hover {
+	stroke-dasharray: 6,3;
+
+}

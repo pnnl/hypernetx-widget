@@ -76,7 +76,7 @@ const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill}) =>
   }}/>
 
 const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24, edgeStroke, edgeStrokeWidth, edgeFill, onClickEdges=Object}) =>
-  <g ref={ele => {
+  <g className='edges' ref={ele => {
     const controlPoints = range(nControlPoints)
       .map(i => {
         const theta = 2*Math.PI*i/nControlPoints;
