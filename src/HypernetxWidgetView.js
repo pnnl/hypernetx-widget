@@ -145,6 +145,15 @@ export const HypernetxWidgetView = ({nodes, edges, width=800, height=600, debug,
         ...rest
       }));
 
+      // sort hyper edges
+      // edges that are enclosed are drawn last
+      // when there is a tie, the smaller edge is drawn last
+      edges.sort((a, b) => 
+        a.level === b.level
+          ? b.elements.length - a.elements.length
+          : b.level - a.level
+      )
+
       //
 
       const radius = d => Math.sqrt(d.value/Math.PI);
