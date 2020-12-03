@@ -186,10 +186,17 @@ export const HypernetxWidgetView = ({nodes, edges, width=800, height=600, debug,
         )
       );
 
+      function boundNode(d) {
+        const {r=0} = d;
+        d.x = Math.max(r, Math.min(width - r, d.x));
+        d.y = Math.max(r, Math.min(height - r, d.y));
+      }
+
       let simulation = forceSimulation([...tree.children, ...edges])
         .force('charge', forceManyBody().strength(-150).distanceMax(300))
         .force('link', forceLink(links).distance(30))
         .force('center', forceCenter(width/2, height/2))
+        .force('bound', () => simulation.nodes().forEach(boundNode))
         .force('collide', forceCollide().radius(d => 2*d.r || 0));
 
       return {links, edges, internals, simulation};
