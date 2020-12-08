@@ -1,0 +1,61 @@
+.tableCont{
+  width: 490px;
+  height: 300px;
+  overflow-y: auto;
+}
+
+
+.hoverShow{
+  visibility: hidden;
+}
+
+.listitem:hover .hoverShow{
+  visibility: visible;
+}
+
+.show {
+  visibility: visible;
+}
+
+.hbarCont {
+  border-width: 0.1mm;
+  border-style: solid;
+  border-color: black;
+  width:30px;
+  height:10px;
+  margin-right: 5px;
+  display: inline-block;
+}
+
+.hbar{
+  min-width: 1px;
+  height: 10px;
+  background-color: gray;
+}
+
+.barChart {
+  display: inline-block;
+  border-width: 0.1mm;
+  border-style: solid;
+  border-color: white;
+  background-color: #42a5f5;
+  width: 9px;
+  max-height: inherit;
+  min-height: 1px;
+
+}
+
+.popover {
+  position: absolute;
+  z-index: 3;
+  top: 180px;
+  right:200px;
+}
+
+.cover {
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+}
