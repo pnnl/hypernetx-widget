@@ -9,7 +9,6 @@ export default {
   title: 'HNX Widget SVG/Basics',
 };
 
-
 export const Default = () =>
   <HypernetxWidget {...props} />
 
