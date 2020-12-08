@@ -132,7 +132,7 @@ const DebugLinks = ({links, simulation}) =>
 
   }}/>
 
-export const HypernetxWidgetView = ({nodes, edges, width=800, height=600, debug, ...props}) => {
+export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, debug, ...props}) => {
   const derivedProps = useMemo(
     () => {
       // construct a simple hierarchy out of the nodes
