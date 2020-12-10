@@ -25,8 +25,7 @@ const encodeProps = (selection, key, props) => {
   
 }
 
-const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill}) =>
-  <g className='nodes' ref={ele => {
+const forceDragBehavior = (selection, simulation) => {
     function dragstarted(event) {
       if (!event.active) simulation.alphaTarget(0.3).restart();
       event.subject.fx = event.subject.x;
@@ -49,16 +48,23 @@ const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill}) =>
       d.fy = null;
     }
 
+  selection
+    .on('dblclick', unfix)
+    .call(drag()
+      .on('start', dragstarted)
+      .on('drag', dragged)
+      .on('end', dragended)
+    );
+}
+
+const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill}) =>
+  <g className='nodes' ref={ele => {
+
     const groups = select(ele)
       .selectAll('g')
         .data(internals)
           .join('g')
-            .on('dblclick', unfix)
-            .call(drag()
-              .on('start', dragstarted)
-              .on('drag', dragged)
-              .on('end', dragended)
-            );
+            .call(forceDragBehavior, simulation);
 
     const circles = groups.selectAll('circle')
       .data(d => d.descendants())
@@ -87,6 +93,7 @@ const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24, edgeStroke, edg
       .selectAll('path')
         .data(edges)
           .join('path')
+            .call(forceDragBehavior, simulation)
             .on('click', onClickEdges)
             .attr('stroke', 'black')
             .attr('fill', 'none')
