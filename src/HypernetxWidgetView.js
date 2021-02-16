@@ -22,23 +22,25 @@ const encodeProps = (selection, key, props) => {
       selection.attr(style, d => encoding[key(d)]);
     }
   })
-  
+
+
 }
 
-const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill}) =>
+const Nodes = ({internals, simulation, onClickNodes=Object, nodeStroke, nodeStrokeWidth, nodeFill, selectNodes }) =>
+
   <g className='nodes' ref={ele => {
     function dragstarted(event) {
       if (!event.active) simulation.alphaTarget(0.3).restart();
       event.subject.fx = event.subject.x;
       event.subject.fy = event.subject.y;
     }
-    
+
     function dragged(event) {
       select(this).classed('fixed', true);
       event.subject.fx = event.x;
       event.subject.fy = event.y;
     }
-    
+
     function dragended(event) {
       if (!event.active) simulation.alphaTarget(0);
     }
@@ -63,16 +65,18 @@ const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill}) =>
     const circles = groups.selectAll('circle')
       .data(d => d.descendants())
         .join('circle')
-          .on('click', onClickNodes)
+          .on('click', (datum, element) => selectNodes(element.data))
           .classed('internal', d => d.height > 0)
           .attr('cx', d => d.height === 0 ? d.x : 0)
           .attr('cy', d => d.height === 0 ? d.y : 0)
           .attr('r', d => d.r)
-          .call(encodeProps, d => d.data.uid, {nodeFill});
+          // .style("stroke-dasharray", ("3, 3"))
+          .call(encodeProps, d => d.data.uid, {nodeStroke, nodeStrokeWidth, nodeFill})
 
     simulation.on('tick.nodes', d => {
       groups.attr('transform', d => `translate(${d.x},${d.y})`);
     });
+
   }}/>
 
 const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24, edgeStroke, edgeStrokeWidth, edgeFill, onClickEdges=Object}) =>
@@ -88,7 +92,7 @@ const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24, edgeStroke, edg
         .data(edges)
           .join('path')
             .on('click', onClickEdges)
-            .attr('stroke', 'black')
+            // .attr('stroke', 'black')
             .attr('fill', 'none')
             .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth, edgeFill});
 
@@ -132,7 +136,8 @@ const DebugLinks = ({links, simulation}) =>
 
   }}/>
 
-export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, debug, ...props}) => {
+export const HypernetxWidgetView = ({sendNodeSelect, nodes, edges, width=600, height=600, debug, ...props}) => {
+  // console.log({});
   const derivedProps = useMemo(
     () => {
       // construct a simple hierarchy out of the nodes
@@ -148,7 +153,7 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, debug,
       // sort hyper edges
       // edges that are enclosed are drawn last
       // when there is a tie, the smaller edge is drawn last
-      edges.sort((a, b) => 
+      edges.sort((a, b) =>
         a.level === b.level
           ? b.elements.length - a.elements.length
           : b.level - a.level
@@ -178,13 +183,14 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, debug,
         .filter(d => d.height > 0 && d.depth > 0);
 
       // setup the force simulation
-      
+
       const links = [];
       edges.forEach(source =>
         source.elements.forEach(target =>
           links.push({source, target})
         )
       );
+
 
       function boundNode(d) {
         const {r=0} = d;
@@ -204,9 +210,13 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, debug,
     [nodes, edges, width, height]
   );
 
+  const getNodeSelect = (x) => {
+      sendNodeSelect(x);
+  }
+
   return <svg style={{width, height}} className='hnx-widget-view'>
     <HyperEdges {...derivedProps}  {...props} />
-    <Nodes {...derivedProps} {...props} />
+    <Nodes {...derivedProps} {...props} selectNodes={getNodeSelect}/>
     { debug && <DebugLinks {...derivedProps} {...props} /> }
   </svg>
 }

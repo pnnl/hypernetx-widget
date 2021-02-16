@@ -12,39 +12,49 @@ import Checkbox from '@material-ui/core/Checkbox';
 import CheckboxEl from './checkboxEl.js';
 import ColorButton from './colorButton.js';
 import VisibilityButton from './visibilityButton.js';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import { max } from 'd3-array';
-import { green } from '@material-ui/core/colors';
+import { descendingComparator, getComparator, stableSort } from './functions.js';
 
-import './css/hnxStyle.css';
+const tableStyles = makeStyles((theme) => ({
+  customTable: {
+    "& .MuiTableCell-sizeSmall": {
+      whitespace: "nowrap",
+      padding: "0px 0px 0px 0px",
+      fontSize: 11,
+      fontWeight: 400,
+      margin: "0px",
+      height: 5
 
-function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
+    },
+    "& .MuiTableCell-paddingNone": {
+      padding: "0px 0px 0px 7px",
+      fontSize: 11,
+      fontWeight: 500,
+      align: "center",
+    },
+    "& .MuiButton-text": {
+      padding: "0px 0px 0px 0px",
 
-function getComparator(order, orderBy) {
-  return order === 'desc'
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-function stableSort(array, comparator) {
-  const stabilizedThis = array.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
-    return a[1] - b[1];
-  });
-  return stabilizedThis.map((el) => el[0]);
-}
-
-
+    },
+    "& .MuiTableSortLabel-icon": {
+      fontSize: "16px",
+      padding: "0px 0px 0px 0px",
+      margin: "0px"
+    }
+  },
+  visuallyHidden: {
+    border: 0,
+    clip: 'rect(0 0 0 0)',
+    height: 1,
+    margin: -1,
+    overflow: 'hidden',
+    padding: 0,
+    position: 'absolute',
+    top: 20,
+    width: 1,
+  },
+}));
 
 function EnhancedTableHead(props) {
   const { datatype, data, classes, onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
@@ -53,18 +63,18 @@ function EnhancedTableHead(props) {
   };
 
   const headCells = [
-    {id: 'uid', label: 'Labels'},
+    {id: 'uid', label: 'Label'},
     {id: 'value', label: datatype === "node" ? "Degree" : "Size"},
     {id: 'visible', label: 'Visibility'},
     {id: 'color', label: 'Color'}
   ];
-
 
   return (
     <TableHead>
       <TableRow>
         <TableCell padding="default">
           <Checkbox
+            size="small"
             defaultChecked
             onChange={onSelectAllClick}
             indeterminate={data.map(x => x.selected).includes(false) && data.map(x => x.selected).includes(true)}
@@ -73,7 +83,6 @@ function EnhancedTableHead(props) {
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
-            align={'center'}
             padding="none"
             sortDirection={orderBy === headCell.id ? order : false}
           >
@@ -108,32 +117,12 @@ EnhancedTableHead.propTypes = {
   rowCount: PropTypes.number.isRequired,
 };
 
-const useStyles = makeStyles((theme) => ({
-  customTable: {
-    "& .MuiTableCell-sizeSmall": {
-      padding: "0px 0px 0px 3px"
-    },
-    "& .MuiTableCell-paddingNone": {
-      padding: "5px 5px 0px 20px"
-    }
-  },
-  visuallyHidden: {
-    border: 0,
-    clip: 'rect(0 0 0 0)',
-    height: 1,
-    margin: -1,
-    overflow: 'hidden',
-    padding: 0,
-    position: 'absolute',
-    top: 20,
-    width: 1,
-  },
 
-
-}));
 
 const LoadTable = ({ type, data, sendColorToMain, sendVisibilityToMain, sendSelectedToMain, sendSelectAll }) => {
-  const classes = useStyles();
+  const classes = tableStyles();
+
+  const customColumnStyle = { width: 8, backgroundColor: 'yellow' };
   const calcBar = i => {
     const values = data.map(x => x.value);
     return String(100 * (i/max(values)))+"%";
@@ -173,9 +162,9 @@ const LoadTable = ({ type, data, sendColorToMain, sendVisibilityToMain, sendSele
     sendSelectedToMain(type, label, check);
   }
 
-  return <div style={{ padding: "5px" }}>
-  <TableContainer component={Paper} style={{width: "490px", height:"260px", border: "1px solid lightgray"}}>
-    <Table classes={{root: classes.customTable}} stickyHeader aria-label="sticky table" size="small">
+  return <div style={{ width: "100%", margin: "0px", padding:"0px"}}>
+  <TableContainer component={Paper} style={{ maxWidth: "100%", height:"200px", border: "1px solid lightgray"}}>
+    <Table classes={{root: classes.customTable}} style={{tableLayout: "auto"}} stickyHeader aria-label="sticky table" size="small">
       <EnhancedTableHead
         datatype={type}
         data={data}
@@ -189,23 +178,28 @@ const LoadTable = ({ type, data, sendColorToMain, sendVisibilityToMain, sendSele
       <TableBody>
         {stableSort(data, getComparator(order, orderBy))
           .map((x, i) => {
+
             return(
-              <TableRow key={i} className="listitem">
+              <TableRow key={i}>
                 <TableCell padding="checkbox">
                   <CheckboxEl label={x.uid} checkState={x.selected} sendCheck={getCheck}/>
                 </TableCell>
-                <TableCell align="center">
-                  <div className="hbarCont">
-                    <div className="hbar" style={{ width: calcBar(x.value) }}/>
-                  </div>
-                  <div style={{ display: "inline-block" }}>{x.uid}</div>
+                <TableCell align="center" >
+                    <div className="hbarCont">
+                      <div className="hbar" style={{ width: calcBar(x.value) }}/>
+                    </div>
+                    <div style={{ display: "inline-block"}}>{x.uid}</div>
                 </TableCell>
                 <TableCell align="center">{x.value}</TableCell>
                 <TableCell align="center">
                 <VisibilityButton label={x.uid} visibility={x.visible}
                 sendVisibility={getVisibility}/>
+
                 </TableCell>
-                <TableCell align="center"><ColorButton label={x.uid} color={x.color} sendColor={getColor}/></TableCell>
+                <TableCell align="left">
+                <ColorButton label={x.uid} color={x.color} sendColor={getColor}/>
+                </TableCell>
+
               </TableRow>
             )
           })

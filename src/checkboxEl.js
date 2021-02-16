@@ -11,7 +11,7 @@ const CheckboxEl = ({ label, checkState, sendCheck }) => {
 
   return (
     <div>
-      <Checkbox checked={checkState} onChange={(event) => handleCheck(event.currentTarget.checked)}/>
+      <Checkbox size="small" checked={checkState} onChange={(event) => handleCheck(event.currentTarget.checked)}/>
     </div>
   )
 }

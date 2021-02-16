@@ -1,6 +1,6 @@
 import React from 'react';
-import Main from '../main.js';
-import {HypernetxWidget} from '..'
+import Widget from '../widget.js';
+import {HnxWidget} from '..'
 import LoadTable from '../loadTable.js';
 import ColorButton from '../colorButton.js';
 import props from './data/props.json'
@@ -11,7 +11,7 @@ export default {
 };
 
 export const Default = () =>
-  <HypernetxWidget {...props} />
+  <HnxWidget {...props} />
 
 export const Debug = () =>
-  <HypernetxWidget debug {...props} />
+  <HnxWidget debug {...props} />

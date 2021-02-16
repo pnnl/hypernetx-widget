@@ -49,13 +49,18 @@
   "dependencies": {
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
+    "@material-ui/lab": "^4.0.0-alpha.57",
     "d3-drag": "^2.0.0",
     "d3-force": "^2.1.1",
     "d3-hierarchy": "^2.0.0",
     "d3-polygon": "^2.0.0",
+    "d3-scale": "^3.2.3",
+    "d3-scale-chromatic": "^2.0.0",
     "d3-selection": "^2.0.0",
     "imp-redux": "^1.0.1",
     "react-color": "^2.19.3",
-    "react-window": "^1.8.6"
+    "react-colorscales": "^0.7.3",
+    "react-window": "^1.8.6",
+    "victory": "^35.4.3"
   }
 }

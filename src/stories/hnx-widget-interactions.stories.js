@@ -1,6 +1,7 @@
 import React from 'react';
 
-import {HypernetxWidget} from '..'
+// import {HypernetxWidget} from '..'
+import {HypernetxWidgetView} from '../HypernetxWidgetView';
 
 import props from './data/props.json'
 
@@ -9,8 +10,7 @@ export default {
 };
 
 export const LogNodeClick = () =>
-  <HypernetxWidget {...props} onClickNodes={console.log}/>
+  <HypernetxWidgetView {...props} onClickNodes={console.log}/>
 
 export const LogEdgeClick = () =>
-  <HypernetxWidget {...props} onClickEdges={console.log}/>
-
+  <HypernetxWidgetView {...props} onClickEdges={console.log}/>
