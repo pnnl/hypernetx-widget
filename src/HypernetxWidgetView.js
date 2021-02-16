@@ -23,12 +23,9 @@ const encodeProps = (selection, key, props) => {
     }
   })
 
-
 }
 
-const Nodes = ({internals, simulation, onClickNodes=Object, nodeStroke, nodeStrokeWidth, nodeFill, selectNodes }) =>
-
-  <g className='nodes' ref={ele => {
+const forceDragBehavior = (selection, simulation) => {
     function dragstarted(event) {
       if (!event.active) simulation.alphaTarget(0.3).restart();
       event.subject.fx = event.subject.x;
@@ -51,32 +48,37 @@ const Nodes = ({internals, simulation, onClickNodes=Object, nodeStroke, nodeStro
       d.fy = null;
     }
 
+  selection
+    .on('dblclick', unfix)
+    .call(drag()
+      .on('start', dragstarted)
+      .on('drag', dragged)
+      .on('end', dragended)
+    );
+}
+
+const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill}) =>
+  <g className='nodes' ref={ele => {
+
     const groups = select(ele)
       .selectAll('g')
         .data(internals)
           .join('g')
-            .on('dblclick', unfix)
-            .call(drag()
-              .on('start', dragstarted)
-              .on('drag', dragged)
-              .on('end', dragended)
-            );
+            .call(forceDragBehavior, simulation);
 
     const circles = groups.selectAll('circle')
       .data(d => d.descendants())
         .join('circle')
-          .on('click', (datum, element) => selectNodes(element.data))
+          .on('click', onClickNodes)
           .classed('internal', d => d.height > 0)
           .attr('cx', d => d.height === 0 ? d.x : 0)
           .attr('cy', d => d.height === 0 ? d.y : 0)
           .attr('r', d => d.r)
-          // .style("stroke-dasharray", ("3, 3"))
-          .call(encodeProps, d => d.data.uid, {nodeStroke, nodeStrokeWidth, nodeFill})
+          .call(encodeProps, d => d.data.uid, {nodeFill});
 
     simulation.on('tick.nodes', d => {
       groups.attr('transform', d => `translate(${d.x},${d.y})`);
     });
-
   }}/>
 
 const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24, edgeStroke, edgeStrokeWidth, edgeFill, onClickEdges=Object}) =>
@@ -91,8 +93,9 @@ const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24, edgeStroke, edg
       .selectAll('path')
         .data(edges)
           .join('path')
+            .call(forceDragBehavior, simulation)
             .on('click', onClickEdges)
-            // .attr('stroke', 'black')
+            .attr('stroke', 'black')
             .attr('fill', 'none')
             .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth, edgeFill});
 
@@ -136,8 +139,7 @@ const DebugLinks = ({links, simulation}) =>
 
   }}/>
 
-export const HypernetxWidgetView = ({sendNodeSelect, nodes, edges, width=600, height=600, debug, ...props}) => {
-  // console.log({});
+export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, debug, ...props}) => {
   const derivedProps = useMemo(
     () => {
       // construct a simple hierarchy out of the nodes
@@ -191,7 +193,6 @@ export const HypernetxWidgetView = ({sendNodeSelect, nodes, edges, width=600, he
         )
       );
 
-
       function boundNode(d) {
         const {r=0} = d;
         d.x = Math.max(r, Math.min(width - r, d.x));
@@ -210,13 +211,9 @@ export const HypernetxWidgetView = ({sendNodeSelect, nodes, edges, width=600, he
     [nodes, edges, width, height]
   );
 
-  const getNodeSelect = (x) => {
-      sendNodeSelect(x);
-  }
-
   return <svg style={{width, height}} className='hnx-widget-view'>
     <HyperEdges {...derivedProps}  {...props} />
-    <Nodes {...derivedProps} {...props} selectNodes={getNodeSelect}/>
+    <Nodes {...derivedProps} {...props} />
     { debug && <DebugLinks {...derivedProps} {...props} /> }
   </svg>
 }
