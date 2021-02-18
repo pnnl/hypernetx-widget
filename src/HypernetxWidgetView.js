@@ -26,6 +26,8 @@ const encodeProps = (selection, key, props) => {
 }
 
 const forceDragBehavior = (selection, simulation) => {
+    const [width, height] = simulation.size;
+
     function dragstarted(event) {
       if (!event.active) simulation.alphaTarget(0.3).restart();
       event.subject.fx = event.subject.x;
@@ -34,8 +36,10 @@ const forceDragBehavior = (selection, simulation) => {
 
     function dragged(event) {
       select(this).classed('fixed', true);
-      event.subject.fx = event.x;
-      event.subject.fy = event.y;
+
+      const {x, y} = event;
+      event.subject.fx = Math.min(width, (Math.max(x, 0)));
+      event.subject.fy = Math.min(width, (Math.max(y, 0)));
     }
 
     function dragended(event) {
@@ -213,6 +217,9 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, debug,
         .force('center', forceCenter(width/2, height/2))
         .force('collide', forceCollide().radius(d => 2*d.r || 0))
         .force('bound', () => simulation.nodes().forEach(boundNode));
+
+
+      simulation.size = [width, height];
 
       return {links, edges, internals, simulation};
     },
