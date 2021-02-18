@@ -14,6 +14,11 @@
 	fill: white;
 }
 
+.hnx-widget-view .nodes text {
+	fill: darkgray;
+	alignment-baseline: middle;
+}
+
 .hnx-widget-view .edges path {
 	fill: white;
 	fill-opacity: 0;

@@ -57,7 +57,7 @@ const forceDragBehavior = (selection, simulation) => {
     );
 }
 
-const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill}) =>
+const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill, nodeLabels={}}) =>
   <g className='nodes' ref={ele => {
 
     const groups = select(ele)
@@ -75,6 +75,14 @@ const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill}) =>
           .attr('cy', d => d.height === 0 ? d.y : 0)
           .attr('r', d => d.r)
           .call(encodeProps, d => d.data.uid, {nodeFill});
+
+    const text = groups.selectAll('text')
+      .data(d => d.leaves())
+        .join('text')
+        .attr('x', d => d.x)
+        .attr('y', d => d.y)
+        .attr('dx', d => d.r + 7)
+        .text(d => d.data.uid in nodeLabels ? nodeLabels[d.data.uid] : d.data.uid);
 
     simulation.on('tick.nodes', d => {
       groups.attr('transform', d => `translate(${d.x},${d.y})`);
