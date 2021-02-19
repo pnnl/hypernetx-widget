@@ -117,9 +117,9 @@ export const accordianStyles = makeStyles((theme) => ({
 
 }));
 
-export const allPalettes = ["Blues", "Greens", "Greys", "Oranges", "Purples", "Reds", "Blue-Green", "Blue-Purple", "Green-Blue",
-"Orange-Red", "Purple-Blue-Green", "Purple-Blue", "Purple-Red", "Red-Purple", "Yellow-Green-Blue", "Yellow-Green", "Yellow-Orange-Brown", "Yellow-Orange-Red",
-"Brown-BlueGreen", "PurpleRed-Green", "Pink-YellowGreen", "Purple-Orange", "Red-Blue", "Red-Grey", "Red-Yellow-Blue", "Spectral",
+export const allPalettes = ["Blues", "Greens", "Greys", "Oranges", "Purples", "Reds", "Bu-Gn", "Bu-Pu", "Gn-Bu",
+"Or-Rd", "Pu-Bu-Gn", "Pu-Bu", "Pu-Rd", "Rd-Pu", "Yl-Gn-Bu", "Yl-Gn", "Yl-Or-Bn", "Yl-Or-Rd",
+"Bn-BuGn", "PuRd-Gn", "Pink-YlGn", "Pu-Or", "Rd-Bu", "Rd-Grey", "Rd-Yl-Bu", "Spectral",
 "Turbo", "Viridis", "Inferno", "Plasma", "Cividis", "Warm", "Cool", "Rainbow", "Sinebow"];
 
 export const getScheme = color => {
@@ -141,61 +141,61 @@ export const getScheme = color => {
   else if(color === "Reds"){
     return scale.interpolateReds
   }
-  else if(color === "Blue-Green"){
+  else if(color === "Bu-Gn"){
     return scale.interpolateBuGn
   }
-  else if(color === "Blue-Purple"){
+  else if(color === "Bu-Pu"){
     return scale.interpolateBuPu
   }
-  else if(color === "Green-Blue"){
+  else if(color === "Gn-Bu"){
     return scale.interpolateGnBu
   }
-  else if(color === "Orange-Red"){
+  else if(color === "Or-Rd"){
     return scale.interpolateOrRd
   }
-  else if(color === "Purple-Blue-Green"){
+  else if(color === "Pu-Bu-Gn"){
     return scale.interpolatePuBuGn
   }
-  else if(color === "Purple-Blue"){
+  else if(color === "Pu-Bu"){
     return scale.interpolatePuBu
   }
-  else if(color === "Purple-Red"){
+  else if(color === "Pu-Rd"){
     return scale.interpolatePuRd
   }
-  else if(color === "Red-Purple"){
+  else if(color === "Rd-Pu"){
     return scale.interpolateRdPu
   }
-  else if(color === "Yellow-Green-Blue"){
+  else if(color === "Yl-Gn-Bu"){
     return scale.interpolateYlGnBu
   }
-  else if(color === "Yellow-Green"){
+  else if(color === "Yl-Gn"){
     return scale.interpolateYlGn
   }
-  else if(color === "Yellow-Orange-Brown"){
+  else if(color === "Yl-Or-Bn"){
     return scale.interpolateYlOrBr
   }
-  else if(color === "Yellow-Orange-Red"){
+  else if(color === "Yl-Or-Rd"){
     return scale.interpolateYlOrRd
   }
-  else if(color === "Brown-BlueGreen"){
+  else if(color === "Bn-BuGn"){
     return scale.interpolateBrBG
   }
-  else if(color === "PurpleRed-Green"){
+  else if(color === "PuRd-Gn"){
     return scale.interpolatePRGn
   }
-  else if(color === "Pink-YellowGreen"){
+  else if(color === "Pink-YlGn"){
     return scale.interpolatePiYG
   }
-  else if(color === "Purple-Orange"){
+  else if(color === "Pu-Or"){
     return scale.interpolatePuOr
   }
-  else if(color === "Red-Blue"){
+  else if(color === "Rd-Bu"){
     return scale.interpolateRdBu
   }
-  else if(color === "Red-Grey"){
+  else if(color === "Rd-Grey"){
     return scale.interpolateRdGy
   }
-  else if(color === "Red-Yellow-Blue"){
+  else if(color === "Rd-Yl-Bu"){
     return scale.interpolateRdYlBu
   }
   else if(color === "Spectral"){

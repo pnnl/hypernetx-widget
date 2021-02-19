@@ -26,13 +26,22 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(2),
   },
   customSelect: {
+    // paddingLeft: "5px",
+    paddingRight:"5px",
     "& .MuiSelect-root": {
       fontSize: "15px",
-      width: 180
+      width: 100,
+
     },
   },
   menuItem: {
       fontSize: "14px",
+  },
+  colorItem: {
+    "& .MuiSelect-root": {
+      fontSize: "15px",
+      width: 270
+    },
   }
 }));
 
@@ -136,7 +145,7 @@ const ColorPalette = ({nodeData, edgeData, sendNodePalette, sendEdgePalette, cur
   }
 
   // getColorArray("Blues");
-  return (
+  return <div style={{width:"100%"}}>
     <form style={{padding: "5px"}}>
         <FormControl classes={{root: classes.customSelect}}>
           <InputLabel>Data</InputLabel>
@@ -154,25 +163,28 @@ const ColorPalette = ({nodeData, edgeData, sendNodePalette, sendEdgePalette, cur
           </Select>
         </FormControl>
 
-        <FormControl classes={{root: classes.customSelect}}>
+        <FormControl classes={{root: classes.colorItem}}>
           <InputLabel>Color palette</InputLabel>
           <Select
             value={palette}
             onChange={handlePalette}
           >
             <MenuItem classes={{root: classes.menuItem}} value={"black"} disabled>Black (default)</MenuItem>
-            {allPalettes.map(c => <MenuItem classes={{root: classes.menuItem}} key={c} value={c}><Colorscale
-            colorscale={getColorArray(c)} label={c} onClick={() => {}}
-            /></MenuItem>)}
+            {allPalettes.map(c => <MenuItem classes={{root: classes.menuItem}} key={c} value={c}>
+                <Colorscale onClick={() => {}}
+                  colorscale={getColorArray(c)} maxWidth={80} label={c}
+                />
+
+              </MenuItem>)}
           </Select>
         </FormControl>
 
       <div className="colorButtonCont">
-      <Button onClick={handleSubmit} type="button" variant="outlined" color="primary">Update</Button>
-      <Button onClick={handleReset} type="button" variant="outlined" color="primary">Reset</Button>
+        <Button onClick={handleSubmit} type="button" variant="outlined" color="primary">Update</Button>
+        <Button onClick={handleReset} type="button" variant="outlined" color="primary">Reset</Button>
       </div>
     </form>
-)
+    </div>
 
 
 }

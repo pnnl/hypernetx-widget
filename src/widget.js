@@ -293,8 +293,6 @@ const Widget = ({ nodes, edges, debug }) => {
     const nodeClickedMap = new Map();
 
     Object.entries(nodeDegList).map((uidDeg, i) => {
-      // console.log(uidDeg[0]);
-      // console.log(x);
 
       if(uidDeg[0] === x.uid){
         nodeClickedMap.set(uidDeg[0], true);
@@ -303,11 +301,6 @@ const Widget = ({ nodes, edges, debug }) => {
         nodeClickedMap.set(uidDeg[0], false);
       }
     })
-    // console.log(nodeClickedMap);
-    // setNodeSelected({...nodeSelected, [x.uid]:true});
-    // nodesData.map(x => nodeClickedMap.set(x.uid, false));
-    // setNodeSelected({})
-    // setNodeSelected(setNodeVisible({...nodeVisible, [uid]:visibility});)
 
   }
 
@@ -337,7 +330,6 @@ const Widget = ({ nodes, edges, debug }) => {
               />
               <ShowButton type={"node"} sendButton={getButton} currButton={currNodeButton}/>
               <Bars type={"node"} freqData={getValueFreq(nodeDegList)} sendValue={getHoverValue}/>
-
             </div>
 
             </AccordionDetails>
