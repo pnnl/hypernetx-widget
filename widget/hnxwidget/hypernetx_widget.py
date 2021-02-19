@@ -16,7 +16,8 @@ converters = {
     'color': 'Fill',
     'colors': 'Fill',
     'linewidths': 'StrokeWidth',
-    'linewidth': 'StrokeWidth'
+    'linewidth': 'StrokeWidth',
+    'node_labels': 'nodeLabels'
 }
 
 def prepare_kwargs(items, kwargs, prefix=''):
@@ -24,6 +25,12 @@ def prepare_kwargs(items, kwargs, prefix=''):
         prefix + converters.get(k, k):
             dict(zip(items, hex_array(v) if 'color' in k else v))
         for k, v in inflate_kwargs(items, kwargs).items()
+    }
+
+def rename_kwargs(**kwargs):
+    return {
+        converters.get(k, k): v
+        for k, v in kwargs.items()
     }
 
 def hex_array(values):
@@ -54,8 +61,8 @@ def hnx_kwargs_to_props(H,
     # if not otherwise specified, set the edge label color
     # to be the same as the edge color
     props.setdefault('edgeLabelColor', props['edgeStroke'])
-    
-    return props
+
+    return {**props, **rename_kwargs(**kwargs)}
 
 @widgets.register
 class HypernetxWidget(ReactJupyterWidget):
