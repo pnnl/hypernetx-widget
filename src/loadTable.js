@@ -162,7 +162,7 @@ const LoadTable = ({ type, data, sendColorToMain, sendVisibilityToMain, sendSele
     sendSelectedToMain(type, label, check);
   }
 
-  return <div style={{ width: "100%", margin: "0px", padding:"0px"}}>
+  return <div style={{ margin: "0px", padding:"0px", display: "block", maxWidth:"100%"}}>
   <TableContainer component={Paper} style={{ maxWidth: "100%", height:"200px", border: "1px solid lightgray"}}>
     <Table classes={{root: classes.customTable}} style={{tableLayout: "auto"}} stickyHeader aria-label="sticky table" size="small">
       <EnhancedTableHead

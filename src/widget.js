@@ -305,7 +305,6 @@ const Widget = ({ nodes, edges, debug }) => {
   }
 
   return <div>
-  <Paper>
     <Grid container spacing={1}>
 
     <Grid item xs={12} sm={!navOpen ? 1 : 4}>
@@ -319,7 +318,7 @@ const Widget = ({ nodes, edges, debug }) => {
               <Typography className={classes.heading}>{"Key Statistics - Nodes" + " (" +  String(nodesData.length) + ")"}</Typography>
             </AccordionSummary>
             <AccordionDetails>
-            <div>
+            <div style={{width: "100%"}}>
               <LoadTable
                 type={"node"}
                 data={convertedData(transNodeData)}
@@ -340,7 +339,7 @@ const Widget = ({ nodes, edges, debug }) => {
               <Typography className={classes.heading}>{"Key Statistics - Edges" + " (" +  String(edges.length) + ")"}</Typography>
             </AccordionSummary>
             <AccordionDetails>
-            <div>
+            <div style={{width: "100%"}}>
               <LoadTable
                 type={"edge"}
                 data={convertedData(transEdgeData)}
@@ -374,7 +373,6 @@ const Widget = ({ nodes, edges, debug }) => {
     sendNodeSelect={getClickedNodes}/>
   </Grid>
   </Grid>
-</Paper>
 
 </div>
 
