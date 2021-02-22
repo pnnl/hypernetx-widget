@@ -129,7 +129,7 @@ const forceEdgeDragBehavior = (selection, simulation) => {
     );
 }
 
-const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill, nodeLabels={}}) =>
+const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill, nodeStroke, nodeStrokeWidth, nodeLabels={}}) =>
   <g className='nodes' ref={ele => {
 
     const groups = select(ele)
@@ -146,7 +146,7 @@ const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill, nodeLabels
           .attr('cx', d => d.height === 0 ? d.x : 0)
           .attr('cy', d => d.height === 0 ? d.y : 0)
           .attr('r', d => d.r)
-          .call(encodeProps, d => d.data.uid, {nodeFill});
+          .call(encodeProps, d => d.data.uid, {nodeFill, nodeStroke, nodeStrokeWidth});
 
     const text = groups.selectAll('text')
       .data(d => d.leaves())

@@ -63,7 +63,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [nodeSelected, setNodeSelected] = React.useState(Object.fromEntries(nodeSelectMap));
   const [nodeVisible, setNodeVisible] = React.useState(Object.fromEntries(nodeVisibleMap));
 
-  const [edgeColor, setEdgeColor] = React.useState(Object.fromEntries(edgeColorMap));
+  const [edgeStroke, setEdgeStroke] = React.useState(Object.fromEntries(edgeColorMap));
   const [edgeSelected, setEdgeSelected] = React.useState(Object.fromEntries(edgeSelectMap));
   const [edgeVisible, setEdgeVisible] = React.useState(Object.fromEntries(edgeVisibleMap));
 
@@ -72,7 +72,7 @@ const Widget = ({ nodes, edges, ...props }) => {
       setNodeFill({...nodeFill, [uid]:`rgba(${ color.r }, ${ color.g }, ${ color.b }, ${ color.a })`});
     }
     else{
-      setEdgeColor({...edgeColor, [uid]:`rgba(${ color.r }, ${ color.g }, ${ color.b }, ${ color.a })`});
+      setEdgeStroke({...edgeStroke, [uid]:`rgba(${ color.r }, ${ color.g }, ${ color.b }, ${ color.a })`});
     }
   }
 
@@ -125,9 +125,6 @@ const Widget = ({ nodes, edges, ...props }) => {
           if(uidDeg[1] === v){
             nodesOnBarMap.set(uidDeg[0], true);
           }
-          // else{
-          //   nodesOnBarMap.set(uidDeg[0], false);
-          // }
         })
 
       })
@@ -165,7 +162,7 @@ const Widget = ({ nodes, edges, ...props }) => {
       setNodeFill(value);
     }
     else{
-      setEdgeColor(value);
+      setEdgeStroke(value);
     }
   }
 
@@ -180,8 +177,8 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const [nodeStroke, setNodeStroke] = React.useState(Object.fromEntries(nodeLineColMap));
 
-  const [nodeWidth, setNodeWidth] = React.useState(Object.fromEntries(nodeWidthMap));
-  const [edgeWidth, setEdgeWidth] = React.useState(Object.fromEntries(edgeWidthMap));
+  const [nodeStrokeWidth, setNodeStrokeWidth] = React.useState(Object.fromEntries(nodeWidthMap));
+  const [edgeStrokeWidth, setEdgeStrokeWidth] = React.useState(Object.fromEntries(edgeWidthMap));
   const [currNodeButton, setCurrNodeButton] = React.useState("default");
   const [currEdgeButton, setCurrEdgeButton] = React.useState("default");
 
@@ -207,15 +204,15 @@ const Widget = ({ nodes, edges, ...props }) => {
         }
       })
       if(value === "selected"){
-        setNodeWidth(Object.fromEntries(nodeSelectedBar));
+        setNodeStrokeWidth(Object.fromEntries(nodeSelectedBar));
         setNodeStroke(Object.fromEntries(nodeSelectLine));
       }
       else if(value === "hidden"){
-        setNodeWidth(Object.fromEntries(nodeHiddenBar));
+        setNodeStrokeWidth(Object.fromEntries(nodeHiddenBar));
         setNodeStroke(Object.fromEntries(nodeHiddenLine));
       }
       else{
-        setNodeWidth(Object.fromEntries(nodeWidthMap));
+        setNodeStrokeWidth(Object.fromEntries(nodeWidthMap));
         setNodeStroke(Object.fromEntries(nodeLineColMap));
       }
     }
@@ -234,13 +231,13 @@ const Widget = ({ nodes, edges, ...props }) => {
         }
       })
       if(value === "selected"){
-        setEdgeWidth(Object.fromEntries(edgeSelectedBar));
+        setEdgeStrokeWidth(Object.fromEntries(edgeSelectedBar));
       }
       else if(value === "hidden"){
-        setEdgeWidth(Object.fromEntries(edgeHiddenBar));
+        setEdgeStrokeWidth(Object.fromEntries(edgeHiddenBar));
       }
       else{
-        setEdgeWidth(Object.fromEntries(edgeWidthMap));
+        setEdgeStrokeWidth(Object.fromEntries(edgeWidthMap));
       }
     }
   }
@@ -259,7 +256,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     return {
       uid: x.uid.toString(),
       value: edgeSizeList[x.uid.toString()],
-      color: {"r": getRGB(edgeColor[x.uid.toString()])[0], "g":getRGB(edgeColor[x.uid.toString()])[1], "b":getRGB(edgeColor[x.uid.toString()])[2], "a":getRGB(edgeColor[x.uid.toString()])[3]},
+      color: {"r": getRGB(edgeStroke[x.uid.toString()])[0], "g":getRGB(edgeStroke[x.uid.toString()])[1], "b":getRGB(edgeStroke[x.uid.toString()])[2], "a":getRGB(edgeStroke[x.uid.toString()])[3]},
       selected: edgeSelected[x.uid.toString()],
       visible: edgeVisible[x.uid.toString()]
     }
@@ -277,7 +274,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     setNodeFill(value);
   }
   const getEdgePalette = value => {
-    setEdgeColor(value);
+    setEdgeStroke(value);
   }
   const [colGroup, setColGroup] = React.useState("each");
   const [colPalette, setColPalette] = React.useState("black");
@@ -371,10 +368,8 @@ const Widget = ({ nodes, edges, ...props }) => {
   </Grid>
 
   <Grid item xs={12} sm={!navOpen ? 11 : 8}>
-    <HypernetxWidgetView {...{nodes, edges, nodeFill, nodeStroke}}
-
-      nodeStrokeWidth={nodeWidth} edgeStrokeWidth={edgeWidth}
-      edgeStroke={edgeColor} edgeStrokeWidth={edgeWidth}
+    <HypernetxWidgetView
+      {...{nodes, edges, nodeFill, nodeStroke, nodeStrokeWidth, edgeStrokeWidth, edgeStroke}}
       sendNodeSelect={getClickedNodes}
       />
   </Grid>
