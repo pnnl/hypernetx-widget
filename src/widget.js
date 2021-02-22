@@ -22,7 +22,7 @@ import { getRGB, rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianSt
 
 
 
-const Widget = ({ nodes, edges, debug }) => {
+const Widget = ({ nodes, edges, ...props }) => {
   const classes = accordianStyles();
 
   const nodesData = nodes.map(x => x.elements).flat();
@@ -370,7 +370,9 @@ const Widget = ({ nodes, edges, debug }) => {
 
   <Grid item xs={12} sm={!navOpen ? 11 : 8}>
     <HypernetxWidgetView {...{nodes, edges}} nodeFill={nodeColor} nodeStroke={nodeLineColor} nodeStrokeWidth={nodeWidth} edgeStrokeWidth={edgeWidth} edgeStroke={edgeColor} edgeStrokeWidth={edgeWidth}
-    sendNodeSelect={getClickedNodes}/>
+    sendNodeSelect={getClickedNodes}
+    {...props}
+    />
   </Grid>
   </Grid>
 
