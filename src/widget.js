@@ -59,7 +59,7 @@ const Widget = ({ nodes, edges, debug }) => {
   const noEdgeSelectMap = new Map();
   edges.map(x => noEdgeSelectMap.set(x.uid.toString(), false));
 
-  const [nodeColor, setNodeColor] = React.useState(Object.fromEntries(nodeColorMap));
+  const [nodeFill, setNodeFill] = React.useState(Object.fromEntries(nodeColorMap));
   const [nodeSelected, setNodeSelected] = React.useState(Object.fromEntries(nodeSelectMap));
   const [nodeVisible, setNodeVisible] = React.useState(Object.fromEntries(nodeVisibleMap));
 
@@ -69,7 +69,7 @@ const Widget = ({ nodes, edges, debug }) => {
 
   const getColorChange = (datatype, uid, color) => {
     if(datatype === "node"){
-      setNodeColor({...nodeColor, [uid]:`rgba(${ color.r }, ${ color.g }, ${ color.b }, ${ color.a })`});
+      setNodeFill({...nodeFill, [uid]:`rgba(${ color.r }, ${ color.g }, ${ color.b }, ${ color.a })`});
     }
     else{
       setEdgeColor({...edgeColor, [uid]:`rgba(${ color.r }, ${ color.g }, ${ color.b }, ${ color.a })`});
@@ -162,7 +162,7 @@ const Widget = ({ nodes, edges, debug }) => {
 
   const getChangedColors = (value, datatype) => {
     if(datatype === "node"){
-      setNodeColor(value);
+      setNodeFill(value);
     }
     else{
       setEdgeColor(value);
@@ -178,7 +178,7 @@ const Widget = ({ nodes, edges, debug }) => {
   const nodeLineColMap = new Map();
   nodesData.map(x => nodeLineColMap.set(x.uid, "rgba(255, 255, 255, 1)"));
 
-  const [nodeLineColor, setNodeLineColor] = React.useState(Object.fromEntries(nodeLineColMap));
+  const [nodeStroke, setNodeStroke] = React.useState(Object.fromEntries(nodeLineColMap));
 
   const [nodeWidth, setNodeWidth] = React.useState(Object.fromEntries(nodeWidthMap));
   const [edgeWidth, setEdgeWidth] = React.useState(Object.fromEntries(edgeWidthMap));
@@ -208,15 +208,15 @@ const Widget = ({ nodes, edges, debug }) => {
       })
       if(value === "selected"){
         setNodeWidth(Object.fromEntries(nodeSelectedBar));
-        setNodeLineColor(Object.fromEntries(nodeSelectLine));
+        setNodeStroke(Object.fromEntries(nodeSelectLine));
       }
       else if(value === "hidden"){
         setNodeWidth(Object.fromEntries(nodeHiddenBar));
-        setNodeLineColor(Object.fromEntries(nodeHiddenLine));
+        setNodeStroke(Object.fromEntries(nodeHiddenLine));
       }
       else{
         setNodeWidth(Object.fromEntries(nodeWidthMap));
-        setNodeLineColor(Object.fromEntries(nodeLineColMap));
+        setNodeStroke(Object.fromEntries(nodeLineColMap));
       }
     }
     else{
@@ -249,7 +249,7 @@ const Widget = ({ nodes, edges, debug }) => {
     return {
       uid: x.uid,
       value: nodeDegList[x.uid],
-      color:  {"r": getRGB(nodeColor[x.uid])[0], "g":getRGB(nodeColor[x.uid])[1], "b":getRGB(nodeColor[x.uid])[2], "a":getRGB(nodeColor[x.uid])[3]},
+      color:  {"r": getRGB(nodeFill[x.uid])[0], "g":getRGB(nodeFill[x.uid])[1], "b":getRGB(nodeFill[x.uid])[2], "a":getRGB(nodeFill[x.uid])[3]},
       selected: nodeSelected[x.uid],
       visible: nodeVisible[x.uid]
     }
@@ -274,7 +274,7 @@ const Widget = ({ nodes, edges, debug }) => {
   }
 
   const getNodePalette = value => {
-    setNodeColor(value);
+    setNodeFill(value);
   }
   const getEdgePalette = value => {
     setEdgeColor(value);
@@ -359,18 +359,24 @@ const Widget = ({ nodes, edges, debug }) => {
               <Typography className={classes.heading}>Color</Typography>
             </AccordionSummary>
             <AccordionDetails>
+              <div style={{width: "100%"}}>
               <ColorPalette nodeData={nodeDegList} edgeData={edgeSizeList}
               sendNodePalette={getNodePalette} sendEdgePalette={getEdgePalette}
               currGroup={colGroup} currPalette={colPalette} currType={colType} sendCurrData={getCurrData}
               />
+              </div>
             </AccordionDetails>
           </Accordion>
         </div> : null }
   </Grid>
 
   <Grid item xs={12} sm={!navOpen ? 11 : 8}>
-    <HypernetxWidgetView {...{nodes, edges}} nodeFill={nodeColor} nodeStroke={nodeLineColor} nodeStrokeWidth={nodeWidth} edgeStrokeWidth={edgeWidth} edgeStroke={edgeColor} edgeStrokeWidth={edgeWidth}
-    sendNodeSelect={getClickedNodes}/>
+    <HypernetxWidgetView {...{nodes, edges, nodeFill, nodeStroke}}
+
+      nodeStrokeWidth={nodeWidth} edgeStrokeWidth={edgeWidth}
+      edgeStroke={edgeColor} edgeStrokeWidth={edgeWidth}
+      sendNodeSelect={getClickedNodes}
+      />
   </Grid>
   </Grid>
 

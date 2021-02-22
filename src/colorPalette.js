@@ -29,17 +29,17 @@ const useStyles = makeStyles((theme) => ({
     // paddingLeft: "5px",
     paddingRight:"5px",
     "& .MuiSelect-root": {
-      fontSize: "15px",
+      // fontSize: "15px",
       width: 100,
 
     },
   },
   menuItem: {
-      fontSize: "14px",
+      // fontSize: "14px",
   },
   colorItem: {
     "& .MuiSelect-root": {
-      fontSize: "15px",
+      // fontSize: "15px",
       width: 270
     },
   }
@@ -145,8 +145,7 @@ const ColorPalette = ({nodeData, edgeData, sendNodePalette, sendEdgePalette, cur
   }
 
   // getColorArray("Blues");
-  return <div style={{width:"100%"}}>
-    <form style={{padding: "5px"}}>
+  return <div style={{padding: "5px", width:"100%"}}>
         <FormControl classes={{root: classes.customSelect}}>
           <InputLabel>Data</InputLabel>
           <Select value={type} onChange={handleType}>
@@ -183,7 +182,6 @@ const ColorPalette = ({nodeData, edgeData, sendNodePalette, sendEdgePalette, cur
         <Button onClick={handleSubmit} type="button" variant="outlined" color="primary">Update</Button>
         <Button onClick={handleReset} type="button" variant="outlined" color="primary">Reset</Button>
       </div>
-    </form>
     </div>
 
 
