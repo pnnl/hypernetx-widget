@@ -30,12 +30,14 @@ const forceDragBehavior = (selection, simulation) => {
 
     function dragstarted(event) {
       if (!event.active) simulation.alphaTarget(0.3).restart();
+
+      select(this).classed('fixed', true);
+      
       event.subject.fx = event.subject.x;
       event.subject.fy = event.subject.y;
     }
 
     function dragged(event) {
-      select(this).classed('fixed', true);
 
       const {x, y} = event;
       event.subject.fx = Math.min(width, (Math.max(x, 0)));
@@ -53,7 +55,60 @@ const forceDragBehavior = (selection, simulation) => {
     }
 
   selection
+    .each(function(d) {
+      d.ele = this;
+    })
     .on('dblclick', unfix)
+    .call(drag()
+      .on('start', dragstarted)
+      .on('drag', dragged)
+      .on('end', dragended)
+    );
+}
+
+const forceEdgeDragBehavior = (selection, simulation) => {
+    const [width, height] = simulation.size;
+
+    function dragstarted(event) {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+
+      // subject.x, subject.y is the location of node
+      const {x, y, elements} = event.subject;
+
+      // loop over each child group of nodes
+      elements.forEach(d => {
+        d.dx = d.x - x;
+        d.dy = d.y - y;
+
+        // set the class to fixed to indicate dragging
+        select(d.ele).classed('fixed', true);
+      })
+    }
+
+    function dragged(event) {
+      // select(this).classed('fixed', true);
+
+      // event.x, event.y is the location of the drag
+      const {dx, dy, elements} = event.subject;
+      const {x, y} = event;
+
+      elements.forEach(d => {
+        d.fx = Math.min(width, (Math.max(x + d.dx, 0)));
+        d.fy = Math.min(width, (Math.max(y + d.dy, 0)));
+      })
+    }
+
+    function dragended(event) {
+      if (!event.active) simulation.alphaTarget(0);
+    }
+
+    function unfix(event, d) {
+      // select(this).classed('fixed', false);
+      // d.fx = null;
+      // d.fy = null;
+    }
+
+  selection
     .call(drag()
       .on('start', dragstarted)
       .on('drag', dragged)
@@ -105,7 +160,7 @@ const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24, edgeStroke, edg
       .selectAll('path')
         .data(edges)
           .join('path')
-            .call(forceDragBehavior, simulation)
+            .call(forceEdgeDragBehavior, simulation)
             .on('click', onClickEdges)
             .attr('stroke', 'black')
             .attr('fill', 'none')
