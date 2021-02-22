@@ -64,6 +64,12 @@ def hnx_kwargs_to_props(H,
 
     return {**props, **rename_kwargs(**kwargs)}
 
+def _forwards_compatible_collapse(H):
+    return [
+        frozenset([entity.uid]) if type(entity.uid) is not frozenset else entity.uid
+        for entity in H.nodes()
+    ]
+
 @widgets.register
 class HypernetxWidget(ReactJupyterWidget):
     def __init__(self, H,
@@ -92,10 +98,10 @@ class HypernetxWidget(ReactJupyterWidget):
                         'uid': uid,
                         'value': get_property(uid, node_size, 1)
                     }
-                    for uid in entity.uid
+                    for uid in members
                 ]
             }
-            for entity in self.H.nodes()
+            for members in _forwards_compatible_collapse(self.H)
         ]
 
         nodes_dict = {
