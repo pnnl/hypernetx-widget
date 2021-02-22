@@ -64,6 +64,12 @@ def hnx_kwargs_to_props(H,
 
     return {**props, **rename_kwargs(**kwargs)}
 
+def _forwards_compatible_collapse(H):
+    return [
+        frozenset([uid]) if type(uid) is not frozenset else uid
+        for uid in H.nodes
+    ]
+
 @widgets.register
 class HypernetxWidget(ReactJupyterWidget):
     def __init__(self, H,
@@ -92,10 +98,10 @@ class HypernetxWidget(ReactJupyterWidget):
                         'uid': uid,
                         'value': get_property(uid, node_size, 1)
                     }
-                    for uid in entity.uid
+                    for uid in members
                 ]
             }
-            for entity in self.H.nodes()
+            for members in _forwards_compatible_collapse(self.H)
         ]
 
         nodes_dict = {
@@ -106,11 +112,11 @@ class HypernetxWidget(ReactJupyterWidget):
         # js friendly representation of the hypergraph
         edges = [
             {
-                'uid': entity.uid,
+                'uid': uid,
                 'elements': [nodes_dict[v] for v in entity.elements],
-                'level': levels[entity.uid]
+                'level': levels[uid]
             }
-            for entity in self.H.edges()
+            for uid, entity in self.H.edges.elements.items()
         ]
 
         super().__init__(

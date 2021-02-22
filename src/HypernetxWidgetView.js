@@ -1,7 +1,7 @@
 import React, {useMemo} from 'react'
 
 import {drag} from 'd3-drag'
-import {range} from 'd3-array'
+import {min, max, range} from 'd3-array'
 import {pack, hierarchy} from 'd3-hierarchy'
 import {select} from 'd3-selection'
 import {forceSimulation, forceLink, forceManyBody, forceCenter, forceCollide} from 'd3-force'
@@ -30,16 +30,20 @@ const forceDragBehavior = (selection, simulation) => {
 
     function dragstarted(event) {
       if (!event.active) simulation.alphaTarget(0.3).restart();
+
+      select(this).classed('fixed', true);
+
       event.subject.fx = event.subject.x;
       event.subject.fy = event.subject.y;
     }
 
     function dragged(event) {
-      select(this).classed('fixed', true);
 
       const {x, y} = event;
-      event.subject.fx = Math.min(width, (Math.max(x, 0)));
-      event.subject.fy = Math.min(width, (Math.max(y, 0)));
+      const {r} = event.subject;
+
+      event.subject.fx = Math.min(width - r, (Math.max(x, r)));
+      event.subject.fy = Math.min(height - r, (Math.max(y, r)));
     }
 
     function dragended(event) {
@@ -53,6 +57,9 @@ const forceDragBehavior = (selection, simulation) => {
     }
 
   selection
+    .each(function(d) {
+      d.ele = this;
+    })
     .on('dblclick', unfix)
     .call(drag()
       .on('start', dragstarted)
@@ -61,7 +68,68 @@ const forceDragBehavior = (selection, simulation) => {
     );
 }
 
-const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill, nodeStroke, nodeLabels={}}) =>
+const forceEdgeDragBehavior = (selection, simulation) => {
+    const [width, height] = simulation.size;
+
+    function dragstarted(event) {
+      if (!event.active) simulation.alphaTarget(0.3).restart();
+
+      // subject.x, subject.y is the location of node
+      const {x, y, elements} = event.subject;
+
+      // loop over each child group of nodes
+      elements.forEach(d => {
+        d.dx = d.x - x;
+        d.dy = d.y - y;
+
+        // set the class to fixed to indicate dragging
+        select(d.ele).classed('fixed', true);
+      });
+
+      event.subject.dxRange = [
+        min(elements, d => d.dx - d.r),
+        max(elements, d => d.dx + d.r)
+      ];
+
+
+      event.subject.dyRange = [
+        min(elements, d => d.dy - d.r),
+        max(elements, d => d.dy + d.r)
+      ];
+    }
+
+    function dragged(event) {
+      // select(this).classed('fixed', true);
+
+      // event.x, event.y is the location of the drag
+      const {dx, dy, elements, dxRange, dyRange} = event.subject;
+      const [minDx, maxDx] = dxRange;
+      const [minDy, maxDy] = dyRange;
+
+      let {x, y} = event;
+
+      x = Math.min(width - maxDx, Math.max(x, -minDx));
+      y = Math.min(height - maxDy, Math.max(y, -minDy));
+
+      elements.forEach(d => {
+        d.fx = x + d.dx;
+        d.fy = y + d.dy;
+      })
+    }
+
+    function dragended(event) {
+      if (!event.active) simulation.alphaTarget(0);
+    }
+
+  selection
+    .call(drag()
+      .on('start', dragstarted)
+      .on('drag', dragged)
+      .on('end', dragended)
+    );
+}
+
+const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill, nodeLabels={}}) =>
   <g className='nodes' ref={ele => {
 
     const groups = select(ele)
@@ -78,7 +146,7 @@ const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill, nodeStroke
           .attr('cx', d => d.height === 0 ? d.x : 0)
           .attr('cy', d => d.height === 0 ? d.y : 0)
           .attr('r', d => d.r)
-          .call(encodeProps, d => d.data.uid, {nodeStroke, nodeFill});
+          .call(encodeProps, d => d.data.uid, {nodeFill});
 
     const text = groups.selectAll('text')
       .data(d => d.leaves())
@@ -105,7 +173,7 @@ const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24, edgeStroke, edg
       .selectAll('path')
         .data(edges)
           .join('path')
-            .call(forceDragBehavior, simulation)
+            .call(forceEdgeDragBehavior, simulation)
             .on('click', onClickEdges)
             .attr('stroke', 'black')
             .attr('fill', 'none')

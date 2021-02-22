@@ -22,7 +22,7 @@ import { getRGB, rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianSt
 
 
 
-const Widget = ({ nodes, edges, debug }) => {
+const Widget = ({ nodes, edges, ...props }) => {
   const classes = accordianStyles();
 
   const nodesData = nodes.map(x => x.elements).flat();
