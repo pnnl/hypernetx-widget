@@ -1,7 +1,7 @@
 import React, {useMemo} from 'react'
 
 import {drag} from 'd3-drag'
-import {range} from 'd3-array'
+import {min, max, range} from 'd3-array'
 import {pack, hierarchy} from 'd3-hierarchy'
 import {select} from 'd3-selection'
 import {forceSimulation, forceLink, forceManyBody, forceCenter, forceCollide} from 'd3-force'
@@ -84,30 +84,41 @@ const forceEdgeDragBehavior = (selection, simulation) => {
 
         // set the class to fixed to indicate dragging
         select(d.ele).classed('fixed', true);
-      })
+      });
+
+      event.subject.dxRange = [
+        min(elements, d => d.dx - d.r),
+        max(elements, d => d.dx + d.r)
+      ];
+
+
+      event.subject.dyRange = [
+        min(elements, d => d.dy - d.r),
+        max(elements, d => d.dy + d.r)
+      ];
     }
 
     function dragged(event) {
       // select(this).classed('fixed', true);
 
       // event.x, event.y is the location of the drag
-      const {dx, dy, elements} = event.subject;
-      const {x, y} = event;
+      const {dx, dy, elements, dxRange, dyRange} = event.subject;
+      const [minDx, maxDx] = dxRange;
+      const [minDy, maxDy] = dyRange;
+
+      let {x, y} = event;
+
+      x = Math.min(width - maxDx, Math.max(x, -minDx));
+      y = Math.min(height - maxDy, Math.max(y, -minDy));
 
       elements.forEach(d => {
-        d.fx = Math.min(width, (Math.max(x + d.dx, 0)));
-        d.fy = Math.min(width, (Math.max(y + d.dy, 0)));
+        d.fx = x + d.dx;
+        d.fy = y + d.dy;
       })
     }
 
     function dragended(event) {
       if (!event.active) simulation.alphaTarget(0);
-    }
-
-    function unfix(event, d) {
-      // select(this).classed('fixed', false);
-      // d.fx = null;
-      // d.fy = null;
     }
 
   selection
