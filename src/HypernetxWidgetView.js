@@ -32,7 +32,7 @@ const forceDragBehavior = (selection, simulation) => {
       if (!event.active) simulation.alphaTarget(0.3).restart();
 
       select(this).classed('fixed', true);
-      
+
       event.subject.fx = event.subject.x;
       event.subject.fy = event.subject.y;
     }
@@ -40,8 +40,10 @@ const forceDragBehavior = (selection, simulation) => {
     function dragged(event) {
 
       const {x, y} = event;
-      event.subject.fx = Math.min(width, (Math.max(x, 0)));
-      event.subject.fy = Math.min(width, (Math.max(y, 0)));
+      const {r} = event.subject;
+
+      event.subject.fx = Math.min(width - r, (Math.max(x, r)));
+      event.subject.fy = Math.min(height - r, (Math.max(y, r)));
     }
 
     function dragended(event) {
