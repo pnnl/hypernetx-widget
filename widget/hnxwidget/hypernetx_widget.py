@@ -73,13 +73,14 @@ def _forwards_compatible_collapse(H):
 @widgets.register
 class HypernetxWidget(ReactJupyterWidget):
     def __init__(self, H,
+        collapse=True,
         node_size=None,
         node_styles={},
         with_color=True,
         **kwargs
     ):
         # will break if already collapsed
-        self.H = H.collapse_nodes()
+        self.H = H.collapse_nodes() if collapse else H
 
         def get_property(id, value, default):
             if value is None:
