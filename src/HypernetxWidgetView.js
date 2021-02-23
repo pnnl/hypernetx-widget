@@ -30,8 +30,6 @@ const forceDragBehavior = (selection, simulation) => {
     function dragstarted(event) {
       if (!event.active) simulation.alphaTarget(0.3).restart();
 
-      select(this).classed('fixed', true);
-
       event.subject.fx = event.subject.x;
       event.subject.fy = event.subject.y;
     }
@@ -50,9 +48,8 @@ const forceDragBehavior = (selection, simulation) => {
     }
 
     function unfix(event, d) {
-      select(this).classed('fixed', false);
-      d.fx = null;
-      d.fy = null;
+      d.fx = undefined;
+      d.fy = undefined;
     }
 
   selection
@@ -80,9 +77,6 @@ const forceEdgeDragBehavior = (selection, simulation) => {
       elements.forEach(d => {
         d.dx = d.x - x;
         d.dy = d.y - y;
-
-        // set the class to fixed to indicate dragging
-        select(d.ele).classed('fixed', true);
       });
 
       event.subject.dxRange = [
@@ -98,8 +92,6 @@ const forceEdgeDragBehavior = (selection, simulation) => {
     }
 
     function dragged(event) {
-      // select(this).classed('fixed', true);
-
       // event.x, event.y is the location of the drag
       const {dx, dy, elements, dxRange, dyRange} = event.subject;
       const [minDx, maxDx] = dxRange;
@@ -156,7 +148,11 @@ const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill, nodeStroke
         .text(d => d.data.uid in nodeLabels ? nodeLabels[d.data.uid] : d.data.uid);
 
     simulation.on('tick.nodes', d => {
-      groups.attr('transform', d => `translate(${d.x},${d.y})`);
+      groups
+        .attr('transform', d => `translate(${d.x},${d.y})`)
+        .classed('fixed', d => d.fx !== undefined);
+
+      updateModel();
     });
   }}/>
 
