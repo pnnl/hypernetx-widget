@@ -1,7 +1,9 @@
 import React, {useMemo} from 'react'
 
+import {throttle} from 'lodash'
+
 import {drag} from 'd3-drag'
-import {mean, min, max, range} from 'd3-array'
+import {merge, mean, min, max, range} from 'd3-array'
 import {pack, hierarchy} from 'd3-hierarchy'
 import {select} from 'd3-selection'
 import {forceSimulation, forceLink, forceManyBody, forceCenter, forceCollide} from 'd3-force'
@@ -120,7 +122,7 @@ const forceEdgeDragBehavior = (selection, simulation) => {
     );
 }
 
-const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill, nodeStroke, nodeStrokeWidth, nodeLabels={}}) =>
+const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill, nodeStroke, nodeStrokeWidth, nodeLabels={}, _model}) =>
   <g className='nodes' ref={ele => {
 
     const groups = select(ele)
@@ -146,6 +148,16 @@ const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill, nodeStroke
         .attr('y', d => d.y)
         .attr('dx', d => d.r + 7)
         .text(d => d.data.uid in nodeLabels ? nodeLabels[d.data.uid] : d.data.uid);
+
+    const updateModel = throttle(() => {
+      if (_model) {
+        const pos = merge(internals.map(d => d.children))
+          .map(d => ([d.data.uid, [d.parent.x + d.x, d.parent.y + d.y]]));
+
+        _model.setState('pos', Object.fromEntries(pos));
+        _model.save();
+      }
+    }, 1000);
 
     simulation.on('tick.nodes', d => {
       groups
