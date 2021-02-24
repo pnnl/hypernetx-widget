@@ -47,9 +47,9 @@
 
 .popover {
   position: absolute;
-  z-index: 5;
-  top: 250px;
-  left:310px;
+  z-index: 2;
+  /* top: 250px;
+  left:310px; */
 }
 
 .bar {
@@ -65,11 +65,16 @@
 }
 
 .cover {
-  position: fixed;
+  /* position: fixed;
   top: 0px;
   right: 0px;
   bottom: 0px;
-  left: 0px;
+  left: 0px; */
+  position: 'fixed';
+  top: '0px';
+  right: '0px';
+  bottom: '0px';
+  left: '0px';
 }
 
 .colorSetting {
