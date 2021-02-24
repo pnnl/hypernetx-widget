@@ -13,7 +13,7 @@ const ShowButton = ({ type, sendButton, currButton }) => {
   }
 
 
-  return <div style={{paddingTop: "10px", paddingLeft: "5px"}}>
+  return <div style={{paddingTop: "10px", paddingLeft: "5px", margin: "auto"}}>
   <ToggleButtonGroup classes={{root: classes.customButton}}
     size="small"
     value={selectedValue}
