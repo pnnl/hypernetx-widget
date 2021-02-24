@@ -154,7 +154,7 @@ const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill, nodeStroke
         const pos = merge(internals.map(d => d.children))
           .map(d => ([d.data.uid, [d.parent.x + d.x, d.parent.y + d.y]]));
 
-        _model.setState('pos', Object.fromEntries(pos));
+        _model.set('pos', Object.fromEntries(pos));
         _model.save();
       }
     }, 1000);

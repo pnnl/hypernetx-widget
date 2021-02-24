@@ -1,6 +1,7 @@
 from .react_jupyter_widget import ReactJupyterWidget
 
 import ipywidgets as widgets
+from traitlets import Dict
 
 import matplotlib.pyplot as plt
 from matplotlib.colors import to_rgba_array, to_hex
@@ -72,6 +73,8 @@ def _forwards_compatible_collapse(H):
 
 @widgets.register
 class HypernetxWidget(ReactJupyterWidget):
+    pos = Dict().tag(sync=True)
+
     def __init__(self, H,
         collapse=True,
         node_size=None,

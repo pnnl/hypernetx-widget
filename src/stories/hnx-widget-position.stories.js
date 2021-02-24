@@ -12,7 +12,7 @@ const TestBackboneModel = () => {
 
   return {
     save: () => console.log('Saving', state),
-    setState: (key, value) => state[key] = value
+    set: (key, value) => state[key] = value
   };
 }
 

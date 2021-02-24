@@ -29,7 +29,8 @@ var ReactModel = widgets.DOMWidgetModel.extend({
         _view_module : 'ipy-nlpvis',
         _model_module_version : '0.1.0',
         _view_module_version : '0.1.0',
-        props : {}
+        props : {},
+        pos: {}
     })
 });
 
@@ -46,6 +47,8 @@ var ReactView = widgets.DOMWidgetView.extend({
         var name = this.model.get('component')
         var view = components[name];
         var props = this.model.get('props');
+
+        props['_model'] = this.model
 
         if (view) {
             var component = React.createElement(view, props, null);

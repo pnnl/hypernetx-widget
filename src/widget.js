@@ -369,6 +369,7 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   <Grid item xs={12} sm={!navOpen ? 11 : 8}>
     <HypernetxWidgetView
+      {...props}
       {...{nodes, edges, nodeFill, nodeStroke, nodeStrokeWidth, edgeStrokeWidth, edgeStroke}}
       sendNodeSelect={getClickedNodes}
       />
