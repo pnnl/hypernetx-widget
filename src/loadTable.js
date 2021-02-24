@@ -18,15 +18,15 @@ import { descendingComparator, getComparator, stableSort } from './functions.js'
 
 const tableStyles = makeStyles((theme) => ({
   customTable: {
-    "& .MuiTableCell-sizeSmall": {
-      whitespace: "nowrap",
-      padding: "0px 0px 0px 0px",
-      fontSize: 11,
-      fontWeight: 400,
-      margin: "0px",
-      height: 5
+    // "& .MuiTableCell-sizeSmall": {
+    //   whitespace: "nowrap",
+    //   padding: "0px 0px 0px 0px",
+    //   fontSize: 11,
+    //   fontWeight: 400,
+    //   margin: "0px",
+    //   height: 5
 
-    },
+    // },
     "& .MuiTableCell-paddingNone": {
       padding: "0px 0px 0px 7px",
       fontSize: 11,
@@ -74,6 +74,7 @@ function EnhancedTableHead(props) {
       <TableRow>
         <TableCell padding="default">
           <Checkbox
+            size="small"
             defaultChecked
             onChange={onSelectAllClick}
             indeterminate={data.map(x => x.selected).includes(false) && data.map(x => x.selected).includes(true)}
