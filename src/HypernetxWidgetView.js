@@ -192,7 +192,9 @@ const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24, edgeStroke, edg
           .join('text')
             .text(d => d.uid);
 
-    const xValue = (a, b) => b[0] - a[0];
+    const xValue = d => d[0];
+    const yValue = d => d[1];
+
     const rightMost = points => {
       const idx = maxIndex(points, xValue);
 
@@ -223,8 +225,8 @@ const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24, edgeStroke, edg
         });
 
       labels
-        .attr('x', d => rightMost(d.points)[0])
-        .attr('y', d => rightMost(d.points)[1]);
+        .attr('x', d => mean(d.points, xValue))
+        .attr('y', d => mean(d.points, yValue));
 
     });
   }}/>
