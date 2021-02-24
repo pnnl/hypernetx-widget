@@ -92,6 +92,7 @@ export const getValueFreq = (obj) => {
 
 export const showButtonStyles = makeStyles((theme) => ({
   customButton: {
+    width: '100%',
     "& .MuiToggleButton-root": {
       color: "#5c6bc0",
       border: "1px solid #5c6bc0",

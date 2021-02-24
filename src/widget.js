@@ -307,11 +307,11 @@ const Widget = ({ nodes, edges, ...props }) => {
     <Grid item xs={12} sm={!navOpen ? 1 : 4}>
       <div className="colorSetting" style={{justifyContent: !navOpen ? "flex-start" : "flex-end"}}>
         <div>
-          <Button style={{justifyContent: !navOpen ? "flex-start": "flex-end"}} color="primary" onClick={() => toggleNav()}>{!navOpen ? <ArrowForwardIos /> : <ArrowBackIos />}</Button></div>
+          <Button style={{justifyContent: !navOpen ? "flex-start": "flex-end"}} color="primary" onClick={() => toggleNav()}>{!navOpen ? <ArrowForwardIos style={{fontSize: "20px"}} /> : <ArrowBackIos style={{fontSize: "20px"}}/>}</Button></div>
         </div>
         {navOpen ? <div className={classes.root}>
           <Accordion>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />} >
+            <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}} />} >
               <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Key Statistics - Nodes" + " (" +  String(nodesData.length) + ")"}</Typography>
             </AccordionSummary>
             <AccordionDetails>
@@ -332,7 +332,7 @@ const Widget = ({ nodes, edges, ...props }) => {
           </Accordion>
 
           <Accordion>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />} >
+            <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}} />} >
               <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Key Statistics - Edges" + " (" +  String(edges.length) + ")"}</Typography>
             </AccordionSummary>
             <AccordionDetails>
@@ -357,10 +357,10 @@ const Widget = ({ nodes, edges, ...props }) => {
             </AccordionSummary>
             <AccordionDetails>
               <div style={{width: "100%"}}>
-              <ColorPalette nodeData={nodeDegList} edgeData={edgeSizeList}
-              sendNodePalette={getNodePalette} sendEdgePalette={getEdgePalette}
-              currGroup={colGroup} currPalette={colPalette} currType={colType} sendCurrData={getCurrData}
-              />
+                <ColorPalette nodeData={nodeDegList} edgeData={edgeSizeList}
+                sendNodePalette={getNodePalette} sendEdgePalette={getEdgePalette}
+                currGroup={colGroup} currPalette={colPalette} currType={colType} sendCurrData={getCurrData}
+                />
               </div>
             </AccordionDetails>
           </Accordion>
