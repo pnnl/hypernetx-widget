@@ -28,7 +28,7 @@ const tableStyles = makeStyles((theme) => ({
 
     },
     "& .MuiTableCell-paddingNone": {
-      padding: "0px 0px 0px 7px",
+      padding: "0px 0px 5px 7px",
       // fontSize: 11,
       fontWeight: 500,
       align: "center",
@@ -38,7 +38,7 @@ const tableStyles = makeStyles((theme) => ({
 
     },
     "& .MuiTableSortLabel-icon": {
-      // fontSize: "16px",
+      fontSize: "16px",
       padding: "0px 0px 0px 0px",
       margin: "0px"
     }
