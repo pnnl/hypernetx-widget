@@ -116,7 +116,7 @@ class HypernetxWidget(ReactJupyterWidget):
         # js friendly representation of the hypergraph
         edges = [
             {
-                'uid': uid,
+                'uid': str(uid),
                 'elements': [nodes_dict[v] for v in entity.elements],
                 'level': levels[uid]
             }
