@@ -24,7 +24,7 @@ const ColorButton = ({ label, color, sendColor }) => {
       <Button onClick={() => handleClick()}><Palette fontSize="small"
         style={{  fill:color}}/></Button>
       {palette ?
-        <div className="popover">
+        <div className="palettePopUp">
           <div className="cover" onClick={() => handleClose()}/>
           <ChromePicker color={paletteColor} onChange={(c) => handleChangeColor(label, c)}/>
         </div> : null
