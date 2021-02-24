@@ -1,7 +1,7 @@
 import React, {useMemo} from 'react'
 
 import {drag} from 'd3-drag'
-import {min, max, range} from 'd3-array'
+import {mean, min, max, range} from 'd3-array'
 import {pack, hierarchy} from 'd3-hierarchy'
 import {select} from 'd3-selection'
 import {forceSimulation, forceLink, forceManyBody, forceCenter, forceCollide} from 'd3-force'
@@ -22,7 +22,6 @@ const encodeProps = (selection, key, props) => {
       selection.attr(style, d => encoding[key(d)]);
     }
   })
-
 }
 
 const forceDragBehavior = (selection, simulation) => {
@@ -219,7 +218,7 @@ const DebugLinks = ({links, simulation}) =>
 
   }}/>
 
-export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, debug, ...props}) => {
+export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, debug, pos={}, ...props}) => {
   const derivedProps = useMemo(
     () => {
       // construct a simple hierarchy out of the nodes
@@ -253,6 +252,18 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, debug,
         .radius(d => scale*radius(d))
         .size([width, height])
         (tree);
+
+      // pre-specified children
+      tree.each(d => {
+        if (d.depth === 1) {
+          const children = d.children.filter(c => c.data.uid in pos);
+
+          if (children.length > 0) {
+            d.fx = mean(children, c => pos[c.data.uid][0]);
+            d.fy = mean(children, c => pos[c.data.uid][1]);
+          }
+        }
+      })
 
       // adjust position of the children relative to their parents
 
