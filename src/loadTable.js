@@ -21,15 +21,15 @@ const tableStyles = makeStyles((theme) => ({
     "& .MuiTableCell-sizeSmall": {
       whitespace: "nowrap",
       padding: "0px 0px 0px 0px",
-      fontSize: 11,
+      fontSize: "12px",
       fontWeight: 400,
       margin: "0px",
       height: 5
 
     },
     "& .MuiTableCell-paddingNone": {
-      padding: "0px 0px 0px 7px",
-      fontSize: 11,
+      padding: "0px 0px 5px 15px",
+      fontSize: "13px",
       fontWeight: 500,
       align: "center",
     },
@@ -41,6 +41,9 @@ const tableStyles = makeStyles((theme) => ({
       fontSize: "16px",
       padding: "0px 0px 0px 0px",
       margin: "0px"
+    },
+    "& .MuiTableSortLabel-root": {
+      fontSize: "13px"
     }
   },
   visuallyHidden: {
@@ -74,6 +77,7 @@ function EnhancedTableHead(props) {
       <TableRow>
         <TableCell padding="default">
           <Checkbox
+            size="small"
             defaultChecked
             onChange={onSelectAllClick}
             indeterminate={data.map(x => x.selected).includes(false) && data.map(x => x.selected).includes(true)}
@@ -180,7 +184,7 @@ const LoadTable = ({ type, data, sendColorToMain, sendVisibilityToMain, sendSele
 
             return(
               <TableRow key={i}>
-                <TableCell padding="checkbox">
+                <TableCell>
                   <CheckboxEl label={x.uid} checkState={x.selected} sendCheck={getCheck}/>
                 </TableCell>
                 <TableCell align="center" >

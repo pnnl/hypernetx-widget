@@ -29,7 +29,7 @@
 
 .hbar{
   min-width: 1px;
-  height: 9px;
+  height: 8px;
   background-color: gray;
 }
 
@@ -47,7 +47,7 @@
 
 .popover {
   position: absolute;
-  z-index: 3;
+  z-index: 5;
   top: 250px;
   left:310px;
 }

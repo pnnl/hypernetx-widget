@@ -92,6 +92,7 @@ export const getValueFreq = (obj) => {
 
 export const showButtonStyles = makeStyles((theme) => ({
   customButton: {
+    // width: '100%',
     "& .MuiToggleButton-root": {
       color: "#5c6bc0",
       border: "1px solid #5c6bc0",
@@ -108,12 +109,12 @@ export const accordianStyles = makeStyles((theme) => ({
     width: '100%',
     "& .MuiAccordionDetails-root": {
       padding: "3px 3px 3px 3px"
+    },
+    "& .MuiAccordianSummary-root.Mui-expanded": {
+      minHeight: "30px",
     }
   },
-  heading: {
-    fontSize: theme.typography.pxToRem(15),
-    fontWeight: theme.typography.fontWeightBold,
-  },
+  
 
 }));
 
