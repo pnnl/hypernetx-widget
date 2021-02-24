@@ -21,7 +21,7 @@ const tableStyles = makeStyles((theme) => ({
     "& .MuiTableCell-sizeSmall": {
       whitespace: "nowrap",
       padding: "0px 0px 0px 0px",
-      // fontSize: 11,
+      fontSize: "12px",
       fontWeight: 400,
       margin: "0px",
       height: 5
