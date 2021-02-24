@@ -18,15 +18,15 @@ import { descendingComparator, getComparator, stableSort } from './functions.js'
 
 const tableStyles = makeStyles((theme) => ({
   customTable: {
-    // "& .MuiTableCell-sizeSmall": {
-    //   whitespace: "nowrap",
-    //   padding: "0px 0px 0px 0px",
-    //   fontSize: 11,
-    //   fontWeight: 400,
-    //   margin: "0px",
-    //   height: 5
+    "& .MuiTableCell-sizeSmall": {
+      whitespace: "nowrap",
+      padding: "0px 0px 0px 0px",
+      // fontSize: 11,
+      fontWeight: 400,
+      margin: "0px",
+      height: 5
 
-    // },
+    },
     "& .MuiTableCell-paddingNone": {
       padding: "0px 0px 0px 7px",
       fontSize: 11,
