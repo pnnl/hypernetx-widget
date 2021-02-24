@@ -13,10 +13,6 @@ import { getScheme, hexToRgb, allPalettes } from './functions.js';
 import {Colorscale} from 'react-colorscales';
 import * as scale from 'd3-scale-chromatic';
 
-
-
-
-
 const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
