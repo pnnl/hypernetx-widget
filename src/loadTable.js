@@ -29,7 +29,7 @@ const tableStyles = makeStyles((theme) => ({
     },
     "& .MuiTableCell-paddingNone": {
       padding: "0px 0px 0px 7px",
-      fontSize: 11,
+      // fontSize: 11,
       fontWeight: 500,
       align: "center",
     },
@@ -38,7 +38,7 @@ const tableStyles = makeStyles((theme) => ({
 
     },
     "& .MuiTableSortLabel-icon": {
-      fontSize: "16px",
+      // fontSize: "16px",
       padding: "0px 0px 0px 0px",
       margin: "0px"
     }
@@ -181,7 +181,7 @@ const LoadTable = ({ type, data, sendColorToMain, sendVisibilityToMain, sendSele
 
             return(
               <TableRow key={i}>
-                <TableCell padding="checkbox">
+                <TableCell>
                   <CheckboxEl label={x.uid} checkState={x.selected} sendCheck={getCheck}/>
                 </TableCell>
                 <TableCell align="center" >
