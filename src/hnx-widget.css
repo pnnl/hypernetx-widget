@@ -17,6 +17,14 @@
 .hnx-widget-view .nodes text {
 	fill: darkgray;
 	alignment-baseline: middle;
+	text-anchor: middle;
+}
+
+.hnx-widget-view .edges text{
+	fill: darkgray;
+	alignment-baseline: middle;
+	text-anchor: middle;
+	font-style: italic;
 }
 
 .hnx-widget-view .edges path {
@@ -26,5 +34,4 @@
 
 .hnx-widget-view .edges path:hover {
 	stroke-dasharray: 6,3;
-
 }
