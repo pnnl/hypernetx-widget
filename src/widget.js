@@ -312,7 +312,7 @@ const Widget = ({ nodes, edges, ...props }) => {
         {navOpen ? <div className={classes.root}>
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMoreIcon />} >
-              <Typography className={classes.heading}>{"Key Statistics - Nodes" + " (" +  String(nodesData.length) + ")"}</Typography>
+              <Typography style={{fontSize: "16px", fontWeight: "bold"}}>{"Key Statistics - Nodes" + " (" +  String(nodesData.length) + ")"}</Typography>
             </AccordionSummary>
             <AccordionDetails>
             <div style={{width: "100%"}}>
@@ -333,7 +333,7 @@ const Widget = ({ nodes, edges, ...props }) => {
 
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMoreIcon />} >
-              <Typography className={classes.heading}>{"Key Statistics - Edges" + " (" +  String(edges.length) + ")"}</Typography>
+              <Typography style={{fontSize: "16px", fontWeight: "bold"}}>{"Key Statistics - Edges" + " (" +  String(edges.length) + ")"}</Typography>
             </AccordionSummary>
             <AccordionDetails>
             <div style={{width: "100%"}}>
@@ -353,7 +353,7 @@ const Widget = ({ nodes, edges, ...props }) => {
 
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMoreIcon />} >
-              <Typography className={classes.heading}>Color</Typography>
+              <Typography style={{fontSize: "16px", fontWeight: "bold"}}>Color</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <div style={{width: "100%"}}>
