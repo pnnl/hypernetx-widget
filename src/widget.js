@@ -352,7 +352,7 @@ const Widget = ({ nodes, edges, ...props }) => {
           </Accordion>
 
           <Accordion>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />} >
+            <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}}/>} >
               <Typography style={{fontSize: "14px", fontWeight: "bold"}}>Color</Typography>
             </AccordionSummary>
             <AccordionDetails>
