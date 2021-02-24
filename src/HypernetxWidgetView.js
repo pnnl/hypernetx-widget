@@ -3,7 +3,7 @@ import React, {useMemo} from 'react'
 import {throttle} from 'lodash'
 
 import {drag} from 'd3-drag'
-import {merge, mean, min, max, range} from 'd3-array'
+import {scan as maxIndex, merge, mean, min, max, range} from 'd3-array'
 import {pack, hierarchy} from 'd3-hierarchy'
 import {select} from 'd3-selection'
 import {forceSimulation, forceLink, forceManyBody, forceCenter, forceCollide} from 'd3-force'
@@ -146,7 +146,7 @@ const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill, nodeStroke
         .join('text')
         .attr('x', d => d.x)
         .attr('y', d => d.y)
-        .attr('dx', d => d.r + 7)
+        // .attr('dx', d => d.r + 7)
         .text(d => d.data.uid in nodeLabels ? nodeLabels[d.data.uid] : d.data.uid);
 
     const updateModel = throttle(() => {
@@ -186,10 +186,26 @@ const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24, edgeStroke, edg
             .attr('fill', 'none')
             .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth, edgeFill});
 
-    simulation.on('tick.hulls', d =>
+    const labels = select(ele)
+      .selectAll('text')
+        .data(edges)
+          .join('text')
+            .text(d => d.uid);
+
+    const xValue = (a, b) => b[0] - a[0];
+    const rightMost = points => {
+      const idx = maxIndex(points, xValue);
+
+      return idx !== -1
+        ? points[idx]
+        : points[0];
+    }
+
+    simulation.on('tick.hulls', d => {
       hulls
-        .attr('d', ({level, elements}) => {
-          let points = [];
+        .attr('d', d => {
+          const {level, elements} = d;
+          let points = d.points = [];
 
           elements.forEach(({r, x, y, ...rest}) => {
             controlPoints.forEach(([cx, cy]) => {
@@ -204,8 +220,13 @@ const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24, edgeStroke, edg
           points.push(points[0]);
 
           return 'M' + points.map(d => d.join(',')).join('L')
-        })
-    );
+        });
+
+      labels
+        .attr('x', d => rightMost(d.points)[0])
+        .attr('y', d => rightMost(d.points)[1]);
+
+    });
   }}/>
 
 const DebugLinks = ({links, simulation}) =>
