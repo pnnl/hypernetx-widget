@@ -168,7 +168,7 @@ const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill, nodeStroke
     });
   }}/>
 
-const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24, edgeStroke, edgeStrokeWidth, edgeFill, onClickEdges=Object}) =>
+const HyperEdges = ({internals, edges, simulation, dr=5, nControlPoints=24, edgeStroke, edgeStrokeWidth, edgeFill, onClickEdges=Object}) =>
   <g className='edges' ref={ele => {
     const controlPoints = range(nControlPoints)
       .map(i => {
@@ -180,6 +180,8 @@ const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24, edgeStroke, edg
       .selectAll('path')
         .data(edges)
           .join('path')
+          	.sort((a, b) => a.level - b.level)
+          	.each(d => console.log(d))
             .call(forceEdgeDragBehavior, simulation)
             .on('click', onClickEdges)
             .attr('stroke', 'black')
@@ -204,12 +206,17 @@ const HyperEdges = ({edges, simulation, dr=5, nControlPoints=24, edgeStroke, edg
     }
 
     simulation.on('tick.hulls', d => {
+      internals.forEach(d => d.numBands = 0);
+
       hulls
         .attr('d', d => {
-          const {level, elements} = d;
+          const {elements} = d;
           let points = d.points = [];
 
-          elements.forEach(({r, x, y, ...rest}) => {
+          elements.forEach(ele => {
+            const {r, x, y} = ele;
+            const level = ele.numBands++;
+
             controlPoints.forEach(([cx, cy]) => {
               const radius = r + dr*(1 + level);
               return points.push([radius*cx + x, radius*cy + y]);
