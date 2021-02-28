@@ -122,7 +122,7 @@ const forceEdgeDragBehavior = (selection, simulation) => {
     );
 }
 
-const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill, nodeStroke, nodeStrokeWidth, nodeLabels={}, _model}) =>
+const Nodes = ({internals, simulation, onClickNodes=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, nodeLabels={}, _model}) =>
   <g className='nodes' ref={ele => {
 
     const groups = select(ele)
@@ -142,7 +142,7 @@ const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill, nodeStroke
           .call(encodeProps, d => d.data.uid, {nodeFill, nodeStroke, nodeStrokeWidth});
 
     const text = groups.selectAll('text')
-      .data(d => d.leaves())
+      .data(withNodeLabels ? d => d.leaves() : [])
         .join('text')
         .attr('x', d => d.x)
         .attr('y', d => d.y)
@@ -168,7 +168,7 @@ const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill, nodeStroke
     });
   }}/>
 
-const HyperEdges = ({internals, edges, simulation, dr=5, nControlPoints=24, edgeStroke, edgeStrokeWidth, onClickEdges=Object}) =>
+const HyperEdges = ({internals, edges, simulation, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, edgeStrokeWidth, onClickEdges=Object}) =>
   <g className='edges' ref={ele => {
     const controlPoints = range(nControlPoints)
       .map(i => {
@@ -190,7 +190,7 @@ const HyperEdges = ({internals, edges, simulation, dr=5, nControlPoints=24, edge
 
     const labels = select(ele)
       .selectAll('text')
-        .data(edges)
+        .data(withEdgeLabels ? edges : [])
           .join('text')
             .text(d => d.uid);
 

@@ -18,8 +18,13 @@ converters = {
     'colors': 'Fill',
     'linewidths': 'StrokeWidth',
     'linewidth': 'StrokeWidth',
-    'node_labels': 'nodeLabels'
 }
+
+def to_camel_case(s):
+    return ''.join([
+        si.title() if i > 0 else si
+        for i, si in enumerate(s.split('_'))
+    ])
 
 def prepare_kwargs(items, kwargs, prefix=''):
     return {
@@ -30,7 +35,7 @@ def prepare_kwargs(items, kwargs, prefix=''):
 
 def rename_kwargs(**kwargs):
     return {
-        converters.get(k, k): v
+        converters.get(k, to_camel_case(k)): v
         for k, v in kwargs.items()
     }
 
