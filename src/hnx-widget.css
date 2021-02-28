@@ -18,6 +18,7 @@
 	fill: darkgray;
 	alignment-baseline: middle;
 	text-anchor: middle;
+	pointer-events: none;
 }
 
 .hnx-widget-view .edges text{
@@ -28,10 +29,14 @@
 }
 
 .hnx-widget-view .edges path {
-	fill: white;
+	stroke-width: 1.5;
 	fill-opacity: 0;
+	pointer-events: visibleStroke;
 }
 
 .hnx-widget-view .edges path:hover {
-	stroke-dasharray: 6,3;
+	/*stroke-dasharray: 6,3;*/
+	stroke-width: 3;
+	fill-opacity: .5;
+	cursor: pointer;
 }

@@ -168,7 +168,7 @@ const Nodes = ({internals, simulation, onClickNodes=Object, nodeFill, nodeStroke
     });
   }}/>
 
-const HyperEdges = ({internals, edges, simulation, dr=5, nControlPoints=24, edgeStroke, edgeStrokeWidth, edgeFill, onClickEdges=Object}) =>
+const HyperEdges = ({internals, edges, simulation, dr=5, nControlPoints=24, edgeStroke, edgeStrokeWidth, onClickEdges=Object}) =>
   <g className='edges' ref={ele => {
     const controlPoints = range(nControlPoints)
       .map(i => {
@@ -185,8 +185,8 @@ const HyperEdges = ({internals, edges, simulation, dr=5, nControlPoints=24, edge
             .call(forceEdgeDragBehavior, simulation)
             .on('click', onClickEdges)
             .attr('stroke', 'black')
-            .attr('fill', 'none')
-            .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth, edgeFill});
+            .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth})
+            .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
 
     const labels = select(ele)
       .selectAll('text')
