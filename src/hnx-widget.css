@@ -40,3 +40,10 @@
 	fill-opacity: .5;
 	cursor: pointer;
 }
+
+.hnx-widget-view table.hnx-tooltip {
+	border: 1px solid black;
+	background: rgb(255, 255, 255, .75);
+	padding: .5em;
+	max-width: 150px;
+}

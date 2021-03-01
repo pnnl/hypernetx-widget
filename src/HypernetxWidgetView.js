@@ -1,6 +1,6 @@
 import React, {useMemo} from 'react'
 
-import {throttle} from 'lodash'
+import {debounce, throttle} from 'lodash'
 
 import {drag} from 'd3-drag'
 import {scan as maxIndex, merge, mean, min, max, range} from 'd3-array'
@@ -122,7 +122,7 @@ const forceEdgeDragBehavior = (selection, simulation) => {
     );
 }
 
-const Nodes = ({internals, simulation, onClickNodes=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, nodeLabels={}, _model}) =>
+const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, nodeLabels={}, _model}) =>
   <g className='nodes' ref={ele => {
 
     const groups = select(ele)
@@ -135,6 +135,17 @@ const Nodes = ({internals, simulation, onClickNodes=Object, withNodeLabels=true,
       .data(d => d.descendants())
         .join('circle')
           .on('click', onClickNodes)
+          .on('mouseover', (ev, d) => 
+            d.height === 0 &&
+            onChangeTooltip({
+              x: ev.offsetX,
+              y: ev.offsetY,
+              xOffset: d.r + 3,
+              title: d.data.uid,
+              content: nodeData ? nodeData[d.data.uid] : undefined
+            })
+          )
+          .on('mouseout', (ev, d) => d.height === 0 && onChangeTooltip())
           .classed('internal', d => d.height > 0)
           .attr('cx', d => d.height === 0 ? d.x : 0)
           .attr('cy', d => d.height === 0 ? d.y : 0)
@@ -181,7 +192,6 @@ const HyperEdges = ({internals, edges, simulation, dr=5, nControlPoints=24, with
         .data(edges)
           .join('path')
           	.sort((a, b) => a.level - b.level)
-          	.each(d => console.log(d))
             .call(forceEdgeDragBehavior, simulation)
             .on('click', onClickEdges)
             .attr('stroke', 'black')
@@ -255,6 +265,34 @@ const DebugLinks = ({links, simulation}) =>
     });
 
   }}/>
+
+const Tooltip = ({x, y, xOffset=20, title, content={}}) =>
+  <div style={{position: 'absolute'}}>
+    <table
+      className='hnx-tooltip'
+      style={{position: 'relative', top: y, left: x + xOffset}}
+    >
+      <thead>
+        <tr>
+          <th colSpan={2}>
+            {title}
+          </th>
+          <th />
+        </tr>        
+      </thead>
+
+      <tbody>
+        { Object.entries(content)
+            .map(([k, v]) =>
+              <tr key={k}>
+                <td>{k}</td>
+                <td>{v}</td>
+              </tr>
+            )
+        }
+      </tbody>
+    </table>
+  </div>
 
 export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, debug, pos={}, ...props}) => {
   const derivedProps = useMemo(
@@ -343,11 +381,24 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, debug,
     [nodes, edges, width, height]
   );
 
-  return <svg style={{width, height}} className='hnx-widget-view'>
-    <HyperEdges {...derivedProps}  {...props} />
-    <Nodes {...derivedProps} {...props} />
-    { debug && <DebugLinks {...derivedProps} {...props} /> }
-  </svg>
+  const [tooltip, setTooltip] = React.useState();
+
+  // debounce to improve rendering performance
+  // when user is mousing quickly
+  const handleTooltip = debounce(setTooltip, 200);
+
+  return <div className='hnx-widget-view'>
+    { tooltip &&
+      <Tooltip {...tooltip} />
+    }
+
+    <svg style={{width, height}}>
+      <HyperEdges {...derivedProps}  {...props} />
+      <Nodes {...derivedProps} {...props} onChangeTooltip={handleTooltip}/>
+      { debug && <DebugLinks {...derivedProps} {...props} /> }
+    </svg>
+
+  </div>
 }
 
 export default HypernetxWidgetView
