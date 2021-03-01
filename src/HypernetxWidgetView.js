@@ -168,7 +168,7 @@ const Nodes = ({internals, simulation, onClickNodes=Object, withNodeLabels=true,
     });
   }}/>
 
-const HyperEdges = ({internals, edges, simulation, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, edgeStrokeWidth, onClickEdges=Object}) =>
+const HyperEdges = ({internals, edges, simulation, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, edgeStrokeWidth, edgeLabels={}, onClickEdges=Object}) =>
   <g className='edges' ref={ele => {
     const controlPoints = range(nControlPoints)
       .map(i => {
@@ -192,7 +192,7 @@ const HyperEdges = ({internals, edges, simulation, dr=5, nControlPoints=24, with
       .selectAll('text')
         .data(withEdgeLabels ? edges : [])
           .join('text')
-            .text(d => d.uid);
+            .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid);
 
     const xValue = d => d[0];
     const yValue = d => d[1];
