@@ -280,22 +280,24 @@ const LineGraphEdges = ({edges, simulation, edgeLabels, edgeData, edgeStroke, ed
         .data(edges)
           .join('g');
 
-    groups.append('rect')
-      .attr('x', d => -d.r)
-      .attr('y', d => -d.r)
-      .attr('width', d => 2*d.r)
-      .attr('height', d => 2*d.r)    
+    const rectDimensions = selection =>
+      selection
+        .attr('x', d => -d.width/2)
+        .attr('y', d => -d.width/2)
+        .attr('width', d => d.width)
+        .attr('height', d => d.width)
+
 
     groups.append('rect')
-      .attr('x', d => -d.r)
-      .attr('y', d => -d.r)
-      .attr('width', d => 2*d.r)
-      .attr('height', d => 2*d.r)
+      .call(rectDimensions);
+
+    groups.append('rect')
+      .call(rectDimensions)
       .on('mouseover', (ev, d) => 
         onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
       )
       .on('mouseout', () => onChangeTooltip())
-      // .call(forceDragBehavior, simulation)
+      .call(forceDragBehavior, simulation)
       .on('click', onClickEdges)
       .attr('stroke', 'black')
       .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth})
@@ -348,7 +350,7 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGr
 
       // replace node ids with references to actual nodes
       edges = edges.map(({elements, ...rest}) => ({
-        r: lineGraph ? 15 : undefined, // this is interacting with the force algorithm, rename to fix
+        r: 15, width: 30, // this is interacting with the force algorithm, rename to fix
         elements: elements.map(v => tree.children[v]),
         ...rest
       }));
@@ -453,7 +455,7 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGr
           <LineGraphEdges {...allProps} />
         </React.Fragment>
       }
-      
+
       <Nodes {...allProps} />
     </svg>
 
