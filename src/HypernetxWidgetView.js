@@ -243,10 +243,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
 
           points = polygonHull(points);
 
-          // add the first point to the end to close the path
-          points.push(points[0]);
-
-          return 'M' + points.map(d => d.join(',')).join('L')
+          return 'M' + points.map(d => d.join(',')).join('L') + 'Z'
         });
 
       labels
