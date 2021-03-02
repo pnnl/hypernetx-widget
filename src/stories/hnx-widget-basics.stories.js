@@ -1,8 +1,7 @@
 import React from 'react';
-import Widget from '../widget.js';
-import {HnxWidget} from '..'
-import LoadTable from '../loadTable.js';
-import ColorButton from '../colorButton.js';
+
+import {HypernetxWidgetView} from '../HypernetxWidgetView';
+
 import props from './data/props.json'
 
 
@@ -11,7 +10,7 @@ export default {
 };
 
 export const Default = () =>
-  <HnxWidget {...props} />
+  <HypernetxWidgetView {...props} />
 
-export const Debug = () =>
-  <HnxWidget debug {...props} />
+export const LineGraph = () =>
+  <HypernetxWidgetView lineGraph {...props} />

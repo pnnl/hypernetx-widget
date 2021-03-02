@@ -28,13 +28,23 @@
 	font-style: italic;
 }
 
-.hnx-widget-view .edges path {
-	stroke-width: 1.5;
-	fill-opacity: 0;
+.hnx-widget-view .edges path{
 	pointer-events: visibleStroke;
 }
 
-.hnx-widget-view .edges path:hover {
+.hnx-widget-view .edges path,
+.hnx-widget-view .edges rect {
+	stroke-width: 1.5;
+	fill-opacity: 0;
+}
+
+.hnx-widget-view .edges rect:first-child {
+	fill-opacity: 1;
+	fill: white;
+}
+
+.hnx-widget-view .edges path:hover,
+.hnx-widget-view .edges rect:hover {
 	/*stroke-dasharray: 6,3;*/
 	stroke-width: 3;
 	fill-opacity: .5;
@@ -44,6 +54,7 @@
 .hnx-widget-view table.hnx-tooltip {
 	border: 1px solid black;
 	background: rgb(255, 255, 255, .75);
+	margin: .5em;
 	padding: .5em;
 	max-width: 150px;
 }

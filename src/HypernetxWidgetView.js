@@ -255,7 +255,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
     });
   }}/>
 
-const DebugLinks = ({links, simulation}) =>
+const LineGraphLinks = ({links, simulation}) =>
   <g ref={ele => {
     const lines = select(ele)
       .selectAll('line')
@@ -263,12 +263,50 @@ const DebugLinks = ({links, simulation}) =>
           .join('line')
             .style('stroke', 'black');
 
-    simulation.on('tick.debug-lines', d => {
+    simulation.on('tick.lineGraph-lines', d => {
       lines
         .attr('x1', d => d.source.x)
         .attr('y1', d => d.source.y)
         .attr('x2', d => d.target.x)
         .attr('y2', d => d.target.y);
+    });
+
+  }}/>
+
+const LineGraphEdges = ({edges, simulation, edgeLabels, edgeData, edgeStroke, edgeStrokeWidth, onClickEdges=Object, onChangeTooltip=Object}) =>
+  <g className='edges' ref={ele => {
+    const groups = select(ele)
+      .selectAll('g')
+        .data(edges)
+          .join('g');
+
+    groups.append('rect')
+      .attr('x', d => -d.r)
+      .attr('y', d => -d.r)
+      .attr('width', d => 2*d.r)
+      .attr('height', d => 2*d.r)    
+
+    groups.append('rect')
+      .attr('x', d => -d.r)
+      .attr('y', d => -d.r)
+      .attr('width', d => 2*d.r)
+      .attr('height', d => 2*d.r)
+      .on('mouseover', (ev, d) => 
+        onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
+      )
+      .on('mouseout', () => onChangeTooltip())
+      // .call(forceDragBehavior, simulation)
+      .on('click', onClickEdges)
+      .attr('stroke', 'black')
+      .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth})
+      .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
+
+    groups.append('text')
+      .text(d => edgeLabels && d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
+
+    simulation.on('tick.lineGraph-edges', d => {
+      groups
+        .attr('transform', d => `translate(${d.x},${d.y})`)
     });
 
   }}/>
@@ -301,7 +339,7 @@ const Tooltip = ({x, y, xOffset=20, title, content={}}) =>
     </table>
   </div>
 
-export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, debug, pos={}, ...props}) => {
+export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGraph, pos={}, ...props}) => {
   const derivedProps = useMemo(
     () => {
       // construct a simple hierarchy out of the nodes
@@ -310,6 +348,7 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, debug,
 
       // replace node ids with references to actual nodes
       edges = edges.map(({elements, ...rest}) => ({
+        r: lineGraph ? 15 : undefined, // this is interacting with the force algorithm, rename to fix
         elements: elements.map(v => tree.children[v]),
         ...rest
       }));
@@ -394,15 +433,28 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, debug,
   // when user is mousing quickly
   const handleTooltip = debounce(setTooltip, 200);
 
+  const allProps = {
+    ...derivedProps,
+    ...props,
+    onChangeTooltip: handleTooltip
+  };
+
   return <div className='hnx-widget-view'>
     { tooltip &&
       <Tooltip {...tooltip} />
     }
 
     <svg style={{width, height}}>
-      { !debug && <HyperEdges {...derivedProps}  {...props} onChangeTooltip={handleTooltip}  /> }
-      <Nodes {...derivedProps} {...props} onChangeTooltip={handleTooltip} />
-      { debug && <DebugLinks {...derivedProps} {...props} /> }
+      { !lineGraph && <HyperEdges {...allProps}  /> }
+
+      { lineGraph &&
+        <React.Fragment>
+          <LineGraphLinks {...allProps} /> 
+          <LineGraphEdges {...allProps} />
+        </React.Fragment>
+      }
+      
+      <Nodes {...allProps} />
     </svg>
 
   </div>
