@@ -122,6 +122,16 @@ const forceEdgeDragBehavior = (selection, simulation) => {
     );
 }
 
+const createTooltipData = (ev, uid, {xOffset=3, labels, data}) => {
+  return {
+    x: ev.offsetX,
+    y: ev.offsetY,
+    xOffset,
+    title: uid in labels ? `${labels[uid]} (${uid})` : uid,
+    content: data ? data[uid] : undefined
+  }
+}
+
 const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, nodeLabels={}, _model}) =>
   <g className='nodes' ref={ele => {
 
@@ -137,13 +147,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
           .on('click', onClickNodes)
           .on('mouseover', (ev, d) => 
             d.height === 0 &&
-            onChangeTooltip({
-              x: ev.offsetX,
-              y: ev.offsetY,
-              xOffset: d.r + 3,
-              title: d.data.uid,
-              content: nodeData ? nodeData[d.data.uid] : undefined
-            })
+            onChangeTooltip(createTooltipData(ev, d.data.uid, {xOffset: d.r + 3, labels: nodeLabels, data: nodeData}))
           )
           .on('mouseout', (ev, d) => d.height === 0 && onChangeTooltip())
           .classed('internal', d => d.height > 0)
@@ -179,7 +183,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
     });
   }}/>
 
-const HyperEdges = ({internals, edges, simulation, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, edgeStrokeWidth, edgeLabels={}, onClickEdges=Object}) =>
+const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, edgeStrokeWidth, edgeLabels={}, onClickEdges=Object, onChangeTooltip=Object}) =>
   <g className='edges' ref={ele => {
     const controlPoints = range(nControlPoints)
       .map(i => {
@@ -189,9 +193,12 @@ const HyperEdges = ({internals, edges, simulation, dr=5, nControlPoints=24, with
 
     const hulls = select(ele)
       .selectAll('path')
-        .data(edges)
+        .data(edges.sort((a, b) => a.level - b.level))
           .join('path')
-          	.sort((a, b) => a.level - b.level)
+            .on('mouseover', (ev, d) => 
+              onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
+            )
+            .on('mouseout', () => onChangeTooltip())
             .call(forceEdgeDragBehavior, simulation)
             .on('click', onClickEdges)
             .attr('stroke', 'black')
@@ -393,8 +400,8 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, debug,
     }
 
     <svg style={{width, height}}>
-      <HyperEdges {...derivedProps}  {...props} />
-      <Nodes {...derivedProps} {...props} onChangeTooltip={handleTooltip}/>
+      { !debug && <HyperEdges {...derivedProps}  {...props} onChangeTooltip={handleTooltip}  /> }
+      <Nodes {...derivedProps} {...props} onChangeTooltip={handleTooltip} />
       { debug && <DebugLinks {...derivedProps} {...props} /> }
     </svg>
 
