@@ -3,11 +3,13 @@ import React, {useMemo} from 'react'
 import {debounce, throttle} from 'lodash'
 
 import {drag} from 'd3-drag'
-import {group, scan as maxIndex, merge, mean, min, max, range} from 'd3-array'
+import {group, scan as maxIndex, merge, mean, min, max, range, sum} from 'd3-array'
 import {pack, hierarchy} from 'd3-hierarchy'
 import {select} from 'd3-selection'
 import {forceSimulation, forceLink, forceManyBody, forceCenter, forceCollide} from 'd3-force'
 import {polygonHull} from 'd3-polygon'
+
+import {TopologicalSort, DiGraph} from 'js-graph-algorithms'
 
 import './hnx-widget.css'
 
@@ -365,6 +367,42 @@ const collapseNodes = ({nodes, edges}) => {
     .sum(d => d.value);
 }
 
+const sortHyperEdges = edges => {
+  // sort hyper edges
+  // edges that are enclosed are drawn last
+  // when there is a tie, the smaller edge is drawn last
+  const G = new DiGraph(edges.length);
+
+  for (let i = 0; i < edges.length; i++) {
+    const si = new Set(edges[i].elements.map(d => d.uid));
+    const nsi = si.size;
+
+    for (let j = i + 1; j < edges.length; j++) {
+      const sj = edges[j].elements.map(d => d.uid);
+      const nsj = sj.length
+      const nsij = sum(sj, d => si.has(d));
+
+      if (nsij === nsi) {
+        // j contains i
+        G.addEdge(i, j);
+      } else if (nsij === nsj) {
+        // i contains j
+        G.addEdge(j, i);
+      } else if (nsij > 0 && nsi > nsj) {
+        // neither contains the other, they overlap, and i is bigger
+        G.addEdge(j, i);
+      } else if (nsij > 0 && nsj > nsi) {
+        // neither contains the other, they overlap, and j is bigger
+        G.addEdge(i, j);
+      }
+    }
+  }
+
+  return new TopologicalSort(G)
+    .order()
+    .map(i => edges[i]);
+}
+
 export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGraph, pos={}, ...props}) => {
   const derivedProps = useMemo(
     () => {
@@ -384,20 +422,13 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGr
         );
 
         return {
-          r: 15, width: 30, // this is interacting with the force algorithm, rename to fix
+          r: 0, width: 30, // this is interacting with the force algorithm, rename to fix
           elements: Array.from(edge.values()),
           ...rest
         }
       });
 
-      // sort hyper edges
-      // edges that are enclosed are drawn last
-      // when there is a tie, the smaller edge is drawn last
-      edges.sort((a, b) =>
-        a.level === b.level
-          ? b.elements.length - a.elements.length
-          : b.level - a.level
-      )
+      edges = sortHyperEdges(edges);
 
       //
 
