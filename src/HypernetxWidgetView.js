@@ -339,7 +339,7 @@ const Tooltip = ({x, y, xOffset=20, title, content={}}) =>
     </table>
   </div>
 
-const collapseNodes = ({nodes, edges}) => {
+const performCollapseNodes = ({nodes, edges, collapseNodes}) => {
 
   const edgesOfNodes = new Map(
     nodes.map(d => ([d.uid, []]))
@@ -353,7 +353,9 @@ const collapseNodes = ({nodes, edges}) => {
 
   const grouped = group(
     nodes,
-    ({uid}) => edgesOfNodes.get(uid).sort().join(',')
+    ({uid}) => collapseNodes
+      ? edgesOfNodes.get(uid).sort().join(',')
+      : uid
   );
 
   const tree = Array.from(grouped.values())
@@ -400,10 +402,10 @@ const sortHyperEdges = edges => {
     .map(i => edges[i]);
 }
 
-export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGraph, pos={}, ...props}) => {
+export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGraph, pos={}, collapseNodes, ...props}) => {
   const derivedProps = useMemo(
     () => {
-      const tree = collapseNodes({nodes, edges})
+      const tree = performCollapseNodes({nodes, edges, collapseNodes})
         .each((d, i) => d.uid = 'uid' in d.data ? d.data.uid : i);
 
       const nodesMap = new Map(

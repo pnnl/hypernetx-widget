@@ -9,8 +9,14 @@ export default {
   title: 'HNX Widget SVG/Basics',
 };
 
-export const Default = () =>
+export const Euler = () =>
   <HypernetxWidgetView {...props} />
+
+export const EulerCollapsed = () =>
+  <HypernetxWidgetView collapseNodes {...props} />
 
 export const LineGraph = () =>
   <HypernetxWidgetView lineGraph {...props} />
+
+export const LineGraphCollapsed = () =>
+  <HypernetxWidgetView lineGraph collapseNodes {...props} />
