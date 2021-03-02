@@ -369,17 +369,17 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGr
   const derivedProps = useMemo(
     () => {
       const tree = collapseNodes({nodes, edges})
-        .each((d, i) => d.key = i);
+        .each((d, i) => d.uid = 'uid' in d.data ? d.data.uid : i);
 
       const nodesMap = new Map(
-        tree.leaves().map(d => ([d.data.uid, d]))
+        tree.leaves().map(d => ([d.uid, d]))
       );
 
       // replace node ids with references to actual nodes
       edges = edges.map(({elements, ...rest}) => {
         const edge = new Map(
           elements.map(
-            v => ([nodesMap.get(v).parent.key, nodesMap.get(v).parent])
+            v => ([nodesMap.get(v).parent.uid, nodesMap.get(v).parent])
           )
         );
 
