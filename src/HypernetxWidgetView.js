@@ -3,7 +3,7 @@ import React, {useMemo} from 'react'
 import {debounce, throttle} from 'lodash'
 
 import {drag} from 'd3-drag'
-import {scan as maxIndex, merge, mean, min, max, range} from 'd3-array'
+import {group, scan as maxIndex, merge, mean, min, max, range} from 'd3-array'
 import {pack, hierarchy} from 'd3-hierarchy'
 import {select} from 'd3-selection'
 import {forceSimulation, forceLink, forceManyBody, forceCenter, forceCollide} from 'd3-force'
@@ -37,7 +37,6 @@ const forceDragBehavior = (selection, simulation) => {
     }
 
     function dragged(event) {
-
       const {x, y} = event;
       const {r} = event.subject;
 
@@ -341,19 +340,55 @@ const Tooltip = ({x, y, xOffset=20, title, content={}}) =>
     </table>
   </div>
 
+const collapseNodes = ({nodes, edges}) => {
+
+  const edgesOfNodes = new Map(
+    nodes.map(d => ([d.uid, []]))
+  );
+
+  edges.forEach(d =>
+    d.elements.forEach(k =>
+      edgesOfNodes.get(k).push(d.uid)
+    )
+  );
+
+  const grouped = group(
+    nodes,
+    ({uid}) => edgesOfNodes.get(uid).sort().join(',')
+  );
+
+  const tree = Array.from(grouped.values())
+    .map(elements => ({elements}));
+
+  // construct a simple hierarchy out of the nodes
+  return hierarchy({elements: tree}, d => d.elements)
+    .sum(d => d.value);
+}
+
 export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGraph, pos={}, ...props}) => {
   const derivedProps = useMemo(
     () => {
-      // construct a simple hierarchy out of the nodes
-      const tree = hierarchy({elements: nodes}, d => d.elements)
-        .sum(d => d.value);
+      const tree = collapseNodes({nodes, edges})
+        .each((d, i) => d.key = i);
+
+      const nodesMap = new Map(
+        tree.leaves().map(d => ([d.data.uid, d]))
+      );
 
       // replace node ids with references to actual nodes
-      edges = edges.map(({elements, ...rest}) => ({
-        r: 15, width: 30, // this is interacting with the force algorithm, rename to fix
-        elements: elements.map(v => tree.children[v]),
-        ...rest
-      }));
+      edges = edges.map(({elements, ...rest}) => {
+        const edge = new Map(
+          elements.map(
+            v => ([nodesMap.get(v).parent.key, nodesMap.get(v).parent])
+          )
+        );
+
+        return {
+          r: 15, width: 30, // this is interacting with the force algorithm, rename to fix
+          elements: Array.from(edge.values()),
+          ...rest
+        }
+      });
 
       // sort hyper edges
       // edges that are enclosed are drawn last

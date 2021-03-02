@@ -89,6 +89,7 @@ class HypernetxWidget(ReactJupyterWidget):
     ):
         # will break if already collapsed
         self.H = H.collapse_nodes() if collapse else H
+        self.H = H
 
         def get_property(id, value, default):
             if value is None:
@@ -102,27 +103,17 @@ class HypernetxWidget(ReactJupyterWidget):
         
         nodes = [
             {
-                'elements': [
-                    {
-                        'uid': uid,
-                        'value': get_property(uid, node_size, 1)
-                    }
-                    for uid in members
-                ]
+                'uid': uid,
+                'value': get_property(uid, node_size, 1)
             }
-            for members in _forwards_compatible_collapse(self.H)
+            for uid in self.H
         ]
-
-        nodes_dict = {
-            entity: i
-            for i, entity in enumerate(self.H)
-        }
 
         # js friendly representation of the hypergraph
         edges = [
             {
                 'uid': str(uid),
-                'elements': [nodes_dict[v] for v in entity.elements],
+                'elements': list(entity.elements),
                 'level': levels[uid]
             }
             for uid, entity in self.H.edges.elements.items()
