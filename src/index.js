@@ -4,4 +4,5 @@ import React from 'react'
 
 import Widget from './widget.js';
 
+export {HypernetxWidgetView} from './HypernetxWidgetView';
 export {Widget as HypernetxWidget};

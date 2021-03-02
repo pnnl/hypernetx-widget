@@ -77,7 +77,7 @@ def _forwards_compatible_collapse(H):
     ]
 
 @widgets.register
-class HypernetxWidget(ReactJupyterWidget):
+class HypernetxWidgetView(ReactJupyterWidget):
     pos = Dict().tag(sync=True)
 
     def __init__(self, H,
@@ -119,3 +119,7 @@ class HypernetxWidget(ReactJupyterWidget):
             edges=edges,
             **hnx_kwargs_to_props(H, **kwargs)
         )
+
+@widgets.register
+class HypernetxWidget(HypernetxWidgetView):
+    pass
