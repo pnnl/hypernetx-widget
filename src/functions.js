@@ -48,20 +48,6 @@ export const getRGB = (strRGB) => {
 }
 
 export const getNodeDegree = (nodeData, edgeData, uid) => {
-  // const degrees = Array.from({length: nodeData.length}, (x, i) => 0);
-  // edgeData.map(e => e.elements.map(v => {
-  //     degrees[v] += 1;
-  //   })
-  // )
-  // const nodeBySuperIdx = nodeData.map((n,i) => [i, n.map(x => x.uid)]);
-  // var deg = null;
-  // nodeBySuperIdx.map((x,i) => {
-  //   if(x[1].includes(uid)){
-  //      deg = degrees[i];
-  //   }
-  // })
-  // return deg
-  // const degrees = Array.from({length: nodeData.length}, (x,i) => 0);
   var degree = 0;
 
   edgeData.map(e => e.elements.map(v => {
@@ -75,12 +61,6 @@ export const getNodeDegree = (nodeData, edgeData, uid) => {
 export const getEdgeSize = (nodeData, edgeData, edgeIdx) => {
   const nodeElems = edgeData[edgeIdx].elements;
   return nodeElems.length
-  
-  // var edgeSize = 0
-  // nodeElems.map(x => {
-  //   edgeSize += nodeData[x].elements.length;
-  // })
-  // return edgeSize
 }
 
 
