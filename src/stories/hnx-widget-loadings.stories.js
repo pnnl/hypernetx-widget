@@ -10,6 +10,8 @@ export default {
   title: 'HNX Widget SVG/Loadings',
 };
 
+console.log("PROPS", props.nodes, props.edges);
+
 export const MainComponent = () => <div>
   <Widget nodes={props.nodes} edges={props.edges}/>
 </div>

@@ -376,9 +376,10 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGr
         .radius(d => scale*radius(d))
         .size([width, height])
         (tree);
-
+      // console.log(tree);
       // pre-specified children
       tree.each(d => {
+        console.log(d);
         if (d.depth === 1) {
           const children = d.children.filter(c => c.data.uid in pos);
 
