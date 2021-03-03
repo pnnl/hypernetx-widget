@@ -83,7 +83,7 @@ export const getNodeDegree = (nodeData, edgeData, uid) => {
 
 export const getEdgeSize = (nodeData, edgeData, edgeIdx) => {
   const nodeElems = edgeData[edgeIdx].elements;
-  console.log(nodeElems.length);
+
   return nodeElems.length
   
   // var edgeSize = 0
