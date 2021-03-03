@@ -61,19 +61,19 @@ export const getNodeDegree = (nodeData, edgeData, uid) => {
   //   }
   // })
   // return deg
-  const degrees = Array.from({length: nodeData.length}, (x,i) => 0);
-  edgeData.map(e => e.elements.map(v => {
-    degrees[v] += 1;
-  }))
+  // const degrees = Array.from({length: nodeData.length}, (x,i) => 0);
+  var degree = 0;
 
-  const uids = nodeData.map(x => x.uid);
-  let i = uids.indexOf(uid);
-  return degrees[i]
+  edgeData.map(e => e.elements.map(v => {
+    if(v === uid){
+      degree += 1;
+    }
+  }))
+  return degree
 }
 
 export const getEdgeSize = (nodeData, edgeData, edgeIdx) => {
   const nodeElems = edgeData[edgeIdx].elements;
-  console.log(nodeElems.length);
   return nodeElems.length
   
   // var edgeSize = 0
@@ -82,6 +82,7 @@ export const getEdgeSize = (nodeData, edgeData, edgeIdx) => {
   // })
   // return edgeSize
 }
+
 
 export const getValueFreq = (obj) => {
   let results = []

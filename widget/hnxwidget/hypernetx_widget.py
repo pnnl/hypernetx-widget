@@ -77,7 +77,7 @@ def _forwards_compatible_collapse(H):
     ]
 
 @widgets.register
-class HypernetxWidget(ReactJupyterWidget):
+class HypernetxWidgetView(ReactJupyterWidget):
     pos = Dict().tag(sync=True)
 
     def __init__(self, H,
@@ -87,8 +87,7 @@ class HypernetxWidget(ReactJupyterWidget):
         with_color=True,
         **kwargs
     ):
-        # will break if already collapsed
-        self.H = H.collapse_nodes() if collapse else H
+        self.H = H
 
         def get_property(id, value, default):
             if value is None:
@@ -97,33 +96,20 @@ class HypernetxWidget(ReactJupyterWidget):
                 return value.get(id, default)
             else:
                 return value
-        
-        levels = get_set_layering(self.H, collapse=False)
-        
+                
         nodes = [
             {
-                'elements': [
-                    {
-                        'uid': uid,
-                        'value': get_property(uid, node_size, 1)
-                    }
-                    for uid in members
-                ]
+                'uid': uid,
+                'value': get_property(uid, node_size, 1)
             }
-            for members in _forwards_compatible_collapse(self.H)
+            for uid in self.H
         ]
-
-        nodes_dict = {
-            entity: i
-            for i, entity in enumerate(self.H)
-        }
 
         # js friendly representation of the hypergraph
         edges = [
             {
                 'uid': str(uid),
-                'elements': [nodes_dict[v] for v in entity.elements],
-                'level': levels[uid]
+                'elements': list(entity.elements),
             }
             for uid, entity in self.H.edges.elements.items()
         ]
@@ -133,3 +119,7 @@ class HypernetxWidget(ReactJupyterWidget):
             edges=edges,
             **hnx_kwargs_to_props(H, **kwargs)
         )
+
+@widgets.register
+class HypernetxWidget(HypernetxWidgetView):
+    pass

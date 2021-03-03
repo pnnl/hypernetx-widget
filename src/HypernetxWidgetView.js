@@ -3,11 +3,14 @@ import React, {useMemo} from 'react'
 import {debounce, throttle} from 'lodash'
 
 import {drag} from 'd3-drag'
-import {scan as maxIndex, merge, mean, min, max, range} from 'd3-array'
+import {group, scan as maxIndex, merge, mean, min, max, range, sum, extent} from 'd3-array'
 import {pack, hierarchy} from 'd3-hierarchy'
 import {select} from 'd3-selection'
 import {forceSimulation, forceLink, forceManyBody, forceCenter, forceCollide} from 'd3-force'
-import {polygonHull} from 'd3-polygon'
+import {polygonCentroid, polygonContains, polygonHull} from 'd3-polygon'
+import {quadtree} from 'd3-quadtree'
+
+import {TopologicalSort, DiGraph} from 'js-graph-algorithms'
 
 import './hnx-widget.css'
 
@@ -37,7 +40,6 @@ const forceDragBehavior = (selection, simulation) => {
     }
 
     function dragged(event) {
-
       const {x, y} = event;
       const {r} = event.subject;
 
@@ -177,7 +179,8 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
     simulation.on('tick.nodes', d => {
       groups
         .attr('transform', d => `translate(${d.x},${d.y})`)
-        .classed('fixed', d => d.fx !== undefined);
+        .classed('fixed', d => d.fx !== undefined)
+        .classed('error', d => d.violations > 0);
 
       updateModel();
     });
@@ -228,7 +231,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
       hulls
         .attr('d', d => {
           const {elements} = d;
-          let points = d.points = [];
+          let points = [];
 
           elements.forEach(ele => {
             const {r, x, y} = ele;
@@ -240,12 +243,9 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
             })
           });
 
-          points = polygonHull(points);
+          points = d.points = polygonHull(points);
 
-          // add the first point to the end to close the path
-          points.push(points[0]);
-
-          return 'M' + points.map(d => d.join(',')).join('L')
+          return 'M' + points.map(d => d.join(',')).join('L') + 'Z'
         });
 
       labels
@@ -341,28 +341,163 @@ const Tooltip = ({x, y, xOffset=20, title, content={}}) =>
     </table>
   </div>
 
-export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGraph, pos={}, ...props}) => {
+const performCollapseNodes = ({nodes, edges, collapseNodes}) => {
+
+  const edgesOfNodes = new Map(
+    nodes.map(d => ([d.uid, []]))
+  );
+
+  edges.forEach(d =>
+    d.elements.forEach(k =>
+      edgesOfNodes.get(k).push(d.uid)
+    )
+  );
+
+  const grouped = group(
+    nodes,
+    ({uid}) => collapseNodes
+      ? edgesOfNodes.get(uid).sort().join(',')
+      : uid
+  );
+
+  const tree = Array.from(grouped.values())
+    .map(elements => ({elements}));
+
+  // construct a simple hierarchy out of the nodes
+  return hierarchy({elements: tree}, d => d.elements)
+    .sum(d => d.value);
+}
+
+const sortHyperEdges = edges => {
+  // sort hyper edges
+  // edges that are enclosed are drawn last
+  // when there is a tie, the smaller edge is drawn last
+  const G = new DiGraph(edges.length);
+
+  for (let i = 0; i < edges.length; i++) {
+    const si = new Set(edges[i].elements.map(d => d.uid));
+    const nsi = si.size;
+
+    for (let j = i + 1; j < edges.length; j++) {
+      const sj = edges[j].elements.map(d => d.uid);
+      const nsj = sj.length
+      const nsij = sum(sj, d => si.has(d));
+
+      if (nsij === nsi) {
+        // j contains i
+        G.addEdge(i, j);
+      } else if (nsij === nsj) {
+        // i contains j
+        G.addEdge(j, i);
+      } else if (nsij > 0 && nsi > nsj) {
+        // neither contains the other, they overlap, and i is bigger
+        G.addEdge(j, i);
+      } else if (nsij > 0 && nsj > nsi) {
+        // neither contains the other, they overlap, and j is bigger
+        G.addEdge(i, j);
+      }
+    }
+  }
+
+  return new TopologicalSort(G)
+    .order()
+    .map(i => edges[i]);
+}
+
+function search(quadtree, xmin, ymin, xmax, ymax) {
+  const results = [];
+  const x = quadtree.x();
+  const y = quadtree.y();
+
+  quadtree.visit(function(node, x1, y1, x2, y2) {
+    if (!node.length) {
+      do {
+        var d = node.data;
+        if (x(d) >= xmin && x(d) < xmax && y(d) >= ymin && y(d) < ymax) {
+          results.push(d);
+        }
+      } while (node = node.next);
+    }
+    return x1 >= xmax || y1 >= ymax || x2 < xmin || y2 < ymin;
+  });
+  return results;
+}
+
+const planarForce = (nodes, edges) => {
+  const px = d => d[0];
+  const py = d => d[1];
+
+  function force(alpha) {
+    // naive implementation
+    // for each combination of node and edge
+
+    nodes.forEach(v => v.violations = 0);
+
+    const qt = quadtree()
+      .x(d => d.x)
+      .y(d => d.y)
+      .addAll(nodes);
+
+    edges.forEach(({points, elementSet=new Set()}) => {
+      if (points) {
+        const [xmin, xmax] = extent(points, px);
+        const [ymin, ymax] = extent(points, py);
+
+        search(qt, xmin, ymin, xmax, ymax)
+          .forEach(v => {
+            const {x, y, uid} = v;
+
+            if (!elementSet.has(uid) && polygonContains(points, [x, y])) {
+              v.violations += 1;
+
+              const [cx, cy] = polygonCentroid(points);
+              const dx = x - cx;
+              const dy = y - cy;
+              const r = Math.sqrt(dx*dx + dy*dy);
+
+              v.vx += dx/(r*r)*alpha;
+              v.vy += dy/(r*r)*alpha;
+            }
+          });
+      }
+    });
+  }
+
+  force.initialize = () => {
+  }
+
+  return force;
+}
+
+export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGraph, pos={}, collapseNodes, ...props}) => {
   const derivedProps = useMemo(
     () => {
-      // construct a simple hierarchy out of the nodes
-      const tree = hierarchy({elements: nodes}, d => d.elements)
-        .sum(d => d.value);
+      const tree = performCollapseNodes({nodes, edges, collapseNodes})
+        .each((d, i) => d.uid = 'uid' in d.data ? d.data.uid : i);
+
+      const nodesMap = new Map(
+        tree.leaves().map(d => ([d.uid, d]))
+      );
 
       // replace node ids with references to actual nodes
-      edges = edges.map(({elements, ...rest}) => ({
-        r: 15, width: 30, // this is interacting with the force algorithm, rename to fix
-        elements: elements.map(v => tree.children[v]),
-        ...rest
-      }));
+      edges = edges.map(({elements, ...rest}) => {
+        const edge = new Map(
+          elements.map(
+            v => ([nodesMap.get(v).parent.uid, nodesMap.get(v).parent])
+          )
+        );
 
-      // sort hyper edges
-      // edges that are enclosed are drawn last
-      // when there is a tie, the smaller edge is drawn last
-      edges.sort((a, b) =>
-        a.level === b.level
-          ? b.elements.length - a.elements.length
-          : b.level - a.level
-      )
+        const elementsAry = Array.from(edge.values())
+
+        return {
+          r: 0, width: 30, // this is interacting with the force algorithm, rename to fix
+          elements: elementsAry,
+          elementSet: new Set(elementsAry.map(d => d.uid)),
+          ...rest
+        }
+      });
+
+      edges = sortHyperEdges(edges);
 
       //
 
@@ -420,7 +555,8 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGr
         .force('link', forceLink(links).distance(30))
         .force('center', forceCenter(width/2, height/2))
         .force('collide', forceCollide().radius(d => 2*d.r || 0))
-        .force('bound', () => simulation.nodes().forEach(boundNode));
+        .force('bound', () => simulation.nodes().forEach(boundNode))
+        .force('planar', lineGraph ? undefined : planarForce(internals, edges));
 
 
       simulation.size = [width, height];
