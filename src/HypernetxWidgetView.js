@@ -178,7 +178,8 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
     simulation.on('tick.nodes', d => {
       groups
         .attr('transform', d => `translate(${d.x},${d.y})`)
-        .classed('fixed', d => d.fx !== undefined);
+        .classed('fixed', d => d.fx !== undefined)
+        .classed('error', d => d.violations > 0);
 
       updateModel();
     });
@@ -229,7 +230,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
       hulls
         .attr('d', d => {
           const {elements} = d;
-          let points = d.points = [];
+          let points = [];
 
           elements.forEach(ele => {
             const {r, x, y} = ele;
@@ -241,7 +242,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
             })
           });
 
-          points = polygonHull(points);
+          points = d.points = polygonHull(points);
 
           return 'M' + points.map(d => d.join(',')).join('L') + 'Z'
         });
@@ -406,6 +407,9 @@ const planarForce = (nodes, edges) => {
   function force(alpha) {
     // naive implementation
     // for each combination of node and edge
+
+    nodes.forEach(v => v.violations = 0);
+
     edges.forEach(e => {
       const {points, elementSet=new Set()} = e;
       nodes.forEach(v => {
@@ -414,14 +418,21 @@ const planarForce = (nodes, edges) => {
 
         // check for violations
         if (!inEdge && points && polygonContains(points, [x, y])) {
-          console.log(v.uid, e.uid);
+          v.violations += 1;
+
+          const [cx, cy] = polygonCentroid(points);
+          const dx = x - cx;
+          const dy = y - cy;
+          const r = Math.sqrt(dx*dx + dy*dy);
+
+          v.vx += dx/(r*r)*alpha;
+          v.vy += dy/(r*r)*alpha;
         }
       })
     })
   }
 
   force.initialize = () => {
-    console.log('init', nodes, edges);
   }
 
   return force;
