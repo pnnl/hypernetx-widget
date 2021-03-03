@@ -7,7 +7,7 @@ import {group, scan as maxIndex, merge, mean, min, max, range, sum} from 'd3-arr
 import {pack, hierarchy} from 'd3-hierarchy'
 import {select} from 'd3-selection'
 import {forceSimulation, forceLink, forceManyBody, forceCenter, forceCollide} from 'd3-force'
-import {polygonHull} from 'd3-polygon'
+import {polygonCentroid, polygonContains, polygonHull} from 'd3-polygon'
 
 import {TopologicalSort, DiGraph} from 'js-graph-algorithms'
 
@@ -402,6 +402,31 @@ const sortHyperEdges = edges => {
     .map(i => edges[i]);
 }
 
+const planarForce = (nodes, edges) => {
+  function force(alpha) {
+    // naive implementation
+    // for each combination of node and edge
+    edges.forEach(e => {
+      const {points, elementSet=new Set()} = e;
+      nodes.forEach(v => {
+        const {x, y, uid} = v;
+        const inEdge = elementSet.has(uid);
+
+        // check for violations
+        if (!inEdge && points && polygonContains(points, [x, y])) {
+          console.log(v.uid, e.uid);
+        }
+      })
+    })
+  }
+
+  force.initialize = () => {
+    console.log('init', nodes, edges);
+  }
+
+  return force;
+}
+
 export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGraph, pos={}, collapseNodes, ...props}) => {
   const derivedProps = useMemo(
     () => {
@@ -420,9 +445,12 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGr
           )
         );
 
+        const elementsAry = Array.from(edge.values())
+
         return {
           r: 0, width: 30, // this is interacting with the force algorithm, rename to fix
-          elements: Array.from(edge.values()),
+          elements: elementsAry,
+          elementSet: new Set(elementsAry.map(d => d.uid)),
           ...rest
         }
       });
@@ -484,7 +512,8 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGr
         .force('link', forceLink(links).distance(30))
         .force('center', forceCenter(width/2, height/2))
         .force('collide', forceCollide().radius(d => 2*d.r || 0))
-        .force('bound', () => simulation.nodes().forEach(boundNode));
+        .force('bound', () => simulation.nodes().forEach(boundNode))
+        .force('planar', lineGraph ? undefined : planarForce(internals, edges));
 
 
       simulation.size = [width, height];
