@@ -25,10 +25,10 @@ import { getRGB, rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianSt
 const Widget = ({ nodes, edges, ...props }) => {
   const classes = accordianStyles();
 
-  const nodesData = nodes.map(x => x.elements).flat();
+  // const nodesData = nodes.map(x => x.elements).flat();
 
   const nodeDegMap = new Map();
-  nodesData.map((x,i) => nodeDegMap.set(x.uid, getNodeDegree(nodes, edges, x.uid)));
+  nodes.map((x,i) => nodeDegMap.set(x.uid, getNodeDegree(nodes, edges, x.uid)));
   const nodeDegList = Object.fromEntries(nodeDegMap);
 
   const edgeSizeMap = new Map();
@@ -36,25 +36,25 @@ const Widget = ({ nodes, edges, ...props }) => {
   const edgeSizeList = Object.fromEntries(edgeSizeMap);
 
   const nodeColorMap = new Map();
-  nodesData.map(x => nodeColorMap.set(x.uid, "rgba(0, 0, 0, 0.6)"));
+  nodes.map(x => nodeColorMap.set(x.uid, "rgba(0, 0, 0, 0.6)"));
 
   const edgeColorMap = new Map();
   edges.map(x => edgeColorMap.set(x.uid.toString(), "rgba(0, 0, 0, 1)"));
 
   const nodeVisibleMap = new Map();
-  nodesData.map(x => nodeVisibleMap.set(x.uid, true));
+  nodes.map(x => nodeVisibleMap.set(x.uid, true));
 
   const edgeVisibleMap = new Map();
   edges.map(x => edgeVisibleMap.set(x.uid.toString(), true));
 
   const nodeSelectMap = new Map();
-  nodesData.map(x => nodeSelectMap.set(x.uid, true));
+  nodes.map(x => nodeSelectMap.set(x.uid, true));
 
   const edgeSelectMap = new Map();
   edges.map(x => edgeSelectMap.set(x.uid.toString(), true));
 
   const noNodeSelectMap = new Map();
-  nodesData.map(x => noNodeSelectMap.set(x.uid, false));
+  nodes.map(x => noNodeSelectMap.set(x.uid, false));
 
   const noEdgeSelectMap = new Map();
   edges.map(x => noEdgeSelectMap.set(x.uid.toString(), false));
@@ -118,7 +118,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   const getHoverValue = (value, datatype) => {
     if(datatype === "node"){
       const nodesOnBarMap = new Map();
-      nodesData.map(x => nodesOnBarMap.set(x.uid, false));
+      nodes.map(x => nodesOnBarMap.set(x.uid, false));
 
       Object.entries(nodeDegList).map((uidDeg, i) => {
         value.map(v => {
@@ -167,13 +167,13 @@ const Widget = ({ nodes, edges, ...props }) => {
   }
 
   const nodeWidthMap = new Map();
-  nodesData.map(x => nodeWidthMap.set(x.uid, 1));
+  nodes.map(x => nodeWidthMap.set(x.uid, 1));
 
   const edgeWidthMap = new Map();
   edges.map(x => edgeWidthMap.set(x.uid.toString(), 1.5));
 
   const nodeLineColMap = new Map();
-  nodesData.map(x => nodeLineColMap.set(x.uid, "rgba(255, 255, 255, 1)"));
+  nodes.map(x => nodeLineColMap.set(x.uid, "rgba(255, 255, 255, 1)"));
 
   const [nodeStroke, setNodeStroke] = React.useState(Object.fromEntries(nodeLineColMap));
 
@@ -242,7 +242,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
-  const transNodeData = nodesData.map(x => {
+  const transNodeData = nodes.map(x => {
     return {
       uid: x.uid,
       value: nodeDegList[x.uid],
@@ -312,7 +312,7 @@ const Widget = ({ nodes, edges, ...props }) => {
         {navOpen ? <div className={classes.root}>
           <Accordion>
             <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}} />} >
-              <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Key Statistics - Nodes" + " (" +  String(nodesData.length) + ")"}</Typography>
+              <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Key Statistics - Nodes" + " (" +  String(nodes.length) + ")"}</Typography>
             </AccordionSummary>
             <AccordionDetails>
             <div style={{width: "100%"}}>
