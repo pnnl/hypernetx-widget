@@ -1,8 +1,5 @@
 import React from 'react';
-// import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
-// import FormHelperText from '@material-ui/core/FormHelperText';
-// import FormLabel from '@material-ui/core/FormLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import Button from '@material-ui/core/Button';
@@ -11,7 +8,6 @@ import { makeStyles, createMuiTheme, createStyles } from '@material-ui/core/styl
 import {range} from 'd3-array';
 import { getScheme, hexToRgb, allPalettes } from './functions.js';
 import {Colorscale} from 'react-colorscales';
-import * as scale from 'd3-scale-chromatic';
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -22,20 +18,14 @@ const useStyles = makeStyles((theme) => ({
     marginTop: theme.spacing(2),
   },
   customSelect: {
-    // paddingLeft: "5px",
     paddingRight:"5px",
     "& .MuiSelect-root": {
-      // fontSize: "15px",
       width: 100,
 
     },
   },
-  menuItem: {
-      // fontSize: "14px",
-  },
   colorItem: {
     "& .MuiSelect-root": {
-      // fontSize: "15px",
       width: 270
     },
   }
@@ -132,7 +122,7 @@ const ColorPalette = ({nodeData, edgeData, sendNodePalette, sendEdgePalette, cur
       sendEdgePalette(Object.fromEntries(defaultMap));
     }
   }
-  const viridisColorscale = ['#fafa6e', '#9cdf7c', '#4abd8c', '#00968e', '#106e7c', '#2a4858'];
+
   const getColorArray = (name) => {
     const colorScheme = getScheme(name);
     const k = [0.2, 0.4, 0.6, 0.8, 1]
@@ -140,7 +130,6 @@ const ColorPalette = ({nodeData, edgeData, sendNodePalette, sendEdgePalette, cur
     return result
   }
 
-  // getColorArray("Blues");
   return <div style={{padding: "5px", width:"100%"}}>
         <FormControl classes={{root: classes.customSelect}}>
           <InputLabel>Data</InputLabel>
