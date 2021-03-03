@@ -3,11 +3,12 @@ import React, {useMemo} from 'react'
 import {debounce, throttle} from 'lodash'
 
 import {drag} from 'd3-drag'
-import {group, scan as maxIndex, merge, mean, min, max, range, sum} from 'd3-array'
+import {group, scan as maxIndex, merge, mean, min, max, range, sum, extent} from 'd3-array'
 import {pack, hierarchy} from 'd3-hierarchy'
 import {select} from 'd3-selection'
 import {forceSimulation, forceLink, forceManyBody, forceCenter, forceCollide} from 'd3-force'
 import {polygonCentroid, polygonContains, polygonHull} from 'd3-polygon'
+import {quadtree} from 'd3-quadtree'
 
 import {TopologicalSort, DiGraph} from 'js-graph-algorithms'
 
@@ -403,33 +404,63 @@ const sortHyperEdges = edges => {
     .map(i => edges[i]);
 }
 
+function search(quadtree, xmin, ymin, xmax, ymax) {
+  const results = [];
+  const x = quadtree.x();
+  const y = quadtree.y();
+
+  quadtree.visit(function(node, x1, y1, x2, y2) {
+    if (!node.length) {
+      do {
+        var d = node.data;
+        if (x(d) >= xmin && x(d) < xmax && y(d) >= ymin && y(d) < ymax) {
+          results.push(d);
+        }
+      } while (node = node.next);
+    }
+    return x1 >= xmax || y1 >= ymax || x2 < xmin || y2 < ymin;
+  });
+  return results;
+}
+
 const planarForce = (nodes, edges) => {
+  const px = d => d[0];
+  const py = d => d[1];
+
   function force(alpha) {
     // naive implementation
     // for each combination of node and edge
 
     nodes.forEach(v => v.violations = 0);
 
-    edges.forEach(e => {
-      const {points, elementSet=new Set()} = e;
-      nodes.forEach(v => {
-        const {x, y, uid} = v;
-        const inEdge = elementSet.has(uid);
+    const qt = quadtree()
+      .x(d => d.x)
+      .y(d => d.y)
+      .addAll(nodes);
 
-        // check for violations
-        if (!inEdge && points && polygonContains(points, [x, y])) {
-          v.violations += 1;
+    edges.forEach(({points, elementSet=new Set()}) => {
+      if (points) {
+        const [xmin, xmax] = extent(points, px);
+        const [ymin, ymax] = extent(points, py);
 
-          const [cx, cy] = polygonCentroid(points);
-          const dx = x - cx;
-          const dy = y - cy;
-          const r = Math.sqrt(dx*dx + dy*dy);
+        search(qt, xmin, ymin, xmax, ymax)
+          .forEach(v => {
+            const {x, y, uid} = v;
 
-          v.vx += dx/(r*r)*alpha;
-          v.vy += dy/(r*r)*alpha;
-        }
-      })
-    })
+            if (!elementSet.has(uid) && polygonContains(points, [x, y])) {
+              v.violations += 1;
+
+              const [cx, cy] = polygonCentroid(points);
+              const dx = x - cx;
+              const dy = y - cy;
+              const r = Math.sqrt(dx*dx + dy*dy);
+
+              v.vx += dx/(r*r)*alpha;
+              v.vy += dy/(r*r)*alpha;
+            }
+          });
+      }
+    });
   }
 
   force.initialize = () => {
