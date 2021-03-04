@@ -7,7 +7,6 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Typography from '@material-ui/core/Typography';
 import { ArrowForwardIos, ArrowBackIos } from '@material-ui/icons';
 import Button from '@material-ui/core/Button';
-
 import {HypernetxWidgetView} from './HypernetxWidgetView';
 import ColorPalette  from './colorPalette.js';
 import LoadTable from './loadTable.js';
@@ -18,6 +17,7 @@ import { getRGB, rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianSt
 
 
 const Widget = ({ nodes, edges, ...props }) => {
+  // console.log("props", props);
   const classes = accordianStyles();
 
   const nodeDegMap = new Map();
@@ -126,17 +126,12 @@ const Widget = ({ nodes, edges, ...props }) => {
       const edgesOnBarMap = new Map();
       edges.map(x => edgesOnBarMap.set(x.uid.toString(), false));
 
-      // edges.map(x => noEdgeSelectMap.set(x.uid.toString(), false));
       Object.entries(edgeSizeList).map(uidSize => {
         value.map(v => {
           if(uidSize[1] === v){
             edgesOnBarMap.set(uidSize[0], true);
           }
-          // else{
-          //   edgesOnBarMap.set(uidSize[0], false);
-          // }
         })
-
       })
       setEdgeSelected(Object.fromEntries(edgesOnBarMap));
     }
@@ -146,16 +141,6 @@ const Widget = ({ nodes, edges, ...props }) => {
   const toggleNav = () => {
     setNavOpen(!navOpen);
   }
-
-
-  // const getChangedColors = (value, datatype) => {
-  //   if(datatype === "node"){
-  //     setNodeFill(value);
-  //   }
-  //   else{
-  //     setEdgeStroke(value);
-  //   }
-  // }
 
   const nodeWidthMap = new Map();
   nodes.map(x => nodeWidthMap.set(x.uid, 1));
@@ -276,21 +261,15 @@ const Widget = ({ nodes, edges, ...props }) => {
     setColType(type);
   }
 
-  const getClickedNodes = x => {
-    // console.log(x.uid);
-    const nodeClickedMap = new Map();
-
-    Object.entries(nodeDegList).map(uidDeg => {
-
-      if(uidDeg[0] === x.uid){
-        nodeClickedMap.set(uidDeg[0], true);
-      }
-      else{
-        nodeClickedMap.set(uidDeg[0], false);
-      }
-    })
-
+  const getClickedNodes = (uid, type) => {
+    if(type === 'select'){
+      setNodeSelected({...nodeSelected, [uid]:true});
+    }
+    else if(type === 'deselect'){
+      setNodeSelected({...nodeSelected, [uid]:false});
+    }
   }
+
 
   return <div>
     <Grid container spacing={1}>
@@ -362,7 +341,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     <HypernetxWidgetView
       {...props}
       {...{nodes, edges, nodeFill, nodeStroke, nodeStrokeWidth, nodeSelected, edgeStrokeWidth, edgeStroke, edgeSelected}}
-      sendNodeSelect={getClickedNodes}
+      onClickNodes={getClickedNodes}
       />
   </Grid>
   </Grid>

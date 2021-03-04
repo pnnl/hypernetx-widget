@@ -10,10 +10,10 @@ export default {
   title: 'HNX Widget SVG/Loadings',
 };
 
-console.log("PROPS", props.nodes, props.edges);
-
+// console.log("PROPS", props.nodes, props.edges);
+const nodeColorDict = {'FN': "#"};
 export const MainComponent = () => <div>
-  <Widget nodes={props.nodes} edges={props.edges}/>
+  <Widget nodes={props.nodes} edges={props.edges} />
 </div>
 
 // export const Button = () => <ShowButton type={"node"} />
