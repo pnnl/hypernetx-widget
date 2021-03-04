@@ -198,12 +198,12 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
       .selectAll('g')
         .data(edges)
           .join(enter => {
-            const g = enter.append('g');
+            const g = enter.append('g')
+              .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
 
             g.append('path')
               .attr('stroke', 'black')
               .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth})
-              .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
 
             g.append('text')
               .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
@@ -288,7 +288,8 @@ const LineGraphEdges = ({edges, simulation, edgeLabels, edgeData, edgeStroke, ed
       .selectAll('g')
         .data(edges)
           .join(enter => {
-            const g = enter.append('g');
+            const g = enter.append('g')
+              .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
 
             g.append('rect')
               .call(rectDimensions);
@@ -297,7 +298,6 @@ const LineGraphEdges = ({edges, simulation, edgeLabels, edgeData, edgeStroke, ed
               .call(rectDimensions)
               .attr('stroke', 'black')
               .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth})
-              .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
 
             g.append('text')
               .text(d => edgeLabels && d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
