@@ -29,12 +29,13 @@ const encodeProps = (selection, key, props) => {
   })
 }
 
-const forceDragBehavior = (selection, simulation) => {
+const forceDragBehavior = (selection, simulation, onClickNodes) => {
+
     const [width, height] = simulation.size;
 
     function dragstarted(event) {
+        console.log(event.active);
       if (!event.active) simulation.alphaTarget(0.3).restart();
-
       event.subject.fx = event.subject.x;
       event.subject.fy = event.subject.y;
     }
@@ -42,7 +43,6 @@ const forceDragBehavior = (selection, simulation) => {
     function dragged(event) {
       const {x, y} = event;
       const {r} = event.subject;
-
       event.subject.fx = Math.min(width - r, (Math.max(x, r)));
       event.subject.fy = Math.min(height - r, (Math.max(y, r)));
     }
@@ -54,6 +54,7 @@ const forceDragBehavior = (selection, simulation) => {
     function unfix(event, d) {
       d.fx = undefined;
       d.fy = undefined;
+      onClickNodes(d.data.elements[0].uid, "deselect")
     }
 
   selection
@@ -141,12 +142,12 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
       .selectAll('g')
         .data(internals)
           .join('g')
-            .call(forceDragBehavior, simulation);
+            .call(forceDragBehavior, simulation, onClickNodes);
 
     const circles = groups.selectAll('circle')
       .data(d => d.descendants())
         .join('circle')
-          .on('click', onClickNodes)
+          .on('click', (ev, d) => onClickNodes(d.data.uid, "select"))
           .on('mouseover', (ev, d) => 
             d.height === 0 &&
             onChangeTooltip(createTooltipData(ev, d.data.uid, {xOffset: d.r + 3, labels: nodeLabels, data: nodeData}))
@@ -552,10 +553,9 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGr
         .radius(d => scale*radius(d))
         .size([width, height])
         (tree);
-      // console.log(tree);
+
       // pre-specified children
       tree.each(d => {
-        console.log(d);
         if (d.depth === 1) {
           const children = d.children.filter(c => c.data.uid in pos);
 
