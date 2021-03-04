@@ -209,6 +209,10 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
               .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
               .style('visibility', withEdgeLabels ? undefined : 'hidden');
 
+            g.append('circle');
+
+            g.append('line')
+
             return g;
           })
             .on('mouseover', (ev, d) => 
