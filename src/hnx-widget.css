@@ -46,8 +46,8 @@
 	fill: white;
 }
 
-.hnx-widget-view .edges path:hover,
-.hnx-widget-view .edges rect:hover {
+.hnx-widget-view .edges :hover path,
+.hnx-widget-view .edges :hover rect {
 	/*stroke-dasharray: 6,3;*/
 	stroke-width: 3;
 	fill-opacity: .5;
