@@ -195,25 +195,29 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
         return [Math.cos(theta), Math.sin(theta)];
       });
 
-    const hulls = select(ele)
-      .selectAll('path')
-        .data(edges.sort((a, b) => a.level - b.level))
-          .join('path')
+    const groups = select(ele)
+      .selectAll('g')
+        .data(edges)
+          .join(enter => {
+            const g = enter.append('g');
+
+            g.append('path')
+              .attr('stroke', 'black')
+              .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth})
+              .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
+
+            g.append('text')
+              .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
+              .style('visibility', withEdgeLabels ? undefined : 'hidden');
+
+            return g;
+          })
             .on('mouseover', (ev, d) => 
               onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
             )
             .on('mouseout', () => onChangeTooltip())
             .call(forceEdgeDragBehavior, simulation)
             .on('click', onClickEdges)
-            .attr('stroke', 'black')
-            .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth})
-            .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
-
-    const labels = select(ele)
-      .selectAll('text')
-        .data(withEdgeLabels ? edges : [])
-          .join('text')
-            .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid);
 
     const xValue = d => d[0];
     const yValue = d => d[1];
@@ -229,7 +233,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
     simulation.on('tick.hulls', d => {
       internals.forEach(d => d.numBands = 0);
 
-      hulls
+      groups.select('path')
         .attr('d', d => {
           const {elements} = d;
           let points = [];
@@ -249,7 +253,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
           return 'M' + points.map(d => d.join(',')).join('L') + 'Z'
         });
 
-      labels
+      groups.select('text')
         .attr('x', d => mean(d.points, xValue))
         .attr('y', d => mean(d.points, yValue));
 
@@ -276,40 +280,47 @@ const LineGraphLinks = ({links, simulation}) =>
 
 const LineGraphEdges = ({edges, simulation, edgeLabels, edgeData, edgeStroke, edgeStrokeWidth, onClickEdges=Object, onChangeTooltip=Object}) =>
   <g className='edges' ref={ele => {
-    const groups = select(ele)
-      .selectAll('g')
-        .data(edges)
-          .join('g');
-
     const rectDimensions = selection =>
       selection
-        .attr('x', d => -d.width/2)
-        .attr('y', d => -d.width/2)
         .attr('width', d => d.width)
         .attr('height', d => d.width)
 
+    const groups = select(ele)
+      .selectAll('g')
+        .data(edges)
+          .join(enter => {
+            const g = enter.append('g');
 
-    groups.append('rect')
-      .call(rectDimensions);
+            g.append('rect')
+              .call(rectDimensions);
 
-    groups.append('rect')
-      .call(rectDimensions)
-      .on('mouseover', (ev, d) => 
-        onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
-      )
-      .on('mouseout', () => onChangeTooltip())
-      .call(forceDragBehavior, simulation)
-      .on('click', onClickEdges)
-      .attr('stroke', 'black')
-      .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth})
-      .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
+            g.append('rect')
+              .call(rectDimensions)
+              .attr('stroke', 'black')
+              .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth})
+              .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
 
-    groups.append('text')
-      .text(d => edgeLabels && d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
+            g.append('text')
+              .text(d => edgeLabels && d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
+
+            return g;
+          })
+            .on('mouseover', (ev, d) => 
+              onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
+            )
+            .on('mouseout', () => onChangeTooltip())
+            .call(forceDragBehavior, simulation)
+            .on('click', onClickEdges)
 
     simulation.on('tick.lineGraph-edges', d => {
       groups
-        .attr('transform', d => `translate(${d.x},${d.y})`)
+        .selectAll('rect')
+          .attr('x', d => d.x - d.width/2)
+          .attr('y', d => d.y - d.width/2);
+
+      groups.select('text')
+        .attr('x', d => d.x)
+        .attr('y', d => d.y);
     });
 
   }}/>
@@ -405,6 +416,7 @@ const sortHyperEdges = edges => {
     .map(i => edges[i]);
 }
 
+// source: https://github.com/d3/d3-quadtree#quadtree_visit
 function search(quadtree, xmin, ymin, xmax, ymax) {
   const results = [];
   const x = quadtree.x();
@@ -423,6 +435,30 @@ function search(quadtree, xmin, ymin, xmax, ymax) {
   });
   return results;
 }
+
+// source: https://math.stackexchange.com/questions/2193720/find-a-point-on-a-line-segment-which-is-the-closest-to-other-point-not-on-the-li
+// const _zero2D = [0, 0]
+
+// function closestPointBetween2D(P, A, B) {
+//     const v = [B[0] - A[0], B[1] - A[1]]
+//     const u = [A[0] - P[0], A[1] - P[1]]
+//     const vu = v[0] * u[0] + v[1] * u[1]
+//     const vv = v[0] ** 2 + v[1] ** 2
+//     const t = -vu / vv
+//     if (t >= 0 && t <= 1) return _vectorToSegment2D(t, _zero2D, A, B)
+//     const g0 = _sqDiag2D(_vectorToSegment2D(0, P, A, B))
+//     const g1 = _sqDiag2D(_vectorToSegment2D(1, P, A, B))
+//     return g0 <= g1 ? A : B
+// }
+
+// function _vectorToSegment2D(t, P, A, B) {
+//     return [
+//         (1 - t) * A[0] + t * B[0] - P[0],
+//         (1 - t) * A[1] + t * B[1] - P[1],
+//     ]
+// }
+
+// function _sqDiag2D(P) { return P[0] ** 2 + P[1] ** 2 }
 
 const planarForce = (nodes, edges) => {
   const px = d => d[0];
