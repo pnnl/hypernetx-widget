@@ -295,12 +295,6 @@ const LineGraphEdges = ({edges, simulation, edgeLabels, edgeData, edgeStroke, ed
 
             g.append('rect')
               .call(rectDimensions)
-              .on('mouseover', (ev, d) => 
-                onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
-              )
-              .on('mouseout', () => onChangeTooltip())
-              .call(forceDragBehavior, simulation)
-              .on('click', onClickEdges)
               .attr('stroke', 'black')
               .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth})
               .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
@@ -309,7 +303,13 @@ const LineGraphEdges = ({edges, simulation, edgeLabels, edgeData, edgeStroke, ed
               .text(d => edgeLabels && d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
 
             return g;
-          });
+          })
+            .on('mouseover', (ev, d) => 
+              onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
+            )
+            .on('mouseout', () => onChangeTooltip())
+            .call(forceDragBehavior, simulation)
+            .on('click', onClickEdges)
 
     simulation.on('tick.lineGraph-edges', d => {
       groups
