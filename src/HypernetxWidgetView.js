@@ -194,25 +194,29 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
         return [Math.cos(theta), Math.sin(theta)];
       });
 
-    const hulls = select(ele)
-      .selectAll('path')
+    const groups = select(ele)
+      .selectAll('g')
         .data(edges)
-          .join('path')
+          .join('g')
             .on('mouseover', (ev, d) => 
               onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
             )
             .on('mouseout', () => onChangeTooltip())
             .call(forceEdgeDragBehavior, simulation)
             .on('click', onClickEdges)
-            .attr('stroke', 'black')
-            .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth})
-            .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
 
-    const labels = select(ele)
-      .selectAll('text')
-        .data(withEdgeLabels ? edges : [])
-          .join('text')
-            .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid);
+    const hulls = groups.selectAll('path')
+      .data(d => [d])
+      .join('path')
+        .attr('stroke', 'black')
+        .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth})
+        .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
+
+    const labels = groups.selectAll('text')
+      .data(d => [d])
+      .join('text')
+        .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
+        .style('visibility', withEdgeLabels ? undefined : 'hidden');
 
     const xValue = d => d[0];
     const yValue = d => d[1];
