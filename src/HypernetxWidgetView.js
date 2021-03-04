@@ -424,6 +424,30 @@ function search(quadtree, xmin, ymin, xmax, ymax) {
   return results;
 }
 
+// source: https://math.stackexchange.com/questions/2193720/find-a-point-on-a-line-segment-which-is-the-closest-to-other-point-not-on-the-li
+// const _zero2D = [0, 0]
+
+// function closestPointBetween2D(P, A, B) {
+//     const v = [B[0] - A[0], B[1] - A[1]]
+//     const u = [A[0] - P[0], A[1] - P[1]]
+//     const vu = v[0] * u[0] + v[1] * u[1]
+//     const vv = v[0] ** 2 + v[1] ** 2
+//     const t = -vu / vv
+//     if (t >= 0 && t <= 1) return _vectorToSegment2D(t, _zero2D, A, B)
+//     const g0 = _sqDiag2D(_vectorToSegment2D(0, P, A, B))
+//     const g1 = _sqDiag2D(_vectorToSegment2D(1, P, A, B))
+//     return g0 <= g1 ? A : B
+// }
+
+// function _vectorToSegment2D(t, P, A, B) {
+//     return [
+//         (1 - t) * A[0] + t * B[0] - P[0],
+//         (1 - t) * A[1] + t * B[1] - P[1],
+//     ]
+// }
+
+// function _sqDiag2D(P) { return P[0] ** 2 + P[1] ** 2 }
+
 const planarForce = (nodes, edges) => {
   const px = d => d[0];
   const py = d => d[1];
