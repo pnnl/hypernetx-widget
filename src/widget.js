@@ -1,14 +1,9 @@
 import React from 'react';
-import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import FormGroup from '@material-ui/core/FormGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import FormLabel from '@material-ui/core/FormLabel';
-import { makeStyles } from "@material-ui/core/styles";
 import Typography from '@material-ui/core/Typography';
 import { ArrowForwardIos, ArrowBackIos } from '@material-ui/icons';
 import Button from '@material-ui/core/Button';
@@ -25,10 +20,8 @@ import { getRGB, rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianSt
 const Widget = ({ nodes, edges, ...props }) => {
   const classes = accordianStyles();
 
-  // const nodesData = nodes.map(x => x.elements).flat();
-
   const nodeDegMap = new Map();
-  nodes.map((x,i) => nodeDegMap.set(x.uid, getNodeDegree(nodes, edges, x.uid)));
+  nodes.map(x => nodeDegMap.set(x.uid, getNodeDegree(nodes, edges, x.uid)));
   const nodeDegList = Object.fromEntries(nodeDegMap);
 
   const edgeSizeMap = new Map();
@@ -94,8 +87,6 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
-  const [selectAllEl, setSelectAllEl] = React.useState(true);
-
   const getSelectAll = (type, value) => {
     if(type === "node"){
       if(value){
@@ -120,7 +111,7 @@ const Widget = ({ nodes, edges, ...props }) => {
       const nodesOnBarMap = new Map();
       nodes.map(x => nodesOnBarMap.set(x.uid, false));
 
-      Object.entries(nodeDegList).map((uidDeg, i) => {
+      Object.entries(nodeDegList).map(uidDeg => {
         value.map(v => {
           if(uidDeg[1] === v){
             nodesOnBarMap.set(uidDeg[0], true);
@@ -136,7 +127,7 @@ const Widget = ({ nodes, edges, ...props }) => {
       edges.map(x => edgesOnBarMap.set(x.uid.toString(), false));
 
       // edges.map(x => noEdgeSelectMap.set(x.uid.toString(), false));
-      Object.entries(edgeSizeList).map((uidSize, i) => {
+      Object.entries(edgeSizeList).map(uidSize => {
         value.map(v => {
           if(uidSize[1] === v){
             edgesOnBarMap.set(uidSize[0], true);
@@ -157,14 +148,14 @@ const Widget = ({ nodes, edges, ...props }) => {
   }
 
 
-  const getChangedColors = (value, datatype) => {
-    if(datatype === "node"){
-      setNodeFill(value);
-    }
-    else{
-      setEdgeStroke(value);
-    }
-  }
+  // const getChangedColors = (value, datatype) => {
+  //   if(datatype === "node"){
+  //     setNodeFill(value);
+  //   }
+  //   else{
+  //     setEdgeStroke(value);
+  //   }
+  // }
 
   const nodeWidthMap = new Map();
   nodes.map(x => nodeWidthMap.set(x.uid, 1));
@@ -189,7 +180,7 @@ const Widget = ({ nodes, edges, ...props }) => {
       const nodeSelectLine = new Map();
       const nodeHiddenLine = new Map();
       setCurrNodeButton(value);
-      Object.entries(nodeSelected).map((x,i) => {
+      Object.entries(nodeSelected).map(x => {
         if(x[1]){
           nodeSelectedBar.set(x[0], 2);
           nodeHiddenBar.set(x[0], 1);
@@ -220,7 +211,7 @@ const Widget = ({ nodes, edges, ...props }) => {
       const edgeSelectedBar = new Map();
       const edgeHiddenBar = new Map();
       setCurrEdgeButton(value);
-      Object.entries(edgeSelected).map((x,i) => {
+      Object.entries(edgeSelected).map(x => {
         if(x[1]){
           edgeSelectedBar.set(x[0], 3);
           edgeHiddenBar.set(x[0], 1.5);
@@ -264,7 +255,7 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const convertedData = function(data){
     const copy = {...data};
-    Object.values(copy).forEach(function(val){
+    Object.values(copy).forEach(val => {
       val["color"] = rgbToHex(parseInt(val.color.r), parseInt(val.color.g), parseInt(val.color.b));
     });
     return Object.values(copy);
@@ -289,7 +280,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     // console.log(x.uid);
     const nodeClickedMap = new Map();
 
-    Object.entries(nodeDegList).map((uidDeg, i) => {
+    Object.entries(nodeDegList).map(uidDeg => {
 
       if(uidDeg[0] === x.uid){
         nodeClickedMap.set(uidDeg[0], true);
@@ -370,7 +361,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   <Grid item xs={12} sm={!navOpen ? 11 : 8}>
     <HypernetxWidgetView
       {...props}
-      {...{nodes, edges, nodeFill, nodeStroke, nodeStrokeWidth, edgeStrokeWidth, edgeStroke}}
+      {...{nodes, edges, nodeFill, nodeStroke, nodeStrokeWidth, nodeSelected, edgeStrokeWidth, edgeStroke, edgeSelected}}
       sendNodeSelect={getClickedNodes}
       />
   </Grid>

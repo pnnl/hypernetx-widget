@@ -14,7 +14,7 @@ import ColorButton from './colorButton.js';
 import VisibilityButton from './visibilityButton.js';
 import { makeStyles } from '@material-ui/core/styles';
 import { max } from 'd3-array';
-import { descendingComparator, getComparator, stableSort } from './functions.js';
+import { getComparator, stableSort } from './functions.js';
 
 const tableStyles = makeStyles((theme) => ({
   customTable: {
