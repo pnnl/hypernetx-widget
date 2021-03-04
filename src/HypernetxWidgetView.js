@@ -197,26 +197,26 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
     const groups = select(ele)
       .selectAll('g')
         .data(edges)
-          .join('g')
+          .join(enter => {
+            const g = enter.append('g');
+
+            g.append('path')
+              .attr('stroke', 'black')
+              .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth})
+              .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
+
+            g.append('text')
+              .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
+              .style('visibility', withEdgeLabels ? undefined : 'hidden');
+
+            return g;
+          })
             .on('mouseover', (ev, d) => 
               onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
             )
             .on('mouseout', () => onChangeTooltip())
             .call(forceEdgeDragBehavior, simulation)
             .on('click', onClickEdges)
-
-    const hulls = groups.selectAll('path')
-      .data(d => [d])
-      .join('path')
-        .attr('stroke', 'black')
-        .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth})
-        .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
-
-    const labels = groups.selectAll('text')
-      .data(d => [d])
-      .join('text')
-        .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
-        .style('visibility', withEdgeLabels ? undefined : 'hidden');
 
     const xValue = d => d[0];
     const yValue = d => d[1];
@@ -232,7 +232,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
     simulation.on('tick.hulls', d => {
       internals.forEach(d => d.numBands = 0);
 
-      hulls
+      groups.select('path')
         .attr('d', d => {
           const {elements} = d;
           let points = [];
@@ -252,7 +252,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
           return 'M' + points.map(d => d.join(',')).join('L') + 'Z'
         });
 
-      labels
+      groups.select('text')
         .attr('x', d => mean(d.points, xValue))
         .attr('y', d => mean(d.points, yValue));
 
