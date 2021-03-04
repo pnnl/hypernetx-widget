@@ -279,11 +279,6 @@ const LineGraphLinks = ({links, simulation}) =>
 
 const LineGraphEdges = ({edges, simulation, edgeLabels, edgeData, edgeStroke, edgeStrokeWidth, onClickEdges=Object, onChangeTooltip=Object}) =>
   <g className='edges' ref={ele => {
-    const groups = select(ele)
-      .selectAll('g')
-        .data(edges)
-          .join('g');
-
     const rectDimensions = selection =>
       selection
         .attr('x', d => -d.width/2)
@@ -291,24 +286,32 @@ const LineGraphEdges = ({edges, simulation, edgeLabels, edgeData, edgeStroke, ed
         .attr('width', d => d.width)
         .attr('height', d => d.width)
 
+    const groups = select(ele)
+      .selectAll('g')
+        .data(edges)
+          .join(enter => {
+            const g = enter.append('g');
 
-    groups.append('rect')
-      .call(rectDimensions);
+            g.append('rect')
+              .call(rectDimensions);
 
-    groups.append('rect')
-      .call(rectDimensions)
-      .on('mouseover', (ev, d) => 
-        onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
-      )
-      .on('mouseout', () => onChangeTooltip())
-      .call(forceDragBehavior, simulation)
-      .on('click', onClickEdges)
-      .attr('stroke', 'black')
-      .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth})
-      .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
+            g.append('rect')
+              .call(rectDimensions)
+              .on('mouseover', (ev, d) => 
+                onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
+              )
+              .on('mouseout', () => onChangeTooltip())
+              .call(forceDragBehavior, simulation)
+              .on('click', onClickEdges)
+              .attr('stroke', 'black')
+              .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth})
+              .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
 
-    groups.append('text')
-      .text(d => edgeLabels && d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
+            g.append('text')
+              .text(d => edgeLabels && d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
+
+            return g;
+          });
 
     simulation.on('tick.lineGraph-edges', d => {
       groups
