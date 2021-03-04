@@ -196,7 +196,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
 
     const hulls = select(ele)
       .selectAll('path')
-        .data(edges.sort((a, b) => a.level - b.level))
+        .data(edges)
           .join('path')
             .on('mouseover', (ev, d) => 
               onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
