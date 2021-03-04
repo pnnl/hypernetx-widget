@@ -248,13 +248,14 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
           });
 
           points = d.points = polygonHull(points);
+          d.centroid = polygonCentroid(points);
 
           return 'M' + points.map(d => d.join(',')).join('L') + 'Z'
         });
 
       groups.select('text')
-        .attr('x', d => mean(d.points, xValue))
-        .attr('y', d => mean(d.points, yValue));
+        .attr('x', d => d.centroid[0])
+        .attr('y', d => d.centroid[1]);
 
     });
   }}/>
@@ -474,7 +475,7 @@ const planarForce = (nodes, edges) => {
       .y(d => d.y)
       .addAll(nodes);
 
-    edges.forEach(({points, elementSet=new Set()}) => {
+    edges.forEach(({points, centroid, elementSet=new Set()}) => {
       if (points) {
         const [xmin, xmax] = extent(points, px);
         const [ymin, ymax] = extent(points, py);
@@ -486,7 +487,7 @@ const planarForce = (nodes, edges) => {
             if (!elementSet.has(uid) && polygonContains(points, [x, y])) {
               v.violations += 1;
 
-              const [cx, cy] = polygonCentroid(points);
+              const [cx, cy] = centroid;
               const dx = x - cx;
               const dy = y - cy;
               const r = Math.sqrt(dx*dx + dy*dy);
