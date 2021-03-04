@@ -281,8 +281,6 @@ const LineGraphEdges = ({edges, simulation, edgeLabels, edgeData, edgeStroke, ed
   <g className='edges' ref={ele => {
     const rectDimensions = selection =>
       selection
-        .attr('x', d => -d.width/2)
-        .attr('y', d => -d.width/2)
         .attr('width', d => d.width)
         .attr('height', d => d.width)
 
@@ -315,7 +313,13 @@ const LineGraphEdges = ({edges, simulation, edgeLabels, edgeData, edgeStroke, ed
 
     simulation.on('tick.lineGraph-edges', d => {
       groups
-        .attr('transform', d => `translate(${d.x},${d.y})`)
+        .selectAll('rect')
+          .attr('x', d => d.x - d.width/2)
+          .attr('y', d => d.y - d.width/2);
+
+      groups.select('text')
+        .attr('x', d => d.x)
+        .attr('y', d => d.y);
     });
 
   }}/>
