@@ -404,6 +404,7 @@ const sortHyperEdges = edges => {
     .map(i => edges[i]);
 }
 
+// source: https://github.com/d3/d3-quadtree#quadtree_visit
 function search(quadtree, xmin, ymin, xmax, ymax) {
   const results = [];
   const x = quadtree.x();
