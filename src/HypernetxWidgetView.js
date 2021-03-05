@@ -216,12 +216,10 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
               .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
 
             g.append('path')
-              .attr('stroke', 'black')
-              .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth})
+              .attr('stroke', 'black');
 
             g.append('text')
-              .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
-              .style('visibility', withEdgeLabels ? undefined : 'hidden');
+              .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid);
 
             g.append('circle');
 
@@ -236,6 +234,12 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
             .on('click', onClickEdges)
             .call(forceEdgeDragBehavior, simulation)
             .call(classedByDict, {'selected': selectedEdges, 'hidden': hiddenEdges});
+
+    groups.select('path')
+      .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth});
+
+    groups.select('text')
+      .style('visibility', withEdgeLabels ? undefined : 'hidden');
 
     const xValue = d => d[0];
     const yValue = d => d[1];
