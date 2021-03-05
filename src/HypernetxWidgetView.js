@@ -54,7 +54,6 @@ const forceDragBehavior = (selection, simulation, onClickNodes) => {
     function unfix(event, d) {
       d.fx = undefined;
       d.fy = undefined;
-      onClickNodes(d.data.elements[0].uid, "deselect")
     }
 
   selection
@@ -160,7 +159,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
             return g;
           }
         )
-          .on('click', (ev, d) => onClickNodes(d.data.uid, "select"))
+          .on('click', onClickNodes)
           .on('mouseover', (ev, d) => 
             d.height === 0 &&
             onChangeTooltip(createTooltipData(ev, d.data.uid, {xOffset: d.r + 3, labels: nodeLabels, data: nodeData}))
@@ -633,7 +632,7 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGr
     ...props,
     onChangeTooltip: handleTooltip
   };
-
+    console.log("ALLPROPS", allProps);
   return <div className='hnx-widget-view'>
     { tooltip &&
       <Tooltip {...tooltip} />
