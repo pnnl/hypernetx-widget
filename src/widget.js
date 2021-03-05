@@ -32,14 +32,17 @@ const Widget = ({ nodes, edges, ...props }) => {
   const edgeColorMap = new Map();
   edges.map(x => edgeColorMap.set(x.uid.toString(), "rgba(0, 0, 0, 1)"));
 
-  const nodeVisibleMap = new Map();
-  nodes.map(x => nodeVisibleMap.set(x.uid, true));
+  // const nodeVisibleMap = new Map();
+  // nodes.map(x => nodeVisibleMap.set(x.uid, true));
 
   const nodeHiddenMap = new Map();
   nodes.map(x => nodeHiddenMap.set(x.uid, false));
 
-  const edgeVisibleMap = new Map();
-  edges.map(x => edgeVisibleMap.set(x.uid.toString(), true));
+  // const edgeVisibleMap = new Map();
+  // edges.map(x => edgeVisibleMap.set(x.uid.toString(), true));
+
+  const edgeHiddenMap = new Map();
+  edges.map(x => edgeHiddenMap.set(x.uid.toString(), false));
 
   const nodeSelectMap = new Map();
   nodes.map(x => nodeSelectMap.set(x.uid, true));
@@ -55,12 +58,13 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const [nodeFill, setNodeFill] = React.useState(Object.fromEntries(nodeColorMap));
   const [selectedNodes, setSelectedNodes] = React.useState(Object.fromEntries(nodeSelectMap));
-  const [nodeVisible, setNodeVisible] = React.useState(Object.fromEntries(nodeVisibleMap));
+  // const [nodeVisible, setNodeVisible] = React.useState(Object.fromEntries(nodeVisibleMap));
   const [hiddenNodes, setHiddenNodes] = React.useState(Object.fromEntries(nodeHiddenMap));
 
   const [edgeStroke, setEdgeStroke] = React.useState(Object.fromEntries(edgeColorMap));
   const [selectedEdges, setSelectedEdges] = React.useState(Object.fromEntries(edgeSelectMap));
-  const [edgeVisible, setEdgeVisible] = React.useState(Object.fromEntries(edgeVisibleMap));
+  // const [edgeVisible, setEdgeVisible] = React.useState(Object.fromEntries(edgeVisibleMap));
+  const [hiddenEdges, setHiddenEdges] = React.useState(Object.fromEntries(edgeHiddenMap));
 
   const getColorChange = (datatype, uid, color) => {
     if(datatype === "node"){
@@ -73,11 +77,11 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const getVisibilityChange = (datatype, uid, visibility) => {
     if(datatype === "node"){
-      setNodeVisible({...nodeVisible, [uid]:visibility});
+      // setNodeVisible({...nodeVisible, [uid]:visibility});
       setHiddenNodes({...hiddenNodes, [uid]:!visibility});
     }
     else{
-      setEdgeVisible({...edgeVisible, [uid]:visibility});
+      setHiddenEdges({...hiddenEdges, [uid]:!visibility});
     }
   }
 
@@ -229,7 +233,6 @@ const Widget = ({ nodes, edges, ...props }) => {
       value: nodeDegList[x.uid],
       color:  {"r": getRGB(nodeFill[x.uid])[0], "g":getRGB(nodeFill[x.uid])[1], "b":getRGB(nodeFill[x.uid])[2], "a":getRGB(nodeFill[x.uid])[3]},
       selected: selectedNodes[x.uid],
-      visible: nodeVisible[x.uid],
       hidden: hiddenNodes[x.uid]
     }
   });
@@ -240,7 +243,7 @@ const Widget = ({ nodes, edges, ...props }) => {
       value: edgeSizeList[x.uid.toString()],
       color: {"r": getRGB(edgeStroke[x.uid.toString()])[0], "g":getRGB(edgeStroke[x.uid.toString()])[1], "b":getRGB(edgeStroke[x.uid.toString()])[2], "a":getRGB(edgeStroke[x.uid.toString()])[3]},
       selected: selectedEdges[x.uid.toString()],
-      visible: edgeVisible[x.uid.toString()]
+      hidden: hiddenEdges[x.uid.toString()]
     }
   })
 
@@ -274,9 +277,6 @@ const Widget = ({ nodes, edges, ...props }) => {
     if(shift && type === 'deselect'){
       setSelectedNodes({...selectedNodes, [uid]:false});
     }
-    // else if(type === 'deselect'){
-    //   setSelectedNodes({...selectedNodes, [uid]:false});
-    // }
   }
 
   const getClickedEdges = (uid, shift) => {
@@ -354,7 +354,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   <Grid item xs={12} sm={!navOpen ? 11 : 8}>
     <HypernetxWidgetView
       {...props}
-      {...{nodes, edges, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes, hiddenNodes, edgeStroke, selectedEdges}}
+      {...{nodes, edges, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes, hiddenNodes, edgeStroke, selectedEdges, hiddenEdges}}
       onClickNodes={getClickedNodes} onClickEdges={getClickedEdges}
       />
   </Grid>

@@ -195,7 +195,7 @@ const LoadTable = ({ type, data, sendColorToMain, sendVisibilityToMain, sendSele
                 </TableCell>
                 <TableCell align="center">{x.value}</TableCell>
                 <TableCell align="center">
-                <VisibilityButton label={x.uid} visibility={x.visible}
+                <VisibilityButton label={x.uid} visibility={!x.hidden}
                 sendVisibility={getVisibility}/>
 
                 </TableCell>
