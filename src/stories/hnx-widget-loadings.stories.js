@@ -11,7 +11,7 @@ export default {
 };
 
 // console.log("PROPS", props.nodes, props.edges);
-const nodeColorDict = {'FN': "#"};
+// const nodeColorDict = {'FN': "#"};
 export const MainComponent = () => <div>
   <Widget nodes={props.nodes} edges={props.edges} />
 </div>

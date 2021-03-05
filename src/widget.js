@@ -17,7 +17,7 @@ import { getRGB, rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianSt
 
 
 const Widget = ({ nodes, edges, ...props }) => {
-  // console.log("props", props);
+
   const classes = accordianStyles();
 
   const nodeDegMap = new Map();
@@ -37,6 +37,9 @@ const Widget = ({ nodes, edges, ...props }) => {
   const nodeVisibleMap = new Map();
   nodes.map(x => nodeVisibleMap.set(x.uid, true));
 
+  const nodeHiddenMap = new Map();
+  nodes.map(x => nodeHiddenMap.set(x.uid, false));
+
   const edgeVisibleMap = new Map();
   edges.map(x => edgeVisibleMap.set(x.uid.toString(), true));
 
@@ -53,8 +56,9 @@ const Widget = ({ nodes, edges, ...props }) => {
   edges.map(x => noEdgeSelectMap.set(x.uid.toString(), false));
 
   const [nodeFill, setNodeFill] = React.useState(Object.fromEntries(nodeColorMap));
-  const [nodeSelected, setNodeSelected] = React.useState(Object.fromEntries(nodeSelectMap));
+  const [selectedNodes, setSelectedNodes] = React.useState(Object.fromEntries(nodeSelectMap));
   const [nodeVisible, setNodeVisible] = React.useState(Object.fromEntries(nodeVisibleMap));
+  const [hiddenNodes, setHiddenNodes] = React.useState(Object.fromEntries(nodeHiddenMap));
 
   const [edgeStroke, setEdgeStroke] = React.useState(Object.fromEntries(edgeColorMap));
   const [edgeSelected, setEdgeSelected] = React.useState(Object.fromEntries(edgeSelectMap));
@@ -72,15 +76,18 @@ const Widget = ({ nodes, edges, ...props }) => {
   const getVisibilityChange = (datatype, uid, visibility) => {
     if(datatype === "node"){
       setNodeVisible({...nodeVisible, [uid]:visibility});
+      setHiddenNodes({...hiddenNodes, [uid]:!visibility});
     }
     else{
       setEdgeVisible({...edgeVisible, [uid]:visibility});
     }
   }
 
+
+
   const getSelectedChange = (datatype, uid, selected ) => {
     if(datatype === "node"){
-      setNodeSelected({...nodeSelected, [uid]:selected});
+      setSelectedNodes({...selectedNodes, [uid]:selected});
     }
     else{
       setEdgeSelected({...edgeSelected, [uid]:selected});
@@ -90,10 +97,10 @@ const Widget = ({ nodes, edges, ...props }) => {
   const getSelectAll = (type, value) => {
     if(type === "node"){
       if(value){
-        setNodeSelected(Object.fromEntries(nodeSelectMap));
+        setSelectedNodes(Object.fromEntries(nodeSelectMap));
       }
       else{
-        setNodeSelected(Object.fromEntries(noNodeSelectMap));
+        setSelectedNodes(Object.fromEntries(noNodeSelectMap));
       }
     }
     else{
@@ -119,7 +126,7 @@ const Widget = ({ nodes, edges, ...props }) => {
         })
 
       })
-      setNodeSelected(Object.fromEntries(nodesOnBarMap));
+      setSelectedNodes(Object.fromEntries(nodesOnBarMap));
     }
 
     else if(datatype === "edge"){
@@ -165,7 +172,7 @@ const Widget = ({ nodes, edges, ...props }) => {
       const nodeSelectLine = new Map();
       const nodeHiddenLine = new Map();
       setCurrNodeButton(value);
-      Object.entries(nodeSelected).map(x => {
+      Object.entries(selectedNodes).map(x => {
         if(x[1]){
           nodeSelectedBar.set(x[0], 2);
           nodeHiddenBar.set(x[0], 1);
@@ -223,8 +230,9 @@ const Widget = ({ nodes, edges, ...props }) => {
       uid: x.uid,
       value: nodeDegList[x.uid],
       color:  {"r": getRGB(nodeFill[x.uid])[0], "g":getRGB(nodeFill[x.uid])[1], "b":getRGB(nodeFill[x.uid])[2], "a":getRGB(nodeFill[x.uid])[3]},
-      selected: nodeSelected[x.uid],
-      visible: nodeVisible[x.uid]
+      selected: selectedNodes[x.uid],
+      visible: nodeVisible[x.uid],
+      hidden: hiddenNodes[x.uid]
     }
   });
 
@@ -263,10 +271,10 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const getClickedNodes = (uid, type) => {
     if(type === 'select'){
-      setNodeSelected({...nodeSelected, [uid]:true});
+      setSelectedNodes({...selectedNodes, [uid]:true});
     }
     else if(type === 'deselect'){
-      setNodeSelected({...nodeSelected, [uid]:false});
+      setSelectedNodes({...selectedNodes, [uid]:false});
     }
   }
 
@@ -340,8 +348,8 @@ const Widget = ({ nodes, edges, ...props }) => {
   <Grid item xs={12} sm={!navOpen ? 11 : 8}>
     <HypernetxWidgetView
       {...props}
-      {...{nodes, edges, nodeFill, nodeStroke, nodeStrokeWidth, nodeSelected, edgeStrokeWidth, edgeStroke, edgeSelected}}
-      onClickNodes={getClickedNodes}
+      {...{nodes, edges, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes, hiddenNodes, edgeStrokeWidth, edgeStroke, edgeSelected}}
+      onClickNodes={getClickedNodes} onClickEdges={console.log}
       />
   </Grid>
   </Grid>

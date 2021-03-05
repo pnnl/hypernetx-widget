@@ -135,7 +135,7 @@ const createTooltipData = (ev, uid, {xOffset=3, labels, data}) => {
   }
 }
 
-const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, nodeSelected, nodeLabels={}, _model}) =>
+const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes, hiddenNodes, nodeLabels={}, _model}) =>
   <g className='nodes' ref={ele => {
 
     const groups = select(ele)
@@ -194,7 +194,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
         const theta = 2*Math.PI*i/nControlPoints;
         return [Math.cos(theta), Math.sin(theta)];
       });
-
+    console.log(edgeStroke, edgeStrokeWidth);
     const groups = select(ele)
       .selectAll('g')
         .data(edges)
@@ -618,7 +618,7 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGr
     ...props,
     onChangeTooltip: handleTooltip
   };
-
+    console.log("ALLPROPS", allProps);
   return <div className='hnx-widget-view'>
     { tooltip &&
       <Tooltip {...tooltip} />
