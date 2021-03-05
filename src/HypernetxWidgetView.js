@@ -54,7 +54,7 @@ const forceDragBehavior = (selection, simulation, onClickNodes) => {
     function unfix(event, d) {
       d.fx = undefined;
       d.fy = undefined;
-      onClickNodes(d.data.elements[0].uid, "deselect")
+      onClickNodes(d.data.elements[0].uid, event.shiftKey, "deselect")
     }
 
   selection
@@ -135,7 +135,7 @@ const createTooltipData = (ev, uid, {xOffset=3, labels, data}) => {
   }
 }
 
-const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes, hiddenNodes, nodeLabels={}, _model}) =>
+const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes, nodeLabels={}, _model}) =>
   <g className='nodes' ref={ele => {
 
     const groups = select(ele)
@@ -147,7 +147,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
     const circles = groups.selectAll('circle')
       .data(d => d.descendants())
         .join('circle')
-          .on('click', (ev, d) => onClickNodes(d.data.uid, "select"))
+          .on('click', (ev, d) => onClickNodes(d.data.uid, ev.shiftKey, "select"))
           .on('mouseover', (ev, d) => 
             d.height === 0 &&
             onChangeTooltip(createTooltipData(ev, d.data.uid, {xOffset: d.r + 3, labels: nodeLabels, data: nodeData}))
@@ -187,14 +187,14 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
     });
   }}/>
 
-const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, edgeStrokeWidth, edgeSelected, edgeLabels={}, onClickEdges=Object, onChangeTooltip=Object}) =>
+const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, edgeStrokeWidth, selectedEdges, edgeLabels={}, onClickEdges=Object, onChangeTooltip=Object}) =>
   <g className='edges' ref={ele => {
     const controlPoints = range(nControlPoints)
       .map(i => {
         const theta = 2*Math.PI*i/nControlPoints;
         return [Math.cos(theta), Math.sin(theta)];
       });
-    console.log(edgeStroke, edgeStrokeWidth);
+
     const groups = select(ele)
       .selectAll('g')
         .data(edges)
@@ -221,7 +221,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
             )
             .on('mouseout', () => onChangeTooltip())
             .call(forceEdgeDragBehavior, simulation)
-            .on('click', onClickEdges)
+            .on('click', (ev, d) => onClickEdges(d.uid, ev.shiftKey))
 
     const xValue = d => d[0];
     const yValue = d => d[1];
