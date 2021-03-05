@@ -135,7 +135,13 @@ const createTooltipData = (ev, uid, {xOffset=3, labels, data}) => {
   }
 }
 
-const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, nodeSelected, nodeLabels={}, _model}) =>
+const classedByDict = (selection, props) =>
+  Object.entries(props)
+    .forEach(([className, dict={}]) =>
+      selection.classed(className, d => dict[d.uid])
+    )
+
+const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes, hiddenNodes, nodeLabels={}, _model}) =>
   <g className='nodes' ref={ele => {
 
     const groups = select(ele)
@@ -157,15 +163,17 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
           .attr('cx', d => d.height === 0 ? d.x : 0)
           .attr('cy', d => d.height === 0 ? d.y : 0)
           .attr('r', d => d.r)
-          .call(encodeProps, d => d.data.uid, {nodeFill, nodeStroke, nodeStrokeWidth});
+          .call(encodeProps, d => d.data.uid, {nodeFill, nodeStroke, nodeStrokeWidth})
+          .call(classedByDict, {'selected': selectedNodes, 'hidden': hiddenNodes});
 
     const text = groups.selectAll('text')
       .data(withNodeLabels ? d => d.leaves() : [])
         .join('text')
-        .attr('x', d => d.x)
-        .attr('y', d => d.y)
-        // .attr('dx', d => d.r + 7)
-        .text(d => d.data.uid in nodeLabels ? nodeLabels[d.data.uid] : d.data.uid);
+          .attr('x', d => d.x)
+          .attr('y', d => d.y)
+          // .attr('dx', d => d.r + 7)
+          .text(d => d.data.uid in nodeLabels ? nodeLabels[d.data.uid] : d.data.uid)
+          .call(classedByDict, {'selected': selectedNodes, 'hidden': hiddenNodes});
 
     const updateModel = throttle(() => {
       if (_model) {
@@ -187,7 +195,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
     });
   }}/>
 
-const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, edgeStrokeWidth, edgeSelected, edgeLabels={}, onClickEdges=Object, onChangeTooltip=Object}) =>
+const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, edgeStrokeWidth, selectedEdges, hiddenEdges, edgeLabels={}, onClickEdges=Object, onChangeTooltip=Object}) =>
   <g className='edges' ref={ele => {
     const controlPoints = range(nControlPoints)
       .map(i => {
@@ -220,8 +228,9 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
               onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
             )
             .on('mouseout', () => onChangeTooltip())
-            .call(forceEdgeDragBehavior, simulation)
             .on('click', onClickEdges)
+            .call(forceEdgeDragBehavior, simulation)
+            .call(classedByDict, {'selected': selectedEdges, 'hidden': hiddenEdges});
 
     const xValue = d => d[0];
     const yValue = d => d[1];
