@@ -14,8 +14,6 @@ import Bars from './bars.js';
 import ShowButton from './showButton.js';
 import { getRGB, rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianStyles } from './functions.js';
 
-
-
 const Widget = ({ nodes, edges, ...props }) => {
 
   const classes = accordianStyles();
