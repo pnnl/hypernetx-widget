@@ -143,16 +143,23 @@ const classedByDict = (selection, props) =>
 
 const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes, hiddenNodes, nodeLabels={}, _model}) =>
   <g className='nodes' ref={ele => {
-
     const groups = select(ele)
-      .selectAll('g')
+      .selectAll('g.group')
         .data(internals)
           .join('g')
+            .classed('group', true)
             .call(forceDragBehavior, simulation, onClickNodes);
 
-    const circles = groups.selectAll('circle')
+    const circles = groups.selectAll('g')
       .data(d => d.descendants())
-        .join('circle')
+        .join(
+          enter => {
+            const g = enter.append('g')
+            g.append('circle')
+            g.append('text');
+            return g;
+          }
+        )
           .on('click', (ev, d) => onClickNodes(d.data.uid, "select"))
           .on('mouseover', (ev, d) => 
             d.height === 0 &&
@@ -160,20 +167,19 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
           )
           .on('mouseout', (ev, d) => d.height === 0 && onChangeTooltip())
           .classed('internal', d => d.height > 0)
-          .attr('cx', d => d.height === 0 ? d.x : 0)
-          .attr('cy', d => d.height === 0 ? d.y : 0)
-          .attr('r', d => d.r)
           .call(encodeProps, d => d.data.uid, {nodeFill, nodeStroke, nodeStrokeWidth})
-          .call(classedByDict, {'selected': selectedNodes, 'hidden': hiddenNodes});
+          .call(classedByDict, {'selected': selectedNodes, 'hidden': hiddenNodes})
 
-    const text = groups.selectAll('text')
-      .data(withNodeLabels ? d => d.leaves() : [])
-        .join('text')
-          .attr('x', d => d.x)
-          .attr('y', d => d.y)
-          // .attr('dx', d => d.r + 7)
-          .text(d => d.data.uid in nodeLabels ? nodeLabels[d.data.uid] : d.data.uid)
-          .call(classedByDict, {'selected': selectedNodes, 'hidden': hiddenNodes});
+    circles.select('circle')
+      .attr('cx', d => d.height === 0 ? d.x : 0)
+      .attr('cy', d => d.height === 0 ? d.y : 0)
+      .attr('r', d => d.r);
+
+    circles.select('text')
+      .attr('x', d => d.x)
+      .attr('y', d => d.y)
+      // .attr('dx', d => d.r + 7)
+      .text(d => d.data.uid in nodeLabels ? nodeLabels[d.data.uid] : d.data.uid);
 
     const updateModel = throttle(() => {
       if (_model) {
