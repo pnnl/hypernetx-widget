@@ -11,11 +11,14 @@ const RemoveButton = ({label, remove, onRemoveChange}) => {
     }
 
     return(
-        <div>
-            <IconButton onClick={handleRemove}>
-                {remove ? <RemoveCircleOutlineOutlinedIcon style={{fill: '#DCDCDC'}} />
-                : <RemoveCircleOutlineOutlinedIcon style={{fill: 'black'}} />}
-            </IconButton>
+        <div className="hoverShow">
+            <div className={remove === true ? "show" : "hide"}>
+                <IconButton onClick={handleRemove} style={{padding: "2px"}}>
+                    {remove ? <RemoveCircleOutlineOutlinedIcon style={{fill: '#DCDCDC'}} />
+                        : <RemoveCircleOutlineOutlinedIcon style={{fill: 'black'}} />}
+                </IconButton>
+            </div>
+
         </div>
     )
 }

@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 
-const ColorPalette = ({nodeData, edgeData, sendNodePalette, sendEdgePalette, currGroup, currPalette, currType, sendCurrData}) => {
+const ColorPalette = ({nodeData, edgeData, onNodePaletteChange, onEdgePaletteChange, currGroup, currPalette, currType, onCurrDataChange}) => {
 
   const classes = useStyles();
 
@@ -99,13 +99,13 @@ const ColorPalette = ({nodeData, edgeData, sendNodePalette, sendEdgePalette, cur
     if(palette !== "black"){
       if(type === "node"){
         const nodeColorPalette = getEachColors(group, palette, nodeData);
-        sendNodePalette(Object.fromEntries(nodeColorPalette));
-        sendCurrData(group, palette, type);
+        onNodePaletteChange(Object.fromEntries(nodeColorPalette));
+        onCurrDataChange(group, palette, type);
       }
       else{
         const edgeColorPalette = getEachColors(group, palette, edgeData);
-        sendEdgePalette(Object.fromEntries(edgeColorPalette));
-        sendCurrData(group, palette, type);
+        onEdgePaletteChange(Object.fromEntries(edgeColorPalette));
+        onCurrDataChange(group, palette, type);
       }
     }
   }
@@ -115,11 +115,11 @@ const ColorPalette = ({nodeData, edgeData, sendNodePalette, sendEdgePalette, cur
     const defaultMap = new Map();
     if(type === "node"){
       Object.keys(nodeData).map(x => defaultMap.set(x, "rgba(0, 0, 0, 1)"));
-      sendNodePalette(Object.fromEntries(defaultMap));
+      onNodePaletteChange(Object.fromEntries(defaultMap));
     }
     else{
       Object.keys(edgeData).map(x => defaultMap.set(x, "rgba(0, 0, 0, 1)"));
-      sendEdgePalette(Object.fromEntries(defaultMap));
+      onEdgePaletteChange(Object.fromEntries(defaultMap));
     }
   }
 

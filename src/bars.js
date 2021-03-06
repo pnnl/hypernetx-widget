@@ -3,10 +3,10 @@ import { withStyles } from '@material-ui/core/styles';
 import { max, range } from 'd3-array';
 import { VictoryTheme, VictoryScatter, VictoryBrushContainer, VictoryVoronoiContainer, VictoryBar, VictoryChart, VictoryAxis, VictorySelectionContainer } from "victory";
 
-const Bars = ({ type, freqData, sendValue }) =>{
+const Bars = ({ type, freqData, onValueChange }) =>{
   const maxVal = max(freqData.map(d => d.x));
   const handleSelection = x => {
-    sendValue(x[0].data.map(x => x.x), type);
+      onValueChange(x[0].data.map(x => x.x), type);
   }
   return(
     <div style={{ height: "150px",  width:"100%",}}>

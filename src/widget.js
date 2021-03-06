@@ -105,7 +105,6 @@ const Widget = ({ nodes, edges, ...props }) => {
       setRemovedEdges({...removedEdges, [uid]:removed});
     }
   }
-  console.log(removedNodes);
 
   const getSelectAll = (type, value) => {
     if(type === "node"){
@@ -213,7 +212,7 @@ const Widget = ({ nodes, edges, ...props }) => {
       const edgeSelectedBar = new Map();
       const edgeHiddenBar = new Map();
       setCurrEdgeButton(value);
-      Object.entries(edgeSelected).map(x => {
+      Object.entries(selectedEdges).map(x => {
         if(x[1]){
           edgeSelectedBar.set(x[0], 3);
           edgeHiddenBar.set(x[0], 1.5);
@@ -313,14 +312,14 @@ const Widget = ({ nodes, edges, ...props }) => {
               <LoadTable
                 type={"node"}
                 data={convertedData(transNodeData)}
-                sendColorToMain={getColorChange}
-                sendVisibilityToMain={getVisibilityChange}
-                sendSelectedToMain={getSelectedChange}
+                onColorChange={getColorChange}
+                onVisibleChange={getVisibilityChange}
+                onSelectedChange={getSelectedChange}
                 onRemovedChange={getRemovedChange}
-                sendSelectAll={getSelectAll}
+                onSelectAllChange={getSelectAll}
               />
-              <ShowButton type={"node"} sendButton={getButton} currButton={currNodeButton}/>
-              <Bars type={"node"} freqData={getValueFreq(nodeDegList)} sendValue={getHoverValue}/>
+              {/*<ShowButton type={"node"} sendButton={getButton} currButton={currNodeButton}/>*/}
+              <Bars type={"node"} freqData={getValueFreq(nodeDegList)} onValueChange={getHoverValue}/>
             </div>
 
             </AccordionDetails>
@@ -335,14 +334,14 @@ const Widget = ({ nodes, edges, ...props }) => {
               <LoadTable
                 type={"edge"}
                 data={convertedData(transEdgeData)}
-                sendColorToMain={getColorChange}
-                sendVisibilityToMain={getVisibilityChange}
-                sendSelectedToMain={getSelectedChange}
+                onColorChange={getColorChange}
+                onVisibleChange={getVisibilityChange}
+                onSelectedChange={getSelectedChange}
                 onRemovedChange={getRemovedChange}
-                sendSelectAll={getSelectAll}
+                onSelectAllChange={getSelectAll}
               />
-              <ShowButton type={"edge"} sendButton={getButton} currButton={currEdgeButton}/>
-              <Bars type={"edge"} freqData={getValueFreq(edgeSizeList)} sendValue={getHoverValue}/>
+              {/*<ShowButton type={"edge"} sendButton={getButton} currButton={currEdgeButton}/>*/}
+              <Bars type={"edge"} freqData={getValueFreq(edgeSizeList)} onValueChange={getHoverValue}/>
             </div>
             </AccordionDetails>
           </Accordion>
@@ -354,8 +353,8 @@ const Widget = ({ nodes, edges, ...props }) => {
             <AccordionDetails>
               <div style={{width: "100%"}}>
                 <ColorPalette nodeData={nodeDegList} edgeData={edgeSizeList}
-                sendNodePalette={getNodePalette} sendEdgePalette={getEdgePalette}
-                currGroup={colGroup} currPalette={colPalette} currType={colType} sendCurrData={getCurrData}
+                onNodePaletteChange={getNodePalette} onEdgePaletteChange={getEdgePalette}
+                currGroup={colGroup} currPalette={colPalette} currType={colType} onCurrDataChange={getCurrData}
                 />
               </div>
             </AccordionDetails>
@@ -366,7 +365,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   <Grid item xs={12} sm={!navOpen ? 11 : 8}>
     <HypernetxWidgetView
       {...props}
-      {...{nodes, edges, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes, hiddenNodes, edgeStroke, selectedEdges, hiddenEdges}}
+      {...{nodes, edges, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges}}
       onClickNodes={getClickedNodes} onClickEdges={getClickedEdges}
       />
   </Grid>
