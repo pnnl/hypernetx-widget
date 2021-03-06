@@ -28,7 +28,6 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const nodeColorMap = new Map();
   nodes.map(x => nodeColorMap.set(x.uid, "rgba(0, 0, 0, 0.6)"));
-
   const edgeColorMap = new Map();
   edges.map(x => edgeColorMap.set(x.uid.toString(), "rgba(0, 0, 0, 1)"));
 
@@ -37,34 +36,38 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const nodeHiddenMap = new Map();
   nodes.map(x => nodeHiddenMap.set(x.uid, false));
-
+  const edgeHiddenMap = new Map();
+  edges.map(x => edgeHiddenMap.set(x.uid.toString(), false));
   // const edgeVisibleMap = new Map();
   // edges.map(x => edgeVisibleMap.set(x.uid.toString(), true));
 
-  const edgeHiddenMap = new Map();
-  edges.map(x => edgeHiddenMap.set(x.uid.toString(), false));
 
   const nodeSelectMap = new Map();
   nodes.map(x => nodeSelectMap.set(x.uid, true));
-
   const edgeSelectMap = new Map();
   edges.map(x => edgeSelectMap.set(x.uid.toString(), true));
 
   const noNodeSelectMap = new Map();
   nodes.map(x => noNodeSelectMap.set(x.uid, false));
-
   const noEdgeSelectMap = new Map();
   edges.map(x => noEdgeSelectMap.set(x.uid.toString(), false));
+
+  const nodeRemovedMap = new Map();
+  nodes.map(x => nodeRemovedMap.set(x.uid, false));
+  const edgeRemovedMap = new Map();
+  edges.map(x => edgeRemovedMap.set(x.uid.toString(), false));
 
   const [nodeFill, setNodeFill] = React.useState(Object.fromEntries(nodeColorMap));
   const [selectedNodes, setSelectedNodes] = React.useState(Object.fromEntries(nodeSelectMap));
   // const [nodeVisible, setNodeVisible] = React.useState(Object.fromEntries(nodeVisibleMap));
   const [hiddenNodes, setHiddenNodes] = React.useState(Object.fromEntries(nodeHiddenMap));
+  const [removedNodes, setRemovedNodes] = React.useState(Object.fromEntries(nodeRemovedMap));
 
   const [edgeStroke, setEdgeStroke] = React.useState(Object.fromEntries(edgeColorMap));
   const [selectedEdges, setSelectedEdges] = React.useState(Object.fromEntries(edgeSelectMap));
   // const [edgeVisible, setEdgeVisible] = React.useState(Object.fromEntries(edgeVisibleMap));
   const [hiddenEdges, setHiddenEdges] = React.useState(Object.fromEntries(edgeHiddenMap));
+  const [removedEdges, setRemovedEdges] = React.useState(Object.fromEntries(edgeRemovedMap));
 
   const getColorChange = (datatype, uid, color) => {
     if(datatype === "node"){
@@ -85,8 +88,6 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
-
-
   const getSelectedChange = (datatype, uid, selected ) => {
     if(datatype === "node"){
       setSelectedNodes({...selectedNodes, [uid]:selected});
@@ -95,6 +96,16 @@ const Widget = ({ nodes, edges, ...props }) => {
       setSelectedEdges({...selectedEdges, [uid]:selected});
     }
   }
+
+  const getRemovedChange = (datatype, uid, removed) => {
+    if(datatype === "node"){
+      setRemovedNodes({...removedNodes, [uid]:removed});
+    }
+    else{
+      setRemovedEdges({...removedEdges, [uid]:removed});
+    }
+  }
+  console.log(removedNodes);
 
   const getSelectAll = (type, value) => {
     if(type === "node"){
@@ -119,14 +130,12 @@ const Widget = ({ nodes, edges, ...props }) => {
     if(datatype === "node"){
       const nodesOnBarMap = new Map();
       nodes.map(x => nodesOnBarMap.set(x.uid, false));
-
       Object.entries(nodeDegList).map(uidDeg => {
         value.map(v => {
           if(uidDeg[1] === v){
             nodesOnBarMap.set(uidDeg[0], true);
           }
         })
-
       })
       setSelectedNodes(Object.fromEntries(nodesOnBarMap));
     }
@@ -134,7 +143,6 @@ const Widget = ({ nodes, edges, ...props }) => {
     else if(datatype === "edge"){
       const edgesOnBarMap = new Map();
       edges.map(x => edgesOnBarMap.set(x.uid.toString(), false));
-
       Object.entries(edgeSizeList).map(uidSize => {
         value.map(v => {
           if(uidSize[1] === v){
@@ -233,7 +241,8 @@ const Widget = ({ nodes, edges, ...props }) => {
       value: nodeDegList[x.uid],
       color:  {"r": getRGB(nodeFill[x.uid])[0], "g":getRGB(nodeFill[x.uid])[1], "b":getRGB(nodeFill[x.uid])[2], "a":getRGB(nodeFill[x.uid])[3]},
       selected: selectedNodes[x.uid],
-      hidden: hiddenNodes[x.uid]
+      hidden: hiddenNodes[x.uid],
+      removed: removedNodes[x.uid],
     }
   });
 
@@ -243,7 +252,8 @@ const Widget = ({ nodes, edges, ...props }) => {
       value: edgeSizeList[x.uid.toString()],
       color: {"r": getRGB(edgeStroke[x.uid.toString()])[0], "g":getRGB(edgeStroke[x.uid.toString()])[1], "b":getRGB(edgeStroke[x.uid.toString()])[2], "a":getRGB(edgeStroke[x.uid.toString()])[3]},
       selected: selectedEdges[x.uid.toString()],
-      hidden: hiddenEdges[x.uid.toString()]
+      hidden: hiddenEdges[x.uid.toString()],
+      removed: removedEdges[x.uid.toString()]
     }
   })
 
@@ -306,6 +316,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                 sendColorToMain={getColorChange}
                 sendVisibilityToMain={getVisibilityChange}
                 sendSelectedToMain={getSelectedChange}
+                onRemovedChange={getRemovedChange}
                 sendSelectAll={getSelectAll}
               />
               <ShowButton type={"node"} sendButton={getButton} currButton={currNodeButton}/>
@@ -327,6 +338,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                 sendColorToMain={getColorChange}
                 sendVisibilityToMain={getVisibilityChange}
                 sendSelectedToMain={getSelectedChange}
+                onRemovedChange={getRemovedChange}
                 sendSelectAll={getSelectAll}
               />
               <ShowButton type={"edge"} sendButton={getButton} currButton={currEdgeButton}/>
