@@ -270,7 +270,11 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
             })
           });
 
-          points = d.points = polygonHull(points);
+          points = points.length === 0
+            ? controlPoints.map(([cx, cy]) => ([d.x + 2*dr*cx, d.y + 2*dr*cy]))
+            : polygonHull(points);
+          
+          d.points = points;
           d.centroid = polygonCentroid(points);
 
           return 'M' + points.map(d => d.join(',')).join('L') + 'Z'
