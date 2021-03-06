@@ -54,7 +54,6 @@ const forceDragBehavior = (selection, simulation, onClickNodes) => {
     function unfix(event, d) {
       d.fx = undefined;
       d.fy = undefined;
-      onClickNodes(d.data.elements[0].uid, event.shiftKey, "deselect")
     }
 
   selection
@@ -135,37 +134,51 @@ const createTooltipData = (ev, uid, {xOffset=3, labels, data}) => {
   }
 }
 
+const classedByDict = (selection, props) =>
+  Object.entries(props)
+    .forEach(([className, dict={}]) =>
+      selection.classed(className, d => dict[d.uid])
+    )
+
 const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes, hiddenNodes, nodeLabels={}, _model}) =>
   <g className='nodes' ref={ele => {
-
     const groups = select(ele)
-      .selectAll('g')
+      .selectAll('g.group')
         .data(internals)
           .join('g')
+            .classed('group', true)
             .call(forceDragBehavior, simulation, onClickNodes);
 
-    const circles = groups.selectAll('circle')
+    const circles = groups.selectAll('g')
       .data(d => d.descendants())
-        .join('circle')
-          .on('click', (ev, d) => onClickNodes(d.data.uid, ev.shiftKey, "select"))
+        .join(
+          enter => {
+            const g = enter.append('g')
+            g.append('circle')
+            g.append('text');
+            return g;
+          }
+        )
+          .on('click', onClickNodes)
           .on('mouseover', (ev, d) => 
             d.height === 0 &&
             onChangeTooltip(createTooltipData(ev, d.data.uid, {xOffset: d.r + 3, labels: nodeLabels, data: nodeData}))
           )
           .on('mouseout', (ev, d) => d.height === 0 && onChangeTooltip())
           .classed('internal', d => d.height > 0)
-          .attr('cx', d => d.height === 0 ? d.x : 0)
-          .attr('cy', d => d.height === 0 ? d.y : 0)
-          .attr('r', d => d.r)
-          .call(encodeProps, d => d.data.uid, {nodeFill, nodeStroke, nodeStrokeWidth});
+          .call(encodeProps, d => d.data.uid, {nodeFill, nodeStroke, nodeStrokeWidth})
+          .call(classedByDict, {'selected': selectedNodes, 'hidden': hiddenNodes})
 
-    const text = groups.selectAll('text')
-      .data(withNodeLabels ? d => d.leaves() : [])
-        .join('text')
-        .attr('x', d => d.x)
-        .attr('y', d => d.y)
-        // .attr('dx', d => d.r + 7)
-        .text(d => d.data.uid in nodeLabels ? nodeLabels[d.data.uid] : d.data.uid);
+    circles.select('circle')
+      .attr('cx', d => d.height === 0 ? d.x : 0)
+      .attr('cy', d => d.height === 0 ? d.y : 0)
+      .attr('r', d => d.r);
+
+    circles.select('text')
+      .attr('x', d => d.x)
+      .attr('y', d => d.y)
+      // .attr('dx', d => d.r + 7)
+      .text(d => d.data.uid in nodeLabels ? nodeLabels[d.data.uid] : d.data.uid);
 
     const updateModel = throttle(() => {
       if (_model) {
@@ -203,12 +216,10 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
               .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
 
             g.append('path')
-              .attr('stroke', 'black')
-              .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth})
+              .attr('stroke', 'black');
 
             g.append('text')
-              .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
-              .style('visibility', withEdgeLabels ? undefined : 'hidden');
+              .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid);
 
             g.append('circle');
 
@@ -220,8 +231,15 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
               onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
             )
             .on('mouseout', () => onChangeTooltip())
+            .on('click', onClickEdges)
             .call(forceEdgeDragBehavior, simulation)
-            .on('click', (ev, d) => onClickEdges(d.uid, ev.shiftKey))
+            .call(classedByDict, {'selected': selectedEdges, 'hidden': hiddenEdges});
+
+    groups.select('path')
+      .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth});
+
+    groups.select('text')
+      .style('visibility', withEdgeLabels ? undefined : 'hidden');
 
     const xValue = d => d[0];
     const yValue = d => d[1];

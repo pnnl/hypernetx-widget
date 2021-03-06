@@ -1,16 +1,22 @@
-.hnx-widget-view .nodes .fixed circle.internal {
+.hnx-widget-view .nodes .fixed .internal {
 	stroke: gray;
 	stroke-width: 3;
 	stroke-dasharray: 6,3;
 }
 
-.hnx-widget-view .nodes circle.internal {
+.hnx-widget-view .nodes .internal {
 	fill-opacity: 0;
 }
 
 .hnx-widget-view .nodes circle:hover {
 	stroke: black;
 	stroke-width: 2;
+	fill: white;
+}
+
+.hnx-widget-view .nodes .selected circle {
+	stroke: black;
+	stroke-width: 4;
 	fill: white;
 }
 
@@ -53,6 +59,11 @@
 	cursor: pointer;
 }
 
+.hnx-widget-view .edges .selected path {
+	stroke-width: 5;
+	fill-opacity: .125;
+}
+
 .hnx-widget-view table.hnx-tooltip {
 	border: 1px solid black;
 	background: rgb(255, 255, 255, .75);
@@ -60,3 +71,8 @@
 	padding: .5em;
 	max-width: 150px;
 }
+
+.hnx-widget-view .hidden {
+	opacity: 0.1;
+}
+
