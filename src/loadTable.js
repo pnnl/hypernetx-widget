@@ -15,6 +15,7 @@ import VisibilityButton from './visibilityButton.js';
 import { makeStyles } from '@material-ui/core/styles';
 import { max } from 'd3-array';
 import { getComparator, stableSort } from './functions.js';
+import RemoveButton from "./removeButton";
 
 const tableStyles = makeStyles((theme) => ({
   customTable: {
@@ -69,6 +70,7 @@ function EnhancedTableHead(props) {
     {id: 'uid', label: 'Label'},
     {id: 'value', label: datatype === "node" ? "Degree" : "Size"},
     {id: 'visible', label: 'Visibility'},
+    {id: 'remove', label: 'Remove'},
     {id: 'color', label: 'Color'}
   ];
 
@@ -116,24 +118,17 @@ EnhancedTableHead.propTypes = {
   onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
   orderBy: PropTypes.string.isRequired,
-  // numSelected: PropTypes.number.isRequired,
   rowCount: PropTypes.number.isRequired,
 };
 
 
-
-const LoadTable = ({ type, data, sendColorToMain, sendVisibilityToMain, sendSelectedToMain, sendSelectAll }) => {
+const LoadTable = ({ type, data, onColorChange, onVisibleChange, onSelectedChange, onRemovedChange, onSelectAllChange }) => {
   const classes = tableStyles();
 
-  const customColumnStyle = { width: 8, backgroundColor: 'yellow' };
   const calcBar = i => {
     const values = data.map(x => x.value);
     return String(100 * (i/max(values)))+"%";
   }
-
-  const createSortHandler = (property) => (event) => {
-    onRequestSort(event, property);
-  };
 
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('label');
@@ -146,23 +141,27 @@ const LoadTable = ({ type, data, sendColorToMain, sendVisibilityToMain, sendSele
 
   const handleSelectAllClick = event => {
     if (event.target.checked) {
-      sendSelectAll(type, true);
+      onSelectAllChange(type, true);
     }
     else{
-      sendSelectAll(type, false);
+      onSelectAllChange(type, false);
     }
   };
 
   const getColor = (label, color) => {
-    sendColorToMain(type, label, color);
+    onColorChange(type, label, color);
   }
 
   const getVisibility = (label, visibility) => {
-    sendVisibilityToMain(type, label, visibility);
+    onVisibleChange(type, label, visibility);
   }
 
   const getCheck = (label, check) => {
-    sendSelectedToMain(type, label, check);
+    onSelectedChange(type, label, check);
+  }
+
+  const getRemove = (label, remove) =>{
+    onRemovedChange(type, label, remove);
   }
 
   return <div style={{ margin: "0px", padding:"0px", }}>
@@ -184,9 +183,7 @@ const LoadTable = ({ type, data, sendColorToMain, sendVisibilityToMain, sendSele
 
             return(
               <TableRow key={i}>
-                <TableCell>
-                  <CheckboxEl label={x.uid} checkState={x.selected} sendCheck={getCheck}/>
-                </TableCell>
+                <TableCell><CheckboxEl label={x.uid} checkState={x.selected} sendCheck={getCheck}/></TableCell>
                 <TableCell align="center" >
                     <div className="hbarCont">
                       <div className="hbar" style={{ width: calcBar(x.value) }}/>
@@ -194,14 +191,9 @@ const LoadTable = ({ type, data, sendColorToMain, sendVisibilityToMain, sendSele
                     <div style={{ display: "inline-block"}}>{x.uid}</div>
                 </TableCell>
                 <TableCell align="center">{x.value}</TableCell>
-                <TableCell align="center">
-                <VisibilityButton label={x.uid} visibility={!x.hidden}
-                sendVisibility={getVisibility}/>
-
-                </TableCell>
-                <TableCell align="left">
-                <ColorButton label={x.uid} color={x.color} sendColor={getColor}/>
-                </TableCell>
+                <TableCell align="center"><VisibilityButton label={x.uid} visibility={!x.hidden} sendVisibility={getVisibility}/></TableCell>
+                <TableCell align="center"><RemoveButton label={x.uid} remove={x.removed} onRemoveChange={getRemove}/></TableCell>
+                <TableCell align="center"><ColorButton label={x.uid} color={x.color} onEachColorChange={getColor}/></TableCell>
 
               </TableRow>
             )

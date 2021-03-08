@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@material-ui/core';
+import {IconButton} from '@material-ui/core';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 
 const VisibilityButton = ({ label, visibility, sendVisibility }) => {
@@ -10,10 +10,11 @@ const VisibilityButton = ({ label, visibility, sendVisibility }) => {
   }
 
   return(
-    <div className="show">
-      <Button color="primary" onClick={handleShow}>
-        {visibility ? <Visibility fontSize="small" style={{fill: "black"}} /> : <VisibilityOff fontSize="small" style={{fill: "black"}} />}
-      </Button>
+    <div className="hoverShow">
+        <div className={visibility === false ? "show" : "hide"}>
+            <IconButton style={{padding: '2px'}} onClick={handleShow}>
+                {visibility ? <Visibility fontSize="small" style={{fill: "black"}} /> : <VisibilityOff fontSize="small" style={{fill: "black"}} />}
+            </IconButton></div>
     </div>
   )
 }

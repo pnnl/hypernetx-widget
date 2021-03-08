@@ -4,12 +4,11 @@
   overflow-y: auto;
 }
 
-
-.hoverShow{
+.hide{
   visibility: hidden;
 }
 
-.listitem:hover .hoverShow{
+.hoverShow:hover .hide{
   visibility: visible;
 }
 

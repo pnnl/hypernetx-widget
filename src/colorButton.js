@@ -1,10 +1,10 @@
 import React from 'react';
 import { ChromePicker } from 'react-color';
 import { Palette } from '@material-ui/icons';
-import { Button } from '@material-ui/core';
+import {IconButton} from '@material-ui/core';
 import './css/hnxStyle.css';
 
-const ColorButton = ({ label, color, sendColor }) => {
+const ColorButton = ({ label, color, onEachColorChange }) => {
   const [paletteColor, setColor] = React.useState("#000000");
   const [palette, setPalette] = React.useState(false);
 
@@ -16,19 +16,24 @@ const ColorButton = ({ label, color, sendColor }) => {
   }
 
   const handleChangeColor = (label, color) => {
-    sendColor(label, color.rgb);
+    onEachColorChange(label, color.rgb);
     setColor(color.rgb);
   }
 
-  return <div>
-      <Button onClick={() => handleClick()}><Palette fontSize="small"
-        style={{  fill:color}}/></Button>
-      {palette ?
-        <div className="palettePopUp">
-          <div className="cover" onClick={() => handleClose()}/>
-          <ChromePicker color={paletteColor} onChange={(c) => handleChangeColor(label, c)}/>
-        </div> : null
-      }
+  return <div className="hoverShow">
+      <div className={color !== "#000000" ? "show" : "hide"}>
+        <IconButton style={{padding:'2px'}} onClick={handleClick}>
+          <Palette fontSize="small" style={{  fill:color}}/>
+        </IconButton>
+
+        {palette ?
+            <div className="palettePopUp">
+              <div className="cover" onClick={() => handleClose()}/>
+              <ChromePicker color={paletteColor} onChange={(c) => handleChangeColor(label, c)}/>
+            </div> : null
+        }
+      </div>
+
     </div>
 }
 
