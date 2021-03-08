@@ -12,8 +12,14 @@ export default {
 export const Euler = () =>
   <HypernetxWidgetView {...props} />
 
+export const EulerWithoutPlanarForce = () =>
+  <HypernetxWidgetView {...props} ignorePlanarForce />
+
 export const EulerCollapsed = () =>
   <HypernetxWidgetView collapseNodes {...props} />
+
+export const EulerCollapsedWithoutPlanarForce = () =>
+  <HypernetxWidgetView collapseNodes {...props} ignorePlanarForce />
 
 export const LineGraph = () =>
   <HypernetxWidgetView lineGraph {...props} />

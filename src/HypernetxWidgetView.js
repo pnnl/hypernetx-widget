@@ -533,7 +533,7 @@ const planarForce = (nodes, edges) => {
   return force;
 }
 
-export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, width=600, height=600, lineGraph, pos={}, collapseNodes, ...props}) => {
+export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, width=600, height=600, lineGraph, ignorePlanarForce, pos={}, collapseNodes, ...props}) => {
   const derivedProps = useMemo(
     () => {
       removedNodes = removedNodes || {};
@@ -629,9 +629,11 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, w
         .force('link', forceLink(links).distance(30))
         .force('center', forceCenter(width/2, height/2))
         .force('collide', forceCollide().radius(d => 2*d.r || 0))
-        .force('bound', () => simulation.nodes().forEach(boundNode))
-        .force('planar', lineGraph ? undefined : planarForce(internals, edges));
+        .force('bound', () => simulation.nodes().forEach(boundNode));
 
+      if (!lineGraph && !ignorePlanarForce) {
+        simulation.force('planar', planarForce(internals, edges));
+      }
 
       simulation.size = [width, height];
 
