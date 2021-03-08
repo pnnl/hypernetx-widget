@@ -269,7 +269,11 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
             })
           });
 
-          points = d.points = polygonHull(points);
+          points = points.length === 0
+            ? controlPoints.map(([cx, cy]) => ([d.x + 2*dr*cx, d.y + 2*dr*cy]))
+            : polygonHull(points);
+          
+          d.points = points;
           d.centroid = polygonCentroid(points);
 
           return 'M' + points.map(d => d.join(',')).join('L') + 'Z'
@@ -528,9 +532,19 @@ const planarForce = (nodes, edges) => {
   return force;
 }
 
-export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGraph, pos={}, collapseNodes, ...props}) => {
+export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, width=600, height=600, lineGraph, pos={}, collapseNodes, ...props}) => {
   const derivedProps = useMemo(
     () => {
+      removedNodes = removedNodes || {};
+      removedEdges = removedEdges || {};
+
+      nodes = nodes.filter(({uid}) => !removedNodes[uid]);
+      edges = edges.filter(({uid}) => !removedEdges[uid])
+        .map(({elements, ...rest}) => ({
+          elements: elements.filter(uid => !removedNodes[uid]),
+          ...rest
+        }));
+
       const tree = performCollapseNodes({nodes, edges, collapseNodes})
         .each((d, i) => d.uid = 'uid' in d.data ? d.data.uid : i);
 
@@ -539,22 +553,23 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGr
       );
 
       // replace node ids with references to actual nodes
-      edges = edges.map(({elements, ...rest}) => {
-        const edge = new Map(
-          elements.map(
-            v => ([nodesMap.get(v).parent.uid, nodesMap.get(v).parent])
-          )
-        );
+      edges = edges
+        .map(({elements, ...rest}) => {
+          const edge = new Map(
+            elements.map(
+              v => ([nodesMap.get(v).parent.uid, nodesMap.get(v).parent])
+            )
+          );
 
-        const elementsAry = Array.from(edge.values())
+          const elementsAry = Array.from(edge.values())
 
-        return {
-          r: 0, width: 30, // this is interacting with the force algorithm, rename to fix
-          elements: elementsAry,
-          elementSet: new Set(elementsAry.map(d => d.uid)),
-          ...rest
-        }
-      });
+          return {
+            r: 0, width: 30, // this is interacting with the force algorithm, rename to fix
+            elements: elementsAry,
+            elementSet: new Set(elementsAry.map(d => d.uid)),
+            ...rest
+          }
+        });
 
       edges = sortHyperEdges(edges);
 
@@ -621,7 +636,7 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGr
 
       return {links, edges, internals, simulation};
     },
-    [nodes, edges, width, height]
+    [nodes, edges, removedNodes, removedEdges, width, height]
   );
 
   const [tooltip, setTooltip] = React.useState();
@@ -635,7 +650,7 @@ export const HypernetxWidgetView = ({nodes, edges, width=600, height=600, lineGr
     ...props,
     onChangeTooltip: handleTooltip
   };
-    // console.log("ALLPROPS", allProps);
+
   return <div className='hnx-widget-view'>
     { tooltip &&
       <Tooltip {...tooltip} />
