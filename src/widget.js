@@ -280,22 +280,38 @@ const Widget = ({ nodes, edges, ...props }) => {
   }
 
   const getClickedNodes = (event, data) => {
+    const newNodeSelect = new Map();
     if(event.shiftKey){
       setSelectedNodes({...selectedNodes, [data.data.uid]: !selectedNodes[data.data.uid]});
     }
     else{
-      setSelectedNodes(Object.fromEntries(noNodeSelectMap));
-      setSelectedNodes({...selectedNodes, [data.data.uid]:true});
+      Array.from(noNodeSelectMap).map(d => {
+        if(d[0] === data.data.uid){
+          newNodeSelect.set(d[0], true)
+        }
+        else{
+          newNodeSelect.set(d[0], false)
+        }
+      })
+      setSelectedNodes(Object.fromEntries(newNodeSelect));
     }
   }
 
   const getClickedEdges = (event, data) => {
+    const newEdgeSelect = new Map();
     if(event.shiftKey){
       setSelectedEdges({...selectedEdges, [data.uid]: !selectedEdges[data.uid]});
     }
     else{
-      setSelectedEdges(Object.fromEntries(noEdgeSelectMap));
-      setSelectedEdges({...selectedEdges, [data.uid]:true});
+      Array.from(noEdgeSelectMap).map(d => {
+        if(d[0] === data.uid){
+          newEdgeSelect.set(d[0], true)
+        }
+        else{
+          newEdgeSelect.set(d[0], false)
+        }
+      })
+      setSelectedEdges(Object.fromEntries(newEdgeSelect));
     }
   }
 
