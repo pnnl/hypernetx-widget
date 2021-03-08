@@ -29,12 +29,11 @@ const encodeProps = (selection, key, props) => {
   })
 }
 
-const forceDragBehavior = (selection, simulation, onClickNodes) => {
+const forceDragBehavior = (selection, simulation) => {
 
     const [width, height] = simulation.size;
 
     function dragstarted(event) {
-        console.log(event.active);
       if (!event.active) simulation.alphaTarget(0.3).restart();
       event.subject.fx = event.subject.x;
       event.subject.fy = event.subject.y;

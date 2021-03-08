@@ -58,13 +58,13 @@ const Widget = ({ nodes, edges, ...props }) => {
   edges.map(x => edgeRemovedMap.set(x.uid.toString(), false));
 
   const [nodeFill, setNodeFill] = React.useState(Object.fromEntries(nodeColorMap));
-  const [selectedNodes, setSelectedNodes] = React.useState(Object.fromEntries(nodeSelectMap));
+  const [selectedNodes, setSelectedNodes] = React.useState(Object.fromEntries(noNodeSelectMap));
   // const [nodeVisible, setNodeVisible] = React.useState(Object.fromEntries(nodeVisibleMap));
   const [hiddenNodes, setHiddenNodes] = React.useState(Object.fromEntries(nodeHiddenMap));
   const [removedNodes, setRemovedNodes] = React.useState(Object.fromEntries(nodeRemovedMap));
 
   const [edgeStroke, setEdgeStroke] = React.useState(Object.fromEntries(edgeColorMap));
-  const [selectedEdges, setSelectedEdges] = React.useState(Object.fromEntries(edgeSelectMap));
+  const [selectedEdges, setSelectedEdges] = React.useState(Object.fromEntries(noEdgeSelectMap));
   // const [edgeVisible, setEdgeVisible] = React.useState(Object.fromEntries(edgeVisibleMap));
   const [hiddenEdges, setHiddenEdges] = React.useState(Object.fromEntries(edgeHiddenMap));
   const [removedEdges, setRemovedEdges] = React.useState(Object.fromEntries(edgeRemovedMap));
@@ -279,18 +279,23 @@ const Widget = ({ nodes, edges, ...props }) => {
     setColType(type);
   }
 
-  const getClickedNodes = (uid, shift, type) => {
-    if(shift && type === 'select'){
-      setSelectedNodes({...selectedNodes, [uid]:true});
+  const getClickedNodes = (event, data) => {
+    if(event.shiftKey){
+      setSelectedNodes({...selectedNodes, [data.data.uid]: !selectedNodes[data.data.uid]});
     }
-    if(shift && type === 'deselect'){
-      setSelectedNodes({...selectedNodes, [uid]:false});
+    else{
+      setSelectedNodes(Object.fromEntries(noNodeSelectMap));
+      setSelectedNodes({...selectedNodes, [data.data.uid]:true});
     }
   }
 
-  const getClickedEdges = (uid, shift) => {
-    if(shift){
-      setSelectedEdges({...selectedEdges, [uid]: true});
+  const getClickedEdges = (event, data) => {
+    if(event.shiftKey){
+      setSelectedEdges({...selectedEdges, [data.uid]: !selectedEdges[data.uid]});
+    }
+    else{
+      setSelectedEdges(Object.fromEntries(noEdgeSelectMap));
+      setSelectedEdges({...selectedEdges, [data.uid]:true});
     }
   }
 
