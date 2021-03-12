@@ -27,8 +27,9 @@ scenes = {
 H = hnx.Hypergraph(scenes)
 HypernetxWidgetView(H)
 ```
-Example output:
 ![Screenshot of HNX Widget](hnx-widget-screenshot.png)
+
+A more in depth demonstration of the widget is found in `/notebooks/example widget.ipynb`.
 
 # Other Installation Methods
 ## For testers
@@ -40,7 +41,7 @@ jupyter nbextension install --py --symlink --sys-prefix hnxwidget
 jupyter nbextension enable --py --sys-prefix hnxwidget
 ```
 
-## Developer 
+## For developers
 If you just want to use the tool with the most recent updates, this installation is not recommended. This installation is intended for people who are developing the JavaScript portion of the library. It will setup the Node.js environments, download packages, etc. To get setup as a developer, run the `setup-develop.sh` script.
 
 To create a universal wheel file, increment the version number in `/widget/hnxwidget/_version.py` and run 
