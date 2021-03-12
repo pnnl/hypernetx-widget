@@ -1,7 +1,7 @@
 {
   "name": "hnx-widget",
   "version": "0.1.0",
-  "description": "A widget for interractive visualization of the hypernetx package.",
+  "description": "A widget for interactive visualization of the hypernetx package.",
   "author": "Dustin Arendt",
   "main": "lib/index.js",
   "repository": {
