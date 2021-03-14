@@ -139,7 +139,7 @@ const classedByDict = (selection, props) =>
       selection.classed(className, d => dict[d.uid])
     )
 
-const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes, hiddenNodes, removedNodes, nodeLabels={}, _model}) =>
+const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, selectedNodes, hiddenNodes, removedNodes, nodeLabels={}, _model}) =>
   <g className='nodes' ref={ele => {
     const groups = select(ele)
       .selectAll('g.group')
@@ -165,7 +165,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
           )
           .on('mouseout', (ev, d) => d.height === 0 && onChangeTooltip())
           .classed('internal', d => d.height > 0)
-          .call(encodeProps, d => d.data.uid, {nodeFill, nodeStroke, nodeStrokeWidth})
+          .call(encodeProps, d => d.data.uid, {nodeFill, nodeStroke})
           .call(classedByDict, {'selected': selectedNodes, 'hidden': hiddenNodes})
 
     circles.select('circle')
@@ -199,7 +199,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
     });
   }}/>
 
-const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, edgeStrokeWidth, selectedEdges, hiddenEdges, removedEdges, edgeLabels={}, onClickEdges=Object, onChangeTooltip=Object}) =>
+const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, selectedEdges, hiddenEdges, removedEdges, edgeLabels={}, onClickEdges=Object, onChangeTooltip=Object}) =>
   <g className='edges' ref={ele => {
     const controlPoints = range(nControlPoints)
       .map(i => {
@@ -235,7 +235,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
             .call(classedByDict, {'selected': selectedEdges, 'hidden': hiddenEdges});
 
     groups.select('path')
-      .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth});
+      .call(encodeProps, d => d.uid, {edgeStroke});
 
     groups.select('text')
       .style('visibility', withEdgeLabels ? undefined : 'hidden');

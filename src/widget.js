@@ -7,11 +7,10 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Typography from '@material-ui/core/Typography';
 import { ArrowForwardIos, ArrowBackIos } from '@material-ui/icons';
 import Button from '@material-ui/core/Button';
-import {HypernetxWidgetView} from './HypernetxWidgetView';
+import { HypernetxWidgetView } from './HypernetxWidgetView';
 import ColorPalette  from './colorPalette.js';
 import LoadTable from './loadTable.js';
 import Bars from './bars.js';
-import ShowButton from './showButton.js';
 import { getRGB, rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianStyles } from './functions.js';
 
 const Widget = ({ nodes, edges, ...props }) => {
@@ -174,65 +173,65 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [currNodeButton, setCurrNodeButton] = React.useState("default");
   const [currEdgeButton, setCurrEdgeButton] = React.useState("default");
 
-  const getButton = (type, value) => {
-    if(type === "node"){
-      const nodeSelectedBar = new Map();
-      const nodeHiddenBar = new Map();
-      const nodeSelectLine = new Map();
-      const nodeHiddenLine = new Map();
-      setCurrNodeButton(value);
-      Object.entries(selectedNodes).map(x => {
-        if(x[1]){
-          nodeSelectedBar.set(x[0], 2);
-          nodeHiddenBar.set(x[0], 1);
-          nodeSelectLine.set(x[0], "rgba(0, 0, 0, 1)");
-          nodeHiddenLine.set(x[0], "rgba(255, 255, 255, 1)");
-        }
-        else{
-          nodeSelectedBar.set(x[0], 1);
-          nodeHiddenBar.set(x[0], 2);
-          nodeSelectLine.set(x[0], "rgba(255, 255, 255, 1)");
-          nodeHiddenLine.set(x[0], "rgba(0, 0, 0, 1)");
-        }
-      })
-      if(value === "selected"){
-        setNodeStrokeWidth(Object.fromEntries(nodeSelectedBar));
-        setNodeStroke(Object.fromEntries(nodeSelectLine));
-      }
-      else if(value === "hidden"){
-        setNodeStrokeWidth(Object.fromEntries(nodeHiddenBar));
-        setNodeStroke(Object.fromEntries(nodeHiddenLine));
-      }
-      else{
-        setNodeStrokeWidth(Object.fromEntries(nodeWidthMap));
-        setNodeStroke(Object.fromEntries(nodeLineColMap));
-      }
-    }
-    else{
-      const edgeSelectedBar = new Map();
-      const edgeHiddenBar = new Map();
-      setCurrEdgeButton(value);
-      Object.entries(selectedEdges).map(x => {
-        if(x[1]){
-          edgeSelectedBar.set(x[0], 3);
-          edgeHiddenBar.set(x[0], 1.5);
-        }
-        else{
-          edgeSelectedBar.set(x[0], 1.5);
-          edgeHiddenBar.set(x[0], 3);
-        }
-      })
-      if(value === "selected"){
-        setEdgeStrokeWidth(Object.fromEntries(edgeSelectedBar));
-      }
-      else if(value === "hidden"){
-        setEdgeStrokeWidth(Object.fromEntries(edgeHiddenBar));
-      }
-      else{
-        setEdgeStrokeWidth(Object.fromEntries(edgeWidthMap));
-      }
-    }
-  }
+  // const getButton = (type, value) => {
+  //   if(type === "node"){
+  //     const nodeSelectedBar = new Map();
+  //     const nodeHiddenBar = new Map();
+  //     const nodeSelectLine = new Map();
+  //     const nodeHiddenLine = new Map();
+  //     setCurrNodeButton(value);
+  //     Object.entries(selectedNodes).map(x => {
+  //       if(x[1]){
+  //         nodeSelectedBar.set(x[0], 2);
+  //         nodeHiddenBar.set(x[0], 1);
+  //         nodeSelectLine.set(x[0], "rgba(0, 0, 0, 1)");
+  //         nodeHiddenLine.set(x[0], "rgba(255, 255, 255, 1)");
+  //       }
+  //       else{
+  //         nodeSelectedBar.set(x[0], 1);
+  //         nodeHiddenBar.set(x[0], 2);
+  //         nodeSelectLine.set(x[0], "rgba(255, 255, 255, 1)");
+  //         nodeHiddenLine.set(x[0], "rgba(0, 0, 0, 1)");
+  //       }
+  //     })
+  //     if(value === "selected"){
+  //       setNodeStrokeWidth(Object.fromEntries(nodeSelectedBar));
+  //       setNodeStroke(Object.fromEntries(nodeSelectLine));
+  //     }
+  //     else if(value === "hidden"){
+  //       setNodeStrokeWidth(Object.fromEntries(nodeHiddenBar));
+  //       setNodeStroke(Object.fromEntries(nodeHiddenLine));
+  //     }
+  //     else{
+  //       setNodeStrokeWidth(Object.fromEntries(nodeWidthMap));
+  //       setNodeStroke(Object.fromEntries(nodeLineColMap));
+  //     }
+  //   }
+  //   else{
+  //     const edgeSelectedBar = new Map();
+  //     const edgeHiddenBar = new Map();
+  //     setCurrEdgeButton(value);
+  //     Object.entries(selectedEdges).map(x => {
+  //       if(x[1]){
+  //         edgeSelectedBar.set(x[0], 3);
+  //         edgeHiddenBar.set(x[0], 1.5);
+  //       }
+  //       else{
+  //         edgeSelectedBar.set(x[0], 1.5);
+  //         edgeHiddenBar.set(x[0], 3);
+  //       }
+  //     })
+  //     if(value === "selected"){
+  //       setEdgeStrokeWidth(Object.fromEntries(edgeSelectedBar));
+  //     }
+  //     else if(value === "hidden"){
+  //       setEdgeStrokeWidth(Object.fromEntries(edgeHiddenBar));
+  //     }
+  //     else{
+  //       setEdgeStrokeWidth(Object.fromEntries(edgeWidthMap));
+  //     }
+  //   }
+  // }
 
   const transNodeData = nodes.map(x => {
     return {
@@ -315,81 +314,120 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
+  const handleShowSelected = (type) => {
+    if(type === 'node'){
+      setHiddenNodes(Object.fromEntries(nodeHiddenMap));
+      setRemovedNodes(Object.fromEntries(nodeRemovedMap));
+    }
+    else{
+      setHiddenEdges(Object.fromEntries(edgeHiddenMap));
+      setRemovedEdges(Object.fromEntries(edgeRemovedMap));
+    }
+  }
+
+  const handleHideSelected = (type) => {
+    if(type === 'node'){
+      setHiddenNodes(selectedNodes);
+      // setRemovedNodes(Object.fromEntries(nodeRemovedMap))
+    }
+    else{
+      setHiddenEdges(selectedEdges);
+      // setRemovedEdges(Object.fromEntries(edgeRemovedMap));
+    }
+  }
+
+  const handleRemoveSelected = (type) => {
+    if(type === 'node'){
+      setRemovedNodes(selectedNodes);
+    }
+    else{
+      setRemovedEdges(selectedEdges);
+    }
+  }
   return <div>
     <Grid container spacing={1}>
-
-    <Grid item xs={12} sm={!navOpen ? 1 : 4}>
-      <div className="colorSetting" style={{justifyContent: !navOpen ? "flex-start" : "flex-end"}}>
-        <div>
-          <Button style={{justifyContent: !navOpen ? "flex-start": "flex-end"}} color="primary" onClick={() => toggleNav()}>{!navOpen ? <ArrowForwardIos style={{fontSize: "20px"}} /> : <ArrowBackIos style={{fontSize: "20px"}}/>}</Button></div>
-        </div>
-        {navOpen ? <div className={classes.root}>
-          <Accordion>
-            <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}} />} >
-              <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Key Statistics - Nodes" + " (" +  String(nodes.length) + ")"}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-            <div style={{width: "100%"}}>
-              <LoadTable
-                type={"node"}
-                data={convertedData(transNodeData)}
-                onColorChange={getColorChange}
-                onVisibleChange={getVisibilityChange}
-                onSelectedChange={getSelectedChange}
-                onRemovedChange={getRemovedChange}
-                onSelectAllChange={getSelectAll}
-              />
-              {/*<ShowButton type={"node"} sendButton={getButton} currButton={currNodeButton}/>*/}
-              <Bars type={"node"} freqData={getValueFreq(nodeDegList)} onValueChange={getHoverValue}/>
-            </div>
-
-            </AccordionDetails>
-          </Accordion>
-
-          <Accordion>
-            <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}} />} >
-              <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Key Statistics - Edges" + " (" +  String(edges.length) + ")"}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-            <div style={{width: "100%"}}>
-              <LoadTable
-                type={"edge"}
-                data={convertedData(transEdgeData)}
-                onColorChange={getColorChange}
-                onVisibleChange={getVisibilityChange}
-                onSelectedChange={getSelectedChange}
-                onRemovedChange={getRemovedChange}
-                onSelectAllChange={getSelectAll}
-              />
-              {/*<ShowButton type={"edge"} sendButton={getButton} currButton={currEdgeButton}/>*/}
-              <Bars type={"edge"} freqData={getValueFreq(edgeSizeList)} onValueChange={getHoverValue}/>
-            </div>
-            </AccordionDetails>
-          </Accordion>
-
-          <Accordion>
-            <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}}/>} >
-              <Typography style={{fontSize: "14px", fontWeight: "bold"}}>Color</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
+      <Grid item xs={12} sm={!navOpen ? 1 : 4}>
+        <div className="colorSetting" style={{justifyContent: !navOpen ? "flex-start" : "flex-end"}}>
+          <div>
+            <Button style={{justifyContent: !navOpen ? "flex-start": "flex-end"}} color="primary" onClick={() => toggleNav()}>{!navOpen ? <ArrowForwardIos style={{fontSize: "20px"}} /> : <ArrowBackIos style={{fontSize: "20px"}}/>}</Button></div>
+          </div>
+          {navOpen ? <div className={classes.root}>
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}} />} >
+                <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Key Statistics - Nodes" + " (" +  String(nodes.length) + ")"}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
               <div style={{width: "100%"}}>
-                <ColorPalette nodeData={nodeDegList} edgeData={edgeSizeList}
-                onNodePaletteChange={getNodePalette} onEdgePaletteChange={getEdgePalette}
-                currGroup={colGroup} currPalette={colPalette} currType={colType} onCurrDataChange={getCurrData}
+                <LoadTable
+                  type={"node"}
+                  data={convertedData(transNodeData)}
+                  onColorChange={getColorChange}
+                  onVisibleChange={getVisibilityChange}
+                  onSelectedChange={getSelectedChange}
+                  onRemovedChange={getRemovedChange}
+                  onSelectAllChange={getSelectAll}
                 />
+                <Bars type={"node"} freqData={getValueFreq(nodeDegList)} onValueChange={getHoverValue}/>
+                <div style={{display: "flex", flexDirection: 'column'}}>
+                  <Button variant={"outlined"} size={"small"} onClick={() => handleShowSelected('node')}>Show selected</Button>
+                  <Button variant={"outlined"} size={"small"} onClick={() => handleHideSelected('node')}>Hide selected</Button>
+                  <Button variant={"outlined"} size={"small"} onClick={() => handleRemoveSelected('node')}>Remove selected</Button>
+                  <Button variant={"outlined"} size={"small"}>Select all edges in selected nodes</Button>
+                </div>
               </div>
-            </AccordionDetails>
-          </Accordion>
-        </div> : null }
-  </Grid>
 
-  <Grid item xs={12} sm={!navOpen ? 11 : 8}>
-    <HypernetxWidgetView
-      {...props}
-      {...{nodes, edges, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges}}
-      onClickNodes={getClickedNodes} onClickEdges={getClickedEdges}
-      />
-  </Grid>
+              </AccordionDetails>
+            </Accordion>
+
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}} />} >
+                <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Key Statistics - Edges" + " (" +  String(edges.length) + ")"}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+              <div style={{width: "100%"}}>
+                <LoadTable
+                  type={"edge"}
+                  data={convertedData(transEdgeData)}
+                  onColorChange={getColorChange}
+                  onVisibleChange={getVisibilityChange}
+                  onSelectedChange={getSelectedChange}
+                  onRemovedChange={getRemovedChange}
+                  onSelectAllChange={getSelectAll}
+                />
+                <Bars type={"edge"} freqData={getValueFreq(edgeSizeList)} onValueChange={getHoverValue}/>
+                <div style={{display: "flex", flexDirection: 'column'}}>
+                  <Button variant={"outlined"} size={"small"} onClick={() => handleShowSelected('edge')}>Show selected</Button>
+                  <Button variant={"outlined"} size={"small"} onClick={() => handleHideSelected('edge')}>Hide selected</Button>
+                  <Button variant={"outlined"} size={"small"} onClick={() => handleRemoveSelected('edge')}>Remove selected</Button>
+                  <Button variant={"outlined"} size={"small"}>Select all nodes in selected edges</Button>
+                </div>
+              </div>
+              </AccordionDetails>
+            </Accordion>
+
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}}/>} >
+                <Typography style={{fontSize: "14px", fontWeight: "bold"}}>Color</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <div style={{width: "100%"}}>
+                  <ColorPalette nodeData={nodeDegList} edgeData={edgeSizeList}
+                  onNodePaletteChange={getNodePalette} onEdgePaletteChange={getEdgePalette}
+                  currGroup={colGroup} currPalette={colPalette} currType={colType} onCurrDataChange={getCurrData}
+                  />
+                </div>
+              </AccordionDetails>
+            </Accordion>
+          </div> : null }
+    </Grid>
+
+    <Grid item xs={12} sm={!navOpen ? 11 : 8}>
+      <HypernetxWidgetView
+        {...props}
+        {...{nodes, edges, nodeFill, nodeStroke, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges}}
+        onClickNodes={getClickedNodes} onClickEdges={getClickedEdges}
+        />
+    </Grid>
   </Grid>
 
 </div>
