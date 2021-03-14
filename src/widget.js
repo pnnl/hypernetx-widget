@@ -15,6 +15,7 @@ import { getRGB, rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianSt
 
 const Widget = ({ nodes, edges, ...props }) => {
 
+
   const classes = accordianStyles();
 
   const nodeDegMap = new Map();
@@ -56,17 +57,23 @@ const Widget = ({ nodes, edges, ...props }) => {
   const edgeRemovedMap = new Map();
   edges.map(x => edgeRemovedMap.set(x.uid.toString(), false));
 
+  const nodesInEdgesMap = new Map();
+  nodes.map(x => nodesInEdgesMap.set(x.uid, false));
+
+  const edgesInNodesMap = new Map();
+  edges.map(x => edgesInNodesMap.set(x.uid.toString(), false));
+
   const [nodeFill, setNodeFill] = React.useState(Object.fromEntries(nodeColorMap));
   const [selectedNodes, setSelectedNodes] = React.useState(Object.fromEntries(noNodeSelectMap));
-  // const [nodeVisible, setNodeVisible] = React.useState(Object.fromEntries(nodeVisibleMap));
   const [hiddenNodes, setHiddenNodes] = React.useState(Object.fromEntries(nodeHiddenMap));
   const [removedNodes, setRemovedNodes] = React.useState(Object.fromEntries(nodeRemovedMap));
+  const [nodesInEdges, setNodesInEdges] = React.useState(Object.fromEntries(nodesInEdgesMap));
 
   const [edgeStroke, setEdgeStroke] = React.useState(Object.fromEntries(edgeColorMap));
   const [selectedEdges, setSelectedEdges] = React.useState(Object.fromEntries(noEdgeSelectMap));
-  // const [edgeVisible, setEdgeVisible] = React.useState(Object.fromEntries(edgeVisibleMap));
   const [hiddenEdges, setHiddenEdges] = React.useState(Object.fromEntries(edgeHiddenMap));
   const [removedEdges, setRemovedEdges] = React.useState(Object.fromEntries(edgeRemovedMap));
+  const [edgesInNodes, setEdgesInNodes] = React.useState(Object.fromEntries(edgesInNodesMap));
 
   const getColorChange = (datatype, uid, color) => {
     if(datatype === "node"){
@@ -90,6 +97,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   const getSelectedChange = (datatype, uid, selected ) => {
     if(datatype === "node"){
       setSelectedNodes({...selectedNodes, [uid]:selected});
+
     }
     else{
       setSelectedEdges({...selectedEdges, [uid]:selected});
@@ -344,6 +352,41 @@ const Widget = ({ nodes, edges, ...props }) => {
       setRemovedEdges(selectedEdges);
     }
   }
+
+  // select all nodes in selected edges
+  // console.log(Object.entries(selectedEdges));
+  // edges.map(e => {
+  //
+  // });
+  // select all edges in selected nodes
+  const handleOtherSelect = (type) => {
+    let nodeToSelect = new Map(Object.entries(nodesInEdges));
+    if(type === "nodes in edges"){
+      Object.entries(selectedEdges).map(d => {
+        edges.map(e => {
+          if(d[1] && d[0] === e.uid){
+            e.elements.map(x => nodeToSelect.set(x, true))
+          }
+        })
+      })
+      setSelectedNodes(Object.fromEntries(nodeToSelect));
+    }
+    else{
+      let edgeToSelect = new Map(Object.entries(edgesInNodes))
+      Object.entries(selectedNodes).map(d => {
+        edges.map(e => {
+          if(d[1] && e.elements.includes(d[0])){
+            edgeToSelect.set(e.uid.toString(), true);
+          }
+        })
+      })
+      setSelectedEdges(Object.fromEntries(edgeToSelect));
+    }
+
+  }
+
+
+
   return <div>
     <Grid container spacing={1}>
       <Grid item xs={12} sm={!navOpen ? 1 : 4}>
@@ -372,7 +415,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                   <Button variant={"outlined"} size={"small"} onClick={() => handleShowSelected('node')}>Show selected</Button>
                   <Button variant={"outlined"} size={"small"} onClick={() => handleHideSelected('node')}>Hide selected</Button>
                   <Button variant={"outlined"} size={"small"} onClick={() => handleRemoveSelected('node')}>Remove selected</Button>
-                  <Button variant={"outlined"} size={"small"}>Select all edges in selected nodes</Button>
+                  <Button variant={"outlined"} size={"small"} onClick={() => handleOtherSelect('edges in nodes')}>Select all edges in selected nodes</Button>
                 </div>
               </div>
 
@@ -399,7 +442,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                   <Button variant={"outlined"} size={"small"} onClick={() => handleShowSelected('edge')}>Show selected</Button>
                   <Button variant={"outlined"} size={"small"} onClick={() => handleHideSelected('edge')}>Hide selected</Button>
                   <Button variant={"outlined"} size={"small"} onClick={() => handleRemoveSelected('edge')}>Remove selected</Button>
-                  <Button variant={"outlined"} size={"small"}>Select all nodes in selected edges</Button>
+                  <Button variant={"outlined"} size={"small"} onClick={() => handleOtherSelect('nodes in edges')}>Select all nodes in selected edges</Button>
                 </div>
               </div>
               </AccordionDetails>
