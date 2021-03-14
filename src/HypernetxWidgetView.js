@@ -3,7 +3,7 @@ import React, {useMemo} from 'react'
 import {debounce, throttle} from 'lodash'
 
 import {drag} from 'd3-drag'
-import {group, scan as maxIndex, merge, mean, min, max, range, sum, extent} from 'd3-array'
+import {group, maxIndex, merge, mean, min, max, range, sum, extent} from 'd3-array'
 import {pack, hierarchy} from 'd3-hierarchy'
 import {select} from 'd3-selection'
 import {forceSimulation, forceLink, forceManyBody, forceCenter, forceCollide} from 'd3-force'
@@ -13,6 +13,8 @@ import {quadtree} from 'd3-quadtree'
 import {TopologicalSort, DiGraph} from 'js-graph-algorithms'
 
 import './hnx-widget.css'
+
+const throttledConsole = throttle(console.log, 1000);
 
 const styleEncodings = {
   Stroke: 'stroke',
@@ -139,7 +141,7 @@ const classedByDict = (selection, props) =>
       selection.classed(className, d => dict[d.uid])
     )
 
-const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, selectedNodes, hiddenNodes, removedNodes, nodeLabels={}, _model}) =>
+const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes, hiddenNodes, removedNodes, nodeLabels={}, _model}) =>
   <g className='nodes' ref={ele => {
     const groups = select(ele)
       .selectAll('g.group')
@@ -165,7 +167,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
           )
           .on('mouseout', (ev, d) => d.height === 0 && onChangeTooltip())
           .classed('internal', d => d.height > 0)
-          .call(encodeProps, d => d.data.uid, {nodeFill, nodeStroke})
+          .call(encodeProps, d => d.data.uid, {nodeFill, nodeStroke, nodeStrokeWidth})
           .call(classedByDict, {'selected': selectedNodes, 'hidden': hiddenNodes})
 
     circles.select('circle')
@@ -199,7 +201,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
     });
   }}/>
 
-const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, selectedEdges, hiddenEdges, removedEdges, edgeLabels={}, onClickEdges=Object, onChangeTooltip=Object}) =>
+const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, edgeStrokeWidth, selectedEdges, hiddenEdges, removedEdges, edgeLabels={}, edgeLabelStyle, onClickEdges=Object, onChangeTooltip=Object}) =>
   <g className='edges' ref={ele => {
     const controlPoints = range(nControlPoints)
       .map(i => {
@@ -235,7 +237,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
             .call(classedByDict, {'selected': selectedEdges, 'hidden': hiddenEdges});
 
     groups.select('path')
-      .call(encodeProps, d => d.uid, {edgeStroke});
+      .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth});
 
     groups.select('text')
       .style('visibility', withEdgeLabels ? undefined : 'hidden');
@@ -276,13 +278,60 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
           d.points = points;
           d.centroid = polygonCentroid(points);
 
+
+          // calculate widest segment
+          const length = points.map((d1, i, a) => {
+            const d0 = i === 0 ? a[a.length - 1] : a[i - 1];
+            const dx = d1[0] - d0[0];
+            const dy = d1[1] - d0[1];
+
+            return ((dx*dx + dy*dy) > 1e3) + 1/(d1[0]*d1[1]);
+          });
+
+          const i = maxIndex(length);
+
+          const d1 = points[i];
+          const d0 = i === 0
+            ? points[points.length - 1]
+            : points[i - 1];
+
+          d.markerLocation = [
+            (d0[0] + d1[0])/2,
+            (d0[1] + d1[1])/2, 
+          ];
+
+          d.markerAngle = (Math.atan2(
+            d0[1] - d1[1],
+            d0[0] - d1[0]
+          )*180/Math.PI+ 360)%360;
+
+          if (90 < d.markerAngle && d.markerAngle < 270) {
+            d.markerAngle -= 180;
+          }
+
           return 'M' + points.map(d => d.join(',')).join('L') + 'Z'
         });
 
-      groups.select('text')
-        .attr('x', d => d.centroid[0])
-        .attr('y', d => d.centroid[1]);
 
+      if (edgeLabelStyle === 'callout') {
+        groups.select('circle')
+          .attr('cx', d => d.markerLocation[0])
+          .attr('cy', d => d.markerLocation[1])
+          .attr('r', 3);
+
+        groups.select('text')
+          .attr('transform',
+            d => `translate(${d.markerLocation[0]},${d.markerLocation[1]})`
+          )
+          .attr('dx', 5)
+          .style('text-anchor', 'start');
+
+      } else {
+        groups.select('text')
+          .attr('transform', 
+            d => `translate(${d.markerLocation[0]},${d.markerLocation[1]}) rotate(${d.markerAngle}) `
+          );
+      }
     });
   }}/>
 

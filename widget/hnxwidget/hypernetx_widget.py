@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import to_rgba_array, to_hex
 import numpy as np
 
-from hypernetx.drawing.util import get_set_layering, inflate_kwargs
+from .util import get_set_layering, inflate_kwargs
 
 converters = {
     'edgecolor': 'Stroke',
