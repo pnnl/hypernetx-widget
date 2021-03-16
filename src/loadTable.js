@@ -80,8 +80,8 @@ function EnhancedTableHead(props) {
         <TableCell padding="default">
           <Checkbox
             size="small"
-
             onChange={onSelectAllClick}
+            checked={!data.map(x => x.selected).includes(false) ? true : false}
             indeterminate={data.map(x => x.selected).includes(false) && data.map(x => x.selected).includes(true)}
           />
         </TableCell>

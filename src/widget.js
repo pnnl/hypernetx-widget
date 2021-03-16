@@ -67,13 +67,11 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [selectedNodes, setSelectedNodes] = React.useState(Object.fromEntries(noNodeSelectMap));
   const [hiddenNodes, setHiddenNodes] = React.useState(Object.fromEntries(nodeHiddenMap));
   const [removedNodes, setRemovedNodes] = React.useState(Object.fromEntries(nodeRemovedMap));
-  const [nodesInEdges, setNodesInEdges] = React.useState(Object.fromEntries(nodesInEdgesMap));
 
   const [edgeStroke, setEdgeStroke] = React.useState(Object.fromEntries(edgeColorMap));
   const [selectedEdges, setSelectedEdges] = React.useState(Object.fromEntries(noEdgeSelectMap));
   const [hiddenEdges, setHiddenEdges] = React.useState(Object.fromEntries(edgeHiddenMap));
   const [removedEdges, setRemovedEdges] = React.useState(Object.fromEntries(edgeRemovedMap));
-  const [edgesInNodes, setEdgesInNodes] = React.useState(Object.fromEntries(edgesInNodesMap));
 
   const getColorChange = (datatype, uid, color) => {
     if(datatype === "node"){
@@ -86,7 +84,6 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const getVisibilityChange = (datatype, uid, visibility) => {
     if(datatype === "node"){
-      // setNodeVisible({...nodeVisible, [uid]:visibility});
       setHiddenNodes({...hiddenNodes, [uid]:!visibility});
     }
     else{
@@ -97,7 +94,6 @@ const Widget = ({ nodes, edges, ...props }) => {
   const getSelectedChange = (datatype, uid, selected ) => {
     if(datatype === "node"){
       setSelectedNodes({...selectedNodes, [uid]:selected});
-
     }
     else{
       setSelectedEdges({...selectedEdges, [uid]:selected});
@@ -174,12 +170,12 @@ const Widget = ({ nodes, edges, ...props }) => {
   const nodeLineColMap = new Map();
   nodes.map(x => nodeLineColMap.set(x.uid, "rgba(255, 255, 255, 1)"));
 
-  const [nodeStroke, setNodeStroke] = React.useState(Object.fromEntries(nodeLineColMap));
+  // const [nodeStroke, setNodeStroke] = React.useState(Object.fromEntries(nodeLineColMap));
 
-  const [nodeStrokeWidth, setNodeStrokeWidth] = React.useState(Object.fromEntries(nodeWidthMap));
-  const [edgeStrokeWidth, setEdgeStrokeWidth] = React.useState(Object.fromEntries(edgeWidthMap));
-  const [currNodeButton, setCurrNodeButton] = React.useState("default");
-  const [currEdgeButton, setCurrEdgeButton] = React.useState("default");
+  // const [nodeStrokeWidth, setNodeStrokeWidth] = React.useState(Object.fromEntries(nodeWidthMap));
+  // const [edgeStrokeWidth, setEdgeStrokeWidth] = React.useState(Object.fromEntries(edgeWidthMap));
+  // const [currNodeButton, setCurrNodeButton] = React.useState("default");
+  // const [currEdgeButton, setCurrEdgeButton] = React.useState("default");
 
   // const getButton = (type, value) => {
   //   if(type === "node"){
@@ -336,31 +332,25 @@ const Widget = ({ nodes, edges, ...props }) => {
   const handleHideSelected = (type) => {
     if(type === 'node'){
       setHiddenNodes(selectedNodes);
-      // setRemovedNodes(Object.fromEntries(nodeRemovedMap))
     }
     else{
       setHiddenEdges(selectedEdges);
-      // setRemovedEdges(Object.fromEntries(edgeRemovedMap));
     }
   }
 
   const handleRemoveSelected = (type) => {
     if(type === 'node'){
       setRemovedNodes(selectedNodes);
+      setSelectedNodes(Object.fromEntries(noNodeSelectMap));
     }
     else{
       setRemovedEdges(selectedEdges);
+      setSelectedEdges(Object.fromEntries(noEdgeSelectMap));
     }
   }
 
-  // select all nodes in selected edges
-  // console.log(Object.entries(selectedEdges));
-  // edges.map(e => {
-  //
-  // });
-  // select all edges in selected nodes
   const handleOtherSelect = (type) => {
-    let nodeToSelect = new Map(Object.entries(nodesInEdges));
+    let nodeToSelect = new Map(nodesInEdgesMap);
     if(type === "nodes in edges"){
       Object.entries(selectedEdges).map(d => {
         edges.map(e => {
@@ -372,7 +362,7 @@ const Widget = ({ nodes, edges, ...props }) => {
       setSelectedNodes(Object.fromEntries(nodeToSelect));
     }
     else{
-      let edgeToSelect = new Map(Object.entries(edgesInNodes))
+      let edgeToSelect = new Map(edgesInNodesMap);
       Object.entries(selectedNodes).map(d => {
         edges.map(e => {
           if(d[1] && e.elements.includes(d[0])){
@@ -382,10 +372,7 @@ const Widget = ({ nodes, edges, ...props }) => {
       })
       setSelectedEdges(Object.fromEntries(edgeToSelect));
     }
-
   }
-
-
 
   return <div>
     <Grid container spacing={1}>
@@ -415,7 +402,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                   <Button variant={"outlined"} size={"small"} onClick={() => handleShowSelected('node')}>Show selected</Button>
                   <Button variant={"outlined"} size={"small"} onClick={() => handleHideSelected('node')}>Hide selected</Button>
                   <Button variant={"outlined"} size={"small"} onClick={() => handleRemoveSelected('node')}>Remove selected</Button>
-                  <Button variant={"outlined"} size={"small"} onClick={() => handleOtherSelect('edges in nodes')}>Select all edges in selected nodes</Button>
+                  <Button variant={"outlined"} size={"small"} onClick={() => handleOtherSelect('edges in nodes')}>Select all edges containing selected nodes</Button>
                 </div>
               </div>
 
@@ -467,7 +454,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     <Grid item xs={12} sm={!navOpen ? 11 : 8}>
       <HypernetxWidgetView
         {...props}
-        {...{nodes, edges, nodeFill, nodeStroke, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges}}
+        {...{nodes, edges, nodeFill, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges}}
         onClickNodes={getClickedNodes} onClickEdges={getClickedEdges}
         />
     </Grid>
