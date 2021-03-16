@@ -79,7 +79,7 @@ export const getValueFreq = (obj) => {
   Array.from(valueMap).map(x => {
     results.push({x:x[0], y:x[1]})
   })
-  return results
+  return results.sort((a,b) => a.x - b.x)
 }
 
 export const showButtonStyles = makeStyles((theme) => ({

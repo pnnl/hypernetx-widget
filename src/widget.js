@@ -374,6 +374,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
+
   return <div>
     <Grid container spacing={1}>
       <Grid item xs={12} sm={!navOpen ? 1 : 4}>
@@ -397,7 +398,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                   onRemovedChange={getRemovedChange}
                   onSelectAllChange={getSelectAll}
                 />
-                <Bars type={"node"} freqData={getValueFreq(nodeDegList)} onValueChange={getHoverValue}/>
+                <Bars type={"node"} freqData={getValueFreq(nodeDegList)} onValueChange={getHoverValue} />
                 <div style={{display: "flex", flexDirection: 'column'}}>
                   <Button variant={"outlined"} size={"small"} onClick={() => handleShowSelected('node')}>Show selected</Button>
                   <Button variant={"outlined"} size={"small"} onClick={() => handleHideSelected('node')}>Hide selected</Button>
