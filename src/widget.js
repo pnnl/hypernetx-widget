@@ -12,6 +12,7 @@ import ColorPalette  from './colorPalette.js';
 import LoadTable from './loadTable.js';
 import Bars from './bars.js';
 import { getRGB, rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianStyles } from './functions.js';
+import Toolbar from "./toolbar";
 
 const Widget = ({ nodes, edges, ...props }) => {
 
@@ -167,76 +168,6 @@ const Widget = ({ nodes, edges, ...props }) => {
   const edgeWidthMap = new Map();
   edges.map(x => edgeWidthMap.set(x.uid.toString(), 1.5));
 
-  const nodeLineColMap = new Map();
-  nodes.map(x => nodeLineColMap.set(x.uid, "rgba(255, 255, 255, 1)"));
-
-  // const [nodeStroke, setNodeStroke] = React.useState(Object.fromEntries(nodeLineColMap));
-
-  // const [nodeStrokeWidth, setNodeStrokeWidth] = React.useState(Object.fromEntries(nodeWidthMap));
-  // const [edgeStrokeWidth, setEdgeStrokeWidth] = React.useState(Object.fromEntries(edgeWidthMap));
-  // const [currNodeButton, setCurrNodeButton] = React.useState("default");
-  // const [currEdgeButton, setCurrEdgeButton] = React.useState("default");
-
-  // const getButton = (type, value) => {
-  //   if(type === "node"){
-  //     const nodeSelectedBar = new Map();
-  //     const nodeHiddenBar = new Map();
-  //     const nodeSelectLine = new Map();
-  //     const nodeHiddenLine = new Map();
-  //     setCurrNodeButton(value);
-  //     Object.entries(selectedNodes).map(x => {
-  //       if(x[1]){
-  //         nodeSelectedBar.set(x[0], 2);
-  //         nodeHiddenBar.set(x[0], 1);
-  //         nodeSelectLine.set(x[0], "rgba(0, 0, 0, 1)");
-  //         nodeHiddenLine.set(x[0], "rgba(255, 255, 255, 1)");
-  //       }
-  //       else{
-  //         nodeSelectedBar.set(x[0], 1);
-  //         nodeHiddenBar.set(x[0], 2);
-  //         nodeSelectLine.set(x[0], "rgba(255, 255, 255, 1)");
-  //         nodeHiddenLine.set(x[0], "rgba(0, 0, 0, 1)");
-  //       }
-  //     })
-  //     if(value === "selected"){
-  //       setNodeStrokeWidth(Object.fromEntries(nodeSelectedBar));
-  //       setNodeStroke(Object.fromEntries(nodeSelectLine));
-  //     }
-  //     else if(value === "hidden"){
-  //       setNodeStrokeWidth(Object.fromEntries(nodeHiddenBar));
-  //       setNodeStroke(Object.fromEntries(nodeHiddenLine));
-  //     }
-  //     else{
-  //       setNodeStrokeWidth(Object.fromEntries(nodeWidthMap));
-  //       setNodeStroke(Object.fromEntries(nodeLineColMap));
-  //     }
-  //   }
-  //   else{
-  //     const edgeSelectedBar = new Map();
-  //     const edgeHiddenBar = new Map();
-  //     setCurrEdgeButton(value);
-  //     Object.entries(selectedEdges).map(x => {
-  //       if(x[1]){
-  //         edgeSelectedBar.set(x[0], 3);
-  //         edgeHiddenBar.set(x[0], 1.5);
-  //       }
-  //       else{
-  //         edgeSelectedBar.set(x[0], 1.5);
-  //         edgeHiddenBar.set(x[0], 3);
-  //       }
-  //     })
-  //     if(value === "selected"){
-  //       setEdgeStrokeWidth(Object.fromEntries(edgeSelectedBar));
-  //     }
-  //     else if(value === "hidden"){
-  //       setEdgeStrokeWidth(Object.fromEntries(edgeHiddenBar));
-  //     }
-  //     else{
-  //       setEdgeStrokeWidth(Object.fromEntries(edgeWidthMap));
-  //     }
-  //   }
-  // }
-
   const transNodeData = nodes.map(x => {
     return {
       uid: x.uid,
@@ -259,7 +190,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   })
 
-  const convertedData = function(data){
+  const convertData = data => {
     const copy = {...data};
     Object.values(copy).forEach(val => {
       val["color"] = rgbToHex(parseInt(val.color.r), parseInt(val.color.g), parseInt(val.color.b));
@@ -318,12 +249,14 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
-  const handleShowSelected = (type) => {
+  const handleOriginal = (type) => {
     if(type === 'node'){
+      setSelectedNodes(Object.fromEntries(noNodeSelectMap));
       setHiddenNodes(Object.fromEntries(nodeHiddenMap));
       setRemovedNodes(Object.fromEntries(nodeRemovedMap));
     }
     else{
+      setSelectedEdges(Object.fromEntries(noEdgeSelectMap))
       setHiddenEdges(Object.fromEntries(edgeHiddenMap));
       setRemovedEdges(Object.fromEntries(edgeRemovedMap));
     }
@@ -374,13 +307,36 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
+  const handleToolbarSelection = (dataType, selectionType) => {
+    if(selectionType === "hidden"){
+      handleHideSelected(dataType);
+    }
+    else if(selectionType === "removed"){
+      handleRemoveSelected(dataType);
+    }
+    else if(selectionType === "other"){
+      if(dataType === "node"){
+        handleOtherSelect("edges in nodes");
+      }
+      else{
+        handleOtherSelect("nodes in edges");
+      }
+    }
+    else{
+      handleOriginal(dataType);
+    }
+  }
+
 
   return <div>
     <Grid container spacing={1}>
       <Grid item xs={12} sm={!navOpen ? 1 : 4}>
-        <div className="colorSetting" style={{justifyContent: !navOpen ? "flex-start" : "flex-end"}}>
+        <div className="colorSetting" style={{ justifyContent: !navOpen ? "flex-start" : "flex-end" }}>
           <div>
-            <Button style={{justifyContent: !navOpen ? "flex-start": "flex-end"}} color="primary" onClick={() => toggleNav()}>{!navOpen ? <ArrowForwardIos style={{fontSize: "20px"}} /> : <ArrowBackIos style={{fontSize: "20px"}}/>}</Button></div>
+            <Button style={{justifyContent: !navOpen ? "flex-start": "flex-end"}} color="primary" onClick={() => toggleNav()}>
+              {!navOpen ? <ArrowForwardIos style={{fontSize: "20px"}} /> : <ArrowBackIos style={{fontSize: "20px"}}/>}
+            </Button>
+          </div>
           </div>
           {navOpen ? <div className={classes.root}>
             <Accordion>
@@ -391,7 +347,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               <div style={{width: "100%"}}>
                 <LoadTable
                   type={"node"}
-                  data={convertedData(transNodeData)}
+                  data={convertData(transNodeData)}
                   onColorChange={getColorChange}
                   onVisibleChange={getVisibilityChange}
                   onSelectedChange={getSelectedChange}
@@ -399,12 +355,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                   onSelectAllChange={getSelectAll}
                 />
                 <Bars type={"node"} freqData={getValueFreq(nodeDegList)} onValueChange={getHoverValue} />
-                <div style={{display: "flex", flexDirection: 'column'}}>
-                  <Button variant={"outlined"} size={"small"} onClick={() => handleShowSelected('node')}>Show selected</Button>
-                  <Button variant={"outlined"} size={"small"} onClick={() => handleHideSelected('node')}>Hide selected</Button>
-                  <Button variant={"outlined"} size={"small"} onClick={() => handleRemoveSelected('node')}>Remove selected</Button>
-                  <Button variant={"outlined"} size={"small"} onClick={() => handleOtherSelect('edges in nodes')}>Select all edges containing selected nodes</Button>
-                </div>
+
               </div>
 
               </AccordionDetails>
@@ -418,7 +369,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               <div style={{width: "100%"}}>
                 <LoadTable
                   type={"edge"}
-                  data={convertedData(transEdgeData)}
+                  data={convertData(transEdgeData)}
                   onColorChange={getColorChange}
                   onVisibleChange={getVisibilityChange}
                   onSelectedChange={getSelectedChange}
@@ -426,12 +377,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                   onSelectAllChange={getSelectAll}
                 />
                 <Bars type={"edge"} freqData={getValueFreq(edgeSizeList)} onValueChange={getHoverValue}/>
-                <div style={{display: "flex", flexDirection: 'column'}}>
-                  <Button variant={"outlined"} size={"small"} onClick={() => handleShowSelected('edge')}>Show selected</Button>
-                  <Button variant={"outlined"} size={"small"} onClick={() => handleHideSelected('edge')}>Hide selected</Button>
-                  <Button variant={"outlined"} size={"small"} onClick={() => handleRemoveSelected('edge')}>Remove selected</Button>
-                  <Button variant={"outlined"} size={"small"} onClick={() => handleOtherSelect('nodes in edges')}>Select all nodes in selected edges</Button>
-                </div>
+
               </div>
               </AccordionDetails>
             </Accordion>
@@ -453,6 +399,15 @@ const Widget = ({ nodes, edges, ...props }) => {
     </Grid>
 
     <Grid item xs={12} sm={!navOpen ? 11 : 8}>
+      <div>
+        <div style={{ display: "flex", justifyContent: "flex-end"}}>
+          <div style={{ border: "2px solid #878787"}}>
+            <Toolbar dataType={"node"} onSelectionChange={handleToolbarSelection}/>
+            <Toolbar dataType={"edge"} onSelectionChange={handleToolbarSelection}/>
+          </div>
+        </div>
+      </div>
+
       <HypernetxWidgetView
         {...props}
         {...{nodes, edges, nodeFill, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges}}

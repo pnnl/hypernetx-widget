@@ -1,5 +1,6 @@
 import * as scale from 'd3-scale-chromatic';
 import { makeStyles } from '@material-ui/core/styles';
+import {descending} from "d3-array";
 
 export const descendingComparator = (a, b, orderBy) => {
   if (b[orderBy] < a[orderBy]) {
@@ -24,6 +25,7 @@ export const stableSort = (array, comparator) => {
     if (order !== 0) return order;
     return a[1] - b[1];
   });
+
   return stabilizedThis.map((el) => el[0]);
 }
 

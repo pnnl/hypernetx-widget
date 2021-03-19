@@ -69,8 +69,8 @@ function EnhancedTableHead(props) {
   const headCells = [
     {id: 'uid', label: 'Label'},
     {id: 'value', label: datatype === "node" ? "Degree" : "Size"},
-    {id: 'visible', label: 'Visibility'},
-    {id: 'remove', label: 'Remove'},
+    {id: 'hidden', label: 'Visibility'},
+    {id: 'removed', label: 'Remove'},
     {id: 'color', label: 'Color'}
   ];
 
@@ -179,9 +179,7 @@ const LoadTable = ({ type, data, onColorChange, onVisibleChange, onSelectedChang
       />
       <TableBody>
         {stableSort(data, getComparator(order, orderBy))
-          .map((x, i) => {
-
-            return(
+          .map((x, i) =>
               <TableRow key={i}>
                 <TableCell><CheckboxEl label={x.uid} checkState={x.selected} sendCheck={getCheck}/></TableCell>
                 <TableCell align="center" >
@@ -197,7 +195,6 @@ const LoadTable = ({ type, data, onColorChange, onVisibleChange, onSelectedChang
 
               </TableRow>
             )
-          })
         }
       </TableBody>
     </Table>
