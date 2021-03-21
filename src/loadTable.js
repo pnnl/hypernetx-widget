@@ -22,21 +22,20 @@ const tableStyles = makeStyles((theme) => ({
     "& .MuiTableCell-sizeSmall": {
       whitespace: "nowrap",
       padding: "0px 0px 0px 0px",
-      fontSize: "12px",
+      fontSize: "10px",
       fontWeight: 400,
       margin: "0px",
-      height: 5
+      // height: 5
 
     },
     "& .MuiTableCell-paddingNone": {
-      padding: "0px 0px 5px 15px",
+      // padding: "0px 0px 5px 15px",
       fontSize: "13px",
       fontWeight: 500,
       align: "center",
     },
     "& .MuiButton-text": {
       padding: "0px 0px 0px 0px",
-
     },
     "& .MuiTableSortLabel-icon": {
       fontSize: "16px",
@@ -166,7 +165,7 @@ const LoadTable = ({ type, data, onColorChange, onVisibleChange, onSelectedChang
 
   return <div style={{ margin: "0px", padding:"0px", }}>
   <TableContainer component={Paper} style={{ maxWidth: "100%", height:"250px", border: "1px solid lightgray"}}>
-    <Table classes={{root: classes.customTable}} style={{tableLayout: "auto"}} stickyHeader aria-label="sticky table" size="small">
+    <Table classes={{root: classes.customTable}} style={{tableLayout: "auto"}} stickyHeader size="small">
       <EnhancedTableHead
         datatype={type}
         data={data}

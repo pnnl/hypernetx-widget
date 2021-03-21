@@ -32,16 +32,10 @@ const Widget = ({ nodes, edges, ...props }) => {
   const edgeColorMap = new Map();
   edges.map(x => edgeColorMap.set(x.uid.toString(), "rgba(0, 0, 0, 1)"));
 
-  // const nodeVisibleMap = new Map();
-  // nodes.map(x => nodeVisibleMap.set(x.uid, true));
-
   const nodeHiddenMap = new Map();
   nodes.map(x => nodeHiddenMap.set(x.uid, false));
   const edgeHiddenMap = new Map();
   edges.map(x => edgeHiddenMap.set(x.uid.toString(), false));
-  // const edgeVisibleMap = new Map();
-  // edges.map(x => edgeVisibleMap.set(x.uid.toString(), true));
-
 
   const nodeSelectMap = new Map();
   nodes.map(x => nodeSelectMap.set(x.uid, true));
@@ -64,17 +58,17 @@ const Widget = ({ nodes, edges, ...props }) => {
   const edgesInNodesMap = new Map();
   edges.map(x => edgesInNodesMap.set(x.uid.toString(), false));
 
-  const [nodeFill, setNodeFill] = React.useState(Object.fromEntries(nodeColorMap));
+  const [nodeFill, setNodeFill] = React.useState(props.nodeColors || Object.fromEntries(nodeColorMap));
   const [selectedNodes, setSelectedNodes] = React.useState(Object.fromEntries(noNodeSelectMap));
-  const [hiddenNodes, setHiddenNodes] = React.useState(Object.fromEntries(nodeHiddenMap));
-  const [removedNodes, setRemovedNodes] = React.useState(Object.fromEntries(nodeRemovedMap));
+  const [hiddenNodes, setHiddenNodes] = React.useState(props.nodeHidden || Object.fromEntries(nodeHiddenMap));
+  const [removedNodes, setRemovedNodes] = React.useState(props.nodeRemoved || Object.fromEntries(nodeRemovedMap));
 
-  const [edgeStroke, setEdgeStroke] = React.useState(Object.fromEntries(edgeColorMap));
+  const [edgeStroke, setEdgeStroke] = React.useState(props.edgeColors || Object.fromEntries(edgeColorMap));
   const [selectedEdges, setSelectedEdges] = React.useState(Object.fromEntries(noEdgeSelectMap));
-  const [hiddenEdges, setHiddenEdges] = React.useState(Object.fromEntries(edgeHiddenMap));
-  const [removedEdges, setRemovedEdges] = React.useState(Object.fromEntries(edgeRemovedMap));
+  const [hiddenEdges, setHiddenEdges] = React.useState(props.edgeHidden || Object.fromEntries(edgeHiddenMap));
+  const [removedEdges, setRemovedEdges] = React.useState(props.edgeRemoved || Object.fromEntries(edgeRemovedMap));
 
-  const getColorChange = (datatype, uid, color) => {
+  const handleColorChange = (datatype, uid, color) => {
     if(datatype === "node"){
       setNodeFill({...nodeFill, [uid]:`rgba(${ color.r }, ${ color.g }, ${ color.b }, ${ color.a })`});
     }
@@ -83,7 +77,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
-  const getVisibilityChange = (datatype, uid, visibility) => {
+  const handleVisibilityChange = (datatype, uid, visibility) => {
     if(datatype === "node"){
       setHiddenNodes({...hiddenNodes, [uid]:!visibility});
     }
@@ -92,7 +86,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
-  const getSelectedChange = (datatype, uid, selected ) => {
+  const handleSelectedChange = (datatype, uid, selected ) => {
     if(datatype === "node"){
       setSelectedNodes({...selectedNodes, [uid]:selected});
     }
@@ -101,7 +95,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
-  const getRemovedChange = (datatype, uid, removed) => {
+  const handleRemovedChange = (datatype, uid, removed) => {
     if(datatype === "node"){
       setRemovedNodes({...removedNodes, [uid]:removed});
     }
@@ -110,7 +104,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
-  const getSelectAll = (type, value) => {
+  const handleSelectAll = (type, value) => {
     if(type === "node"){
       if(value){
         setSelectedNodes(Object.fromEntries(nodeSelectMap));
@@ -129,7 +123,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
-  const getHoverValue = (value, datatype) => {
+  const handleBarSelect = (value, datatype) => {
     if(datatype === "node"){
       const nodesOnBarMap = new Map();
       nodes.map(x => nodesOnBarMap.set(x.uid, false));
@@ -198,16 +192,10 @@ const Widget = ({ nodes, edges, ...props }) => {
     return Object.values(copy);
   }
 
-  const getNodePalette = value => {
-    setNodeFill(value);
-  }
-  const getEdgePalette = value => {
-    setEdgeStroke(value);
-  }
   const [colGroup, setColGroup] = React.useState("each");
   const [colPalette, setColPalette] = React.useState("black");
   const [colType, setColType] = React.useState("node");
-  const getCurrData = (group, palette, type) => {
+  const handleCurrData = (group, palette, type) => {
     setColGroup(group);
     setColPalette(palette);
     setColType(type);
@@ -326,12 +314,12 @@ const Widget = ({ nodes, edges, ...props }) => {
       handleOriginal(dataType);
     }
   }
-
+  console.log(edgeStroke);
 
   return <div>
     <Grid container spacing={1}>
-      <Grid item xs={12} sm={!navOpen ? 1 : 4}>
-        <div className="colorSetting" style={{ justifyContent: !navOpen ? "flex-start" : "flex-end" }}>
+      <Grid item xs={12} sm={4} style={{zIndex: 99, position: 'absolute'}}>
+        <div className="colorSetting" style={{ justifyContent: !navOpen ? "flex-start" : "flex-end", }}>
           <div>
             <Button style={{justifyContent: !navOpen ? "flex-start": "flex-end"}} color="primary" onClick={() => toggleNav()}>
               {!navOpen ? <ArrowForwardIos style={{fontSize: "20px"}} /> : <ArrowBackIos style={{fontSize: "20px"}}/>}
@@ -348,13 +336,13 @@ const Widget = ({ nodes, edges, ...props }) => {
                 <LoadTable
                   type={"node"}
                   data={convertData(transNodeData)}
-                  onColorChange={getColorChange}
-                  onVisibleChange={getVisibilityChange}
-                  onSelectedChange={getSelectedChange}
-                  onRemovedChange={getRemovedChange}
-                  onSelectAllChange={getSelectAll}
+                  onColorChange={handleColorChange}
+                  onVisibleChange={handleVisibilityChange}
+                  onSelectedChange={handleSelectedChange}
+                  onRemovedChange={handleRemovedChange}
+                  onSelectAllChange={handleSelectAll}
                 />
-                <Bars type={"node"} freqData={getValueFreq(nodeDegList)} onValueChange={getHoverValue} />
+                <Bars type={"node"} freqData={getValueFreq(nodeDegList)} onValueChange={handleBarSelect} />
 
               </div>
 
@@ -366,19 +354,18 @@ const Widget = ({ nodes, edges, ...props }) => {
                 <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Key Statistics - Edges" + " (" +  String(edges.length) + ")"}</Typography>
               </AccordionSummary>
               <AccordionDetails>
-              <div style={{width: "100%"}}>
-                <LoadTable
-                  type={"edge"}
-                  data={convertData(transEdgeData)}
-                  onColorChange={getColorChange}
-                  onVisibleChange={getVisibilityChange}
-                  onSelectedChange={getSelectedChange}
-                  onRemovedChange={getRemovedChange}
-                  onSelectAllChange={getSelectAll}
-                />
-                <Bars type={"edge"} freqData={getValueFreq(edgeSizeList)} onValueChange={getHoverValue}/>
-
-              </div>
+                <div style={{width: "100%"}}>
+                  <LoadTable
+                    type={"edge"}
+                    data={convertData(transEdgeData)}
+                    onColorChange={handleColorChange}
+                    onVisibleChange={handleVisibilityChange}
+                    onSelectedChange={handleSelectedChange}
+                    onRemovedChange={handleRemovedChange}
+                    onSelectAllChange={handleSelectAll}
+                  />
+                  <Bars type={"edge"} freqData={getValueFreq(edgeSizeList)} onValueChange={handleBarSelect}/>
+                </div>
               </AccordionDetails>
             </Accordion>
 
@@ -389,8 +376,8 @@ const Widget = ({ nodes, edges, ...props }) => {
               <AccordionDetails>
                 <div style={{width: "100%"}}>
                   <ColorPalette nodeData={nodeDegList} edgeData={edgeSizeList}
-                  onNodePaletteChange={getNodePalette} onEdgePaletteChange={getEdgePalette}
-                  currGroup={colGroup} currPalette={colPalette} currType={colType} onCurrDataChange={getCurrData}
+                  onNodePaletteChange={palette => setNodeFill(palette)} onEdgePaletteChange={palette => setEdgeStroke(palette)}
+                  currGroup={colGroup} currPalette={colPalette} currType={colType} onCurrDataChange={handleCurrData}
                   />
                 </div>
               </AccordionDetails>
@@ -398,7 +385,7 @@ const Widget = ({ nodes, edges, ...props }) => {
           </div> : null }
     </Grid>
 
-    <Grid item xs={12} sm={!navOpen ? 11 : 8}>
+    <Grid item xs={12} >
       <div>
         <div style={{ display: "flex", justifyContent: "flex-end"}}>
           <div style={{ border: "2px solid #878787"}}>

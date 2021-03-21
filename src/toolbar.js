@@ -6,7 +6,6 @@ import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
 import BubbleChartIcon from '@material-ui/icons/BubbleChart';
 import Tooltip from '@material-ui/core/Tooltip';
-import {Paper} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 
 const toggleStyle = makeStyles((theme) => ({
@@ -14,7 +13,7 @@ const toggleStyle = makeStyles((theme) => ({
         "& .MuiToggleButton-root": {
             color: "#d3d3d3",
             border: "1px solid #605f5f",
-            fontSize: "10px",
+            fontSize: "9px",
             height: 30,
             maxWidth: 100,
 
@@ -42,25 +41,13 @@ const Toolbar = ({ dataType, onSelectionChange }) => {
             setSelectionType(newSelection);
             onSelectionChange(dataType, newSelection);
         }
-        // if(newSelection === "other"){
-        //     if(dataType === "node"){
-        //         onSelectionChange("edges in nodes", newSelection);
-        //     }
-        //     else{
-        //         onSelectionChange("nodes in edges", newSelection);
-        //     }
-        // }
-        // else{
-        //     onSelectionChange(dataType, newSelection);
-        // }
-
     }
 
 
     return(
       <div style={{ padding: "5px",}}>
           <div style={{textAlign: 'center', fontFamily: "Arial", fontSize: "14px", padding: "5px"}}>
-              {dataType === "node" ? "Nodes" : "Edges"}
+              {dataType === "node" ? "Nodes" : "Edges "}
           </div>
           <ToggleButtonGroup
             size={"small"}
@@ -70,26 +57,26 @@ const Toolbar = ({ dataType, onSelectionChange }) => {
             onChange={handleSelection}
           >
               <ToggleButton value={"original"}>
-                  <Tooltip title={"Return to original"}>
+                  <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Return to original</div>}>
                       <SettingsBackupRestoreIcon />
                   </Tooltip>
               </ToggleButton>
 
               <ToggleButton value={"hidden"}>
-                  <Tooltip title={"Hide selected"}>
+                  <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Hide selected</div>}>
                       <VisibilityOffIcon />
                   </Tooltip>
               </ToggleButton>
 
               <ToggleButton value={"removed"}>
-                  <Tooltip title={"Remove selected"}>
+                  <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Remove selected</div>}>
                       <RemoveCircleOutlineIcon />
                   </Tooltip>
 
               </ToggleButton>
 
               <ToggleButton value={"other"}>
-                  <Tooltip title={dataType === "Nodes" ? "Select all edges containing selected nodes " : "Select all nodes in selected edges"}>
+                  <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>{dataType === "node" ? "Select all edges containing selected nodes " : "Select all nodes in selected edges"}</div>}>
                       <BubbleChartIcon />
                   </Tooltip>
 

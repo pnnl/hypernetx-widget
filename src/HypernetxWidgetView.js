@@ -179,7 +179,8 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
       .attr('x', d => d.x)
       .attr('y', d => d.y)
       // .attr('dx', d => d.r + 7)
-      .text(d => d.data.uid in nodeLabels ? nodeLabels[d.data.uid] : d.data.uid);
+      .text(d => d.data.uid in nodeLabels ? nodeLabels[d.data.uid] : d.data.uid)
+      .style('visibility', withNodeLabels ? undefined : 'hidden');
 
     const updateModel = throttle(() => {
       if (_model) {
@@ -581,7 +582,7 @@ const planarForce = (nodes, edges) => {
   return force;
 }
 
-export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, width=600, height=600, lineGraph, ignorePlanarForce, pos={}, collapseNodes, ...props}) => {
+export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, width=800, height=700, lineGraph, ignorePlanarForce, pos={}, collapseNodes, ...props}) => {
   const derivedProps = useMemo(
     () => {
       removedNodes = removedNodes || {};
