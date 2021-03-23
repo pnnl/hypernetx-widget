@@ -16,7 +16,6 @@ import Toolbar from "./toolbar";
 
 const Widget = ({ nodes, edges, ...props }) => {
 
-
   const classes = accordianStyles();
 
   const nodeDegMap = new Map();
@@ -314,11 +313,10 @@ const Widget = ({ nodes, edges, ...props }) => {
       handleOriginal(dataType);
     }
   }
-  console.log(edgeStroke);
 
   return <div>
     <Grid container spacing={1}>
-      <Grid item xs={12} sm={4} style={{zIndex: 99, position: 'absolute'}}>
+      <Grid item xs={12} sm={!navOpen ? 1 : 4} >
         <div className="colorSetting" style={{ justifyContent: !navOpen ? "flex-start" : "flex-end", }}>
           <div>
             <Button style={{justifyContent: !navOpen ? "flex-start": "flex-end"}} color="primary" onClick={() => toggleNav()}>
@@ -385,13 +383,13 @@ const Widget = ({ nodes, edges, ...props }) => {
           </div> : null }
     </Grid>
 
-    <Grid item xs={12} >
+    <Grid item xs={12}  sm={!navOpen ? 11 : 8}>
       <div>
-        <div style={{ display: "flex", justifyContent: "flex-end"}}>
-          <div style={{ border: "2px solid #878787"}}>
+        <div style={{ display: "flex", justifyContent: "flex-start", flexFlow: "row wrap"}}>
+          {/*<div style={{ border: "2px solid #878787"}}>*/}
             <Toolbar dataType={"node"} onSelectionChange={handleToolbarSelection}/>
             <Toolbar dataType={"edge"} onSelectionChange={handleToolbarSelection}/>
-          </div>
+          {/*</div>*/}
         </div>
       </div>
 

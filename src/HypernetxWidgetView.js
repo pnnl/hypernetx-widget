@@ -702,7 +702,7 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, w
     ...props,
     onChangeTooltip: handleTooltip
   };
-  console.log("ALL", allProps);
+
   return <div className='hnx-widget-view'>
     { tooltip &&
       <Tooltip {...tooltip} />

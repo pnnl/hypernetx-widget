@@ -8,14 +8,14 @@ export default {
 };
 
 const nodeColorDict = {
-  // 'BM':'rgba(193, 122, 158, 0.5)',
+  'BM':'rgba(193, 122, 158, 0.5)',
   'BR':'rgba(150, 213, 95, 0.7)',
   'CC':'rgba(88, 148, 150, 0.8)',
   'CH':'rgba(136, 25, 118, 0.8)',
   'CN':'rgba(176, 220, 206, 0.7)',
   'FN':'rgba(79, 255, 88, 0.7)',
   'GP':'rgba(75, 184, 25, 0.9)',
-  // 'JA':'rgba(213, 59, 43, 0.8)',
+  'JA':'rgba(213, 59, 43, 0.8)',
   'JU':'rgba(80, 35, 135, 0.2)',
   'JV':'rgba(209, 137, 72, 0.5)',
   'MA':'rgba(227, 134, 90, 0.7)',
@@ -45,7 +45,7 @@ const edgeColorDict = {
   4: 'rgba(36, 34, 132, 0.8)',
   5: 'rgba(73, 84, 27, 0.2)',
   6: 'rgba(98, 213, 173, 1)',
-  // 7: 'rgba(0, 0, 0, 1)'
+  7: 'rgba(0, 0, 0, 1)'
 }
 export const MainComponent = () => <div>
   <Widget nodes={props.nodes} edges={props.edges} withEdgeLabels={true} withNodeLabels={true}
