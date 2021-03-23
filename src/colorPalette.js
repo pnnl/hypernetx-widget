@@ -114,7 +114,7 @@ const ColorPalette = ({nodeData, edgeData, onNodePaletteChange, onEdgePaletteCha
     setPalette("black");
     const defaultMap = new Map();
     if(type === "node"){
-      Object.keys(nodeData).map(x => defaultMap.set(x, "rgba(0, 0, 0, 0.6)"));
+      Object.keys(nodeData).map(x => defaultMap.set(x, "rgba(105, 105, 105, 1)"));
       onNodePaletteChange(Object.fromEntries(defaultMap));
     }
     else{

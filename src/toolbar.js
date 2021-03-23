@@ -45,8 +45,8 @@ const Toolbar = ({ dataType, onSelectionChange }) => {
 
 
     return(
-      <div style={{ padding: "5px",}}>
-          <div style={{textAlign: 'center', fontFamily: "Arial", fontSize: "14px", padding: "5px"}}>
+      <div style={{ paddingRight: "7px",}}>
+          <div style={{fontFamily: "Arial", fontSize: "14px", paddingBottom: "5px"}}>
               {dataType === "node" ? "Nodes" : "Edges "}
           </div>
           <ToggleButtonGroup

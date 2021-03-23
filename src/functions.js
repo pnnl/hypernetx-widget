@@ -44,8 +44,21 @@ export const rgbToHex = (r, g, b) => {
 }
 
 export const getRGB = (strRGB) => {
-  let split = strRGB.split(/[()]+/).filter(function(e) { return e; });
-  let rgbVal = split[1].split(", ");
+  // console.log(strRGB);
+  // if(strRGB !== undefined){
+    let split = strRGB.split(/[()]+/).filter(function(e) { return e; });
+    let rgbVal = split[1].split(", ");
+    // console.log(strRGB, rgbVal);
+    // console.log(rgbVal, 'here');
+    // return rgbVal
+  // }
+  // else{
+
+    // console.log('no color', ["0", "0", "0", "1"]);
+    // return ["0", "0", "0", "1"]
+  // }
+  // console.log('rgbval', rgbVal);
+
   return rgbVal
 }
 
