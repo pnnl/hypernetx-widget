@@ -14,6 +14,9 @@ import {TopologicalSort, DiGraph} from 'js-graph-algorithms'
 
 import './hnx-widget.css'
 
+export const now = () => +(new Date());
+
+
 const throttledConsole = throttle(console.log, 1000);
 
 const styleEncodings = {
@@ -31,8 +34,7 @@ const encodeProps = (selection, key, props) => {
   })
 }
 
-const forceDragBehavior = (selection, simulation) => {
-
+const forceDragBehavior = (selection, simulation, unpinned) => {
     const [width, height] = simulation.size;
 
     function dragstarted(event) {
@@ -46,6 +48,7 @@ const forceDragBehavior = (selection, simulation) => {
       const {r} = event.subject;
       event.subject.fx = Math.min(width - r, (Math.max(x, r)));
       event.subject.fy = Math.min(height - r, (Math.max(y, r)));
+      event.subject.pinned = now();
     }
 
     function dragended(event) {
@@ -60,6 +63,10 @@ const forceDragBehavior = (selection, simulation) => {
   selection
     .each(function(d) {
       d.ele = this;
+
+      if (d.pinned < unpinned) {
+        unfix(undefined, d)
+      }
     })
     .on('dblclick', unfix)
     .call(drag()
@@ -110,6 +117,7 @@ const forceEdgeDragBehavior = (selection, simulation) => {
       elements.forEach(d => {
         d.fx = x + d.dx;
         d.fy = y + d.dy;
+        d.pinned = now();
       })
     }
 
@@ -141,14 +149,14 @@ const classedByDict = (selection, props) =>
       selection.classed(className, d => dict[d.uid])
     )
 
-const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes, hiddenNodes, removedNodes, nodeLabels={}, _model}) =>
+const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes, hiddenNodes, removedNodes, nodeLabels={}, unpinned, _model}) =>
   <g className='nodes' ref={ele => {
     const groups = select(ele)
       .selectAll('g.group')
         .data(internals)
           .join('g')
             .classed('group', true)
-            .call(forceDragBehavior, simulation, onClickNodes);
+            .call(forceDragBehavior, simulation, unpinned);
 
     const circles = groups.selectAll('g')
       .data(d => d.descendants())
