@@ -7,12 +7,12 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Typography from '@material-ui/core/Typography';
 import { ArrowForwardIos, ArrowBackIos } from '@material-ui/icons';
 import Button from '@material-ui/core/Button';
-import {HypernetxWidgetView} from './HypernetxWidgetView';
+import { HypernetxWidgetView } from './HypernetxWidgetView';
 import ColorPalette  from './colorPalette.js';
 import LoadTable from './loadTable.js';
 import Bars from './bars.js';
-import ShowButton from './showButton.js';
 import { getRGB, rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianStyles } from './functions.js';
+import Toolbar from "./toolbar";
 
 const Widget = ({ nodes, edges, ...props }) => {
 
@@ -31,16 +31,10 @@ const Widget = ({ nodes, edges, ...props }) => {
   const edgeColorMap = new Map();
   edges.map(x => edgeColorMap.set(x.uid.toString(), "rgba(0, 0, 0, 1)"));
 
-  // const nodeVisibleMap = new Map();
-  // nodes.map(x => nodeVisibleMap.set(x.uid, true));
-
   const nodeHiddenMap = new Map();
   nodes.map(x => nodeHiddenMap.set(x.uid, false));
   const edgeHiddenMap = new Map();
   edges.map(x => edgeHiddenMap.set(x.uid.toString(), false));
-  // const edgeVisibleMap = new Map();
-  // edges.map(x => edgeVisibleMap.set(x.uid.toString(), true));
-
 
   const nodeSelectMap = new Map();
   nodes.map(x => nodeSelectMap.set(x.uid, true));
@@ -57,19 +51,23 @@ const Widget = ({ nodes, edges, ...props }) => {
   const edgeRemovedMap = new Map();
   edges.map(x => edgeRemovedMap.set(x.uid.toString(), false));
 
-  const [nodeFill, setNodeFill] = React.useState(Object.fromEntries(nodeColorMap));
+  const nodesInEdgesMap = new Map();
+  nodes.map(x => nodesInEdgesMap.set(x.uid, false));
+
+  const edgesInNodesMap = new Map();
+  edges.map(x => edgesInNodesMap.set(x.uid.toString(), false));
+
+  const [nodeFill, setNodeFill] = React.useState(props.nodeColors || Object.fromEntries(nodeColorMap));
   const [selectedNodes, setSelectedNodes] = React.useState(Object.fromEntries(noNodeSelectMap));
-  // const [nodeVisible, setNodeVisible] = React.useState(Object.fromEntries(nodeVisibleMap));
-  const [hiddenNodes, setHiddenNodes] = React.useState(Object.fromEntries(nodeHiddenMap));
-  const [removedNodes, setRemovedNodes] = React.useState(Object.fromEntries(nodeRemovedMap));
+  const [hiddenNodes, setHiddenNodes] = React.useState(props.nodeHidden || Object.fromEntries(nodeHiddenMap));
+  const [removedNodes, setRemovedNodes] = React.useState(props.nodeRemoved || Object.fromEntries(nodeRemovedMap));
 
-  const [edgeStroke, setEdgeStroke] = React.useState(Object.fromEntries(edgeColorMap));
+  const [edgeStroke, setEdgeStroke] = React.useState(props.edgeColors || Object.fromEntries(edgeColorMap));
   const [selectedEdges, setSelectedEdges] = React.useState(Object.fromEntries(noEdgeSelectMap));
-  // const [edgeVisible, setEdgeVisible] = React.useState(Object.fromEntries(edgeVisibleMap));
-  const [hiddenEdges, setHiddenEdges] = React.useState(Object.fromEntries(edgeHiddenMap));
-  const [removedEdges, setRemovedEdges] = React.useState(Object.fromEntries(edgeRemovedMap));
+  const [hiddenEdges, setHiddenEdges] = React.useState(props.edgeHidden || Object.fromEntries(edgeHiddenMap));
+  const [removedEdges, setRemovedEdges] = React.useState(props.edgeRemoved || Object.fromEntries(edgeRemovedMap));
 
-  const getColorChange = (datatype, uid, color) => {
+  const handleColorChange = (datatype, uid, color) => {
     if(datatype === "node"){
       setNodeFill({...nodeFill, [uid]:`rgba(${ color.r }, ${ color.g }, ${ color.b }, ${ color.a })`});
     }
@@ -78,9 +76,8 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
-  const getVisibilityChange = (datatype, uid, visibility) => {
+  const handleVisibilityChange = (datatype, uid, visibility) => {
     if(datatype === "node"){
-      // setNodeVisible({...nodeVisible, [uid]:visibility});
       setHiddenNodes({...hiddenNodes, [uid]:!visibility});
     }
     else{
@@ -88,7 +85,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
-  const getSelectedChange = (datatype, uid, selected ) => {
+  const handleSelectedChange = (datatype, uid, selected ) => {
     if(datatype === "node"){
       setSelectedNodes({...selectedNodes, [uid]:selected});
     }
@@ -97,7 +94,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
-  const getRemovedChange = (datatype, uid, removed) => {
+  const handleRemovedChange = (datatype, uid, removed) => {
     if(datatype === "node"){
       setRemovedNodes({...removedNodes, [uid]:removed});
     }
@@ -106,7 +103,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
-  const getSelectAll = (type, value) => {
+  const handleSelectAll = (type, value) => {
     if(type === "node"){
       if(value){
         setSelectedNodes(Object.fromEntries(nodeSelectMap));
@@ -125,7 +122,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
-  const getHoverValue = (value, datatype) => {
+  const handleBarSelect = (value, datatype) => {
     if(datatype === "node"){
       const nodesOnBarMap = new Map();
       nodes.map(x => nodesOnBarMap.set(x.uid, false));
@@ -164,76 +161,6 @@ const Widget = ({ nodes, edges, ...props }) => {
   const edgeWidthMap = new Map();
   edges.map(x => edgeWidthMap.set(x.uid.toString(), 1.5));
 
-  const nodeLineColMap = new Map();
-  nodes.map(x => nodeLineColMap.set(x.uid, "rgba(255, 255, 255, 1)"));
-
-  const [nodeStroke, setNodeStroke] = React.useState(Object.fromEntries(nodeLineColMap));
-
-  const [nodeStrokeWidth, setNodeStrokeWidth] = React.useState(Object.fromEntries(nodeWidthMap));
-  const [edgeStrokeWidth, setEdgeStrokeWidth] = React.useState(Object.fromEntries(edgeWidthMap));
-  const [currNodeButton, setCurrNodeButton] = React.useState("default");
-  const [currEdgeButton, setCurrEdgeButton] = React.useState("default");
-
-  const getButton = (type, value) => {
-    if(type === "node"){
-      const nodeSelectedBar = new Map();
-      const nodeHiddenBar = new Map();
-      const nodeSelectLine = new Map();
-      const nodeHiddenLine = new Map();
-      setCurrNodeButton(value);
-      Object.entries(selectedNodes).map(x => {
-        if(x[1]){
-          nodeSelectedBar.set(x[0], 2);
-          nodeHiddenBar.set(x[0], 1);
-          nodeSelectLine.set(x[0], "rgba(0, 0, 0, 1)");
-          nodeHiddenLine.set(x[0], "rgba(255, 255, 255, 1)");
-        }
-        else{
-          nodeSelectedBar.set(x[0], 1);
-          nodeHiddenBar.set(x[0], 2);
-          nodeSelectLine.set(x[0], "rgba(255, 255, 255, 1)");
-          nodeHiddenLine.set(x[0], "rgba(0, 0, 0, 1)");
-        }
-      })
-      if(value === "selected"){
-        setNodeStrokeWidth(Object.fromEntries(nodeSelectedBar));
-        setNodeStroke(Object.fromEntries(nodeSelectLine));
-      }
-      else if(value === "hidden"){
-        setNodeStrokeWidth(Object.fromEntries(nodeHiddenBar));
-        setNodeStroke(Object.fromEntries(nodeHiddenLine));
-      }
-      else{
-        setNodeStrokeWidth(Object.fromEntries(nodeWidthMap));
-        setNodeStroke(Object.fromEntries(nodeLineColMap));
-      }
-    }
-    else{
-      const edgeSelectedBar = new Map();
-      const edgeHiddenBar = new Map();
-      setCurrEdgeButton(value);
-      Object.entries(selectedEdges).map(x => {
-        if(x[1]){
-          edgeSelectedBar.set(x[0], 3);
-          edgeHiddenBar.set(x[0], 1.5);
-        }
-        else{
-          edgeSelectedBar.set(x[0], 1.5);
-          edgeHiddenBar.set(x[0], 3);
-        }
-      })
-      if(value === "selected"){
-        setEdgeStrokeWidth(Object.fromEntries(edgeSelectedBar));
-      }
-      else if(value === "hidden"){
-        setEdgeStrokeWidth(Object.fromEntries(edgeHiddenBar));
-      }
-      else{
-        setEdgeStrokeWidth(Object.fromEntries(edgeWidthMap));
-      }
-    }
-  }
-
   const transNodeData = nodes.map(x => {
     return {
       uid: x.uid,
@@ -256,7 +183,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   })
 
-  const convertedData = function(data){
+  const convertData = data => {
     const copy = {...data};
     Object.values(copy).forEach(val => {
       val["color"] = rgbToHex(parseInt(val.color.r), parseInt(val.color.g), parseInt(val.color.b));
@@ -264,16 +191,10 @@ const Widget = ({ nodes, edges, ...props }) => {
     return Object.values(copy);
   }
 
-  const getNodePalette = value => {
-    setNodeFill(value);
-  }
-  const getEdgePalette = value => {
-    setEdgeStroke(value);
-  }
   const [colGroup, setColGroup] = React.useState("each");
   const [colPalette, setColPalette] = React.useState("black");
   const [colType, setColType] = React.useState("node");
-  const getCurrData = (group, palette, type) => {
+  const handleCurrData = (group, palette, type) => {
     setColGroup(group);
     setColPalette(palette);
     setColType(type);
@@ -315,81 +236,169 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
+  const handleOriginal = (type) => {
+    if(type === 'node'){
+      setSelectedNodes(Object.fromEntries(noNodeSelectMap));
+      setHiddenNodes(Object.fromEntries(nodeHiddenMap));
+      setRemovedNodes(Object.fromEntries(nodeRemovedMap));
+    }
+    else{
+      setSelectedEdges(Object.fromEntries(noEdgeSelectMap))
+      setHiddenEdges(Object.fromEntries(edgeHiddenMap));
+      setRemovedEdges(Object.fromEntries(edgeRemovedMap));
+    }
+  }
+
+  const handleHideSelected = (type) => {
+    if(type === 'node'){
+      setHiddenNodes(selectedNodes);
+    }
+    else{
+      setHiddenEdges(selectedEdges);
+    }
+  }
+
+  const handleRemoveSelected = (type) => {
+    if(type === 'node'){
+      setRemovedNodes(selectedNodes);
+      setSelectedNodes(Object.fromEntries(noNodeSelectMap));
+    }
+    else{
+      setRemovedEdges(selectedEdges);
+      setSelectedEdges(Object.fromEntries(noEdgeSelectMap));
+    }
+  }
+
+  const handleOtherSelect = (type) => {
+    let nodeToSelect = new Map(nodesInEdgesMap);
+    if(type === "nodes in edges"){
+      Object.entries(selectedEdges).map(d => {
+        edges.map(e => {
+          if(d[1] && d[0] === e.uid){
+            e.elements.map(x => nodeToSelect.set(x, true))
+          }
+        })
+      })
+      setSelectedNodes(Object.fromEntries(nodeToSelect));
+    }
+    else{
+      let edgeToSelect = new Map(edgesInNodesMap);
+      Object.entries(selectedNodes).map(d => {
+        edges.map(e => {
+          if(d[1] && e.elements.includes(d[0])){
+            edgeToSelect.set(e.uid.toString(), true);
+          }
+        })
+      })
+      setSelectedEdges(Object.fromEntries(edgeToSelect));
+    }
+  }
+
+  const handleToolbarSelection = (dataType, selectionType) => {
+    if(selectionType === "hidden"){
+      handleHideSelected(dataType);
+    }
+    else if(selectionType === "removed"){
+      handleRemoveSelected(dataType);
+    }
+    else if(selectionType === "other"){
+      if(dataType === "node"){
+        handleOtherSelect("edges in nodes");
+      }
+      else{
+        handleOtherSelect("nodes in edges");
+      }
+    }
+    else{
+      handleOriginal(dataType);
+    }
+  }
+
   return <div>
     <Grid container spacing={1}>
-
-    <Grid item xs={12} sm={!navOpen ? 1 : 4}>
-      <div className="colorSetting" style={{justifyContent: !navOpen ? "flex-start" : "flex-end"}}>
-        <div>
-          <Button style={{justifyContent: !navOpen ? "flex-start": "flex-end"}} color="primary" onClick={() => toggleNav()}>{!navOpen ? <ArrowForwardIos style={{fontSize: "20px"}} /> : <ArrowBackIos style={{fontSize: "20px"}}/>}</Button></div>
-        </div>
-        {navOpen ? <div className={classes.root}>
-          <Accordion>
-            <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}} />} >
-              <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Key Statistics - Nodes" + " (" +  String(nodes.length) + ")"}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-            <div style={{width: "100%"}}>
-              <LoadTable
-                type={"node"}
-                data={convertedData(transNodeData)}
-                onColorChange={getColorChange}
-                onVisibleChange={getVisibilityChange}
-                onSelectedChange={getSelectedChange}
-                onRemovedChange={getRemovedChange}
-                onSelectAllChange={getSelectAll}
-              />
-              {/*<ShowButton type={"node"} sendButton={getButton} currButton={currNodeButton}/>*/}
-              <Bars type={"node"} freqData={getValueFreq(nodeDegList)} onValueChange={getHoverValue}/>
-            </div>
-
-            </AccordionDetails>
-          </Accordion>
-
-          <Accordion>
-            <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}} />} >
-              <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Key Statistics - Edges" + " (" +  String(edges.length) + ")"}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-            <div style={{width: "100%"}}>
-              <LoadTable
-                type={"edge"}
-                data={convertedData(transEdgeData)}
-                onColorChange={getColorChange}
-                onVisibleChange={getVisibilityChange}
-                onSelectedChange={getSelectedChange}
-                onRemovedChange={getRemovedChange}
-                onSelectAllChange={getSelectAll}
-              />
-              {/*<ShowButton type={"edge"} sendButton={getButton} currButton={currEdgeButton}/>*/}
-              <Bars type={"edge"} freqData={getValueFreq(edgeSizeList)} onValueChange={getHoverValue}/>
-            </div>
-            </AccordionDetails>
-          </Accordion>
-
-          <Accordion>
-            <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}}/>} >
-              <Typography style={{fontSize: "14px", fontWeight: "bold"}}>Color</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
+      <Grid item xs={12} sm={!navOpen ? 1 : 4} >
+        <div className="colorSetting" style={{ justifyContent: !navOpen ? "flex-start" : "flex-end", }}>
+          <div>
+            <Button style={{justifyContent: !navOpen ? "flex-start": "flex-end"}} color="primary" onClick={() => toggleNav()}>
+              {!navOpen ? <ArrowForwardIos style={{fontSize: "20px"}} /> : <ArrowBackIos style={{fontSize: "20px"}}/>}
+            </Button>
+          </div>
+          </div>
+          {navOpen ? <div className={classes.root}>
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}} />} >
+                <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Key Statistics - Nodes" + " (" +  String(nodes.length) + ")"}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
               <div style={{width: "100%"}}>
-                <ColorPalette nodeData={nodeDegList} edgeData={edgeSizeList}
-                onNodePaletteChange={getNodePalette} onEdgePaletteChange={getEdgePalette}
-                currGroup={colGroup} currPalette={colPalette} currType={colType} onCurrDataChange={getCurrData}
+                <LoadTable
+                  type={"node"}
+                  data={convertData(transNodeData)}
+                  onColorChange={handleColorChange}
+                  onVisibleChange={handleVisibilityChange}
+                  onSelectedChange={handleSelectedChange}
+                  onRemovedChange={handleRemovedChange}
+                  onSelectAllChange={handleSelectAll}
                 />
-              </div>
-            </AccordionDetails>
-          </Accordion>
-        </div> : null }
-  </Grid>
+                <Bars type={"node"} freqData={getValueFreq(nodeDegList)} onValueChange={handleBarSelect} />
 
-  <Grid item xs={12} sm={!navOpen ? 11 : 8}>
-    <HypernetxWidgetView
-      {...props}
-      {...{nodes, edges, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges}}
-      onClickNodes={getClickedNodes} onClickEdges={getClickedEdges}
-      />
-  </Grid>
+              </div>
+
+              </AccordionDetails>
+            </Accordion>
+
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}} />} >
+                <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Key Statistics - Edges" + " (" +  String(edges.length) + ")"}</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <div style={{width: "100%"}}>
+                  <LoadTable
+                    type={"edge"}
+                    data={convertData(transEdgeData)}
+                    onColorChange={handleColorChange}
+                    onVisibleChange={handleVisibilityChange}
+                    onSelectedChange={handleSelectedChange}
+                    onRemovedChange={handleRemovedChange}
+                    onSelectAllChange={handleSelectAll}
+                  />
+                  <Bars type={"edge"} freqData={getValueFreq(edgeSizeList)} onValueChange={handleBarSelect}/>
+                </div>
+              </AccordionDetails>
+            </Accordion>
+
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}}/>} >
+                <Typography style={{fontSize: "14px", fontWeight: "bold"}}>Color</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <div style={{width: "100%"}}>
+                  <ColorPalette nodeData={nodeDegList} edgeData={edgeSizeList}
+                  onNodePaletteChange={palette => setNodeFill(palette)} onEdgePaletteChange={palette => setEdgeStroke(palette)}
+                  currGroup={colGroup} currPalette={colPalette} currType={colType} onCurrDataChange={handleCurrData}
+                  />
+                </div>
+              </AccordionDetails>
+            </Accordion>
+          </div> : null }
+    </Grid>
+
+    <Grid item xs={12}  sm={!navOpen ? 11 : 8}>
+      <div>
+        <div style={{ display: "flex", justifyContent: "flex-start", flexFlow: "row wrap"}}>
+          {/*<div style={{ border: "2px solid #878787"}}>*/}
+            <Toolbar dataType={"node"} onSelectionChange={handleToolbarSelection}/>
+            <Toolbar dataType={"edge"} onSelectionChange={handleToolbarSelection}/>
+          {/*</div>*/}
+        </div>
+      </div>
+
+      <HypernetxWidgetView
+        {...props}
+        {...{nodes, edges, nodeFill, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges}}
+        onClickNodes={getClickedNodes} onClickEdges={getClickedEdges}
+        />
+    </Grid>
   </Grid>
 
 </div>

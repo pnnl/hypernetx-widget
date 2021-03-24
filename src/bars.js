@@ -1,32 +1,84 @@
 import React from 'react';
-import { withStyles } from '@material-ui/core/styles';
-import { max, range } from 'd3-array';
-import { VictoryTheme, VictoryScatter, VictoryBrushContainer, VictoryVoronoiContainer, VictoryBar, VictoryChart, VictoryAxis, VictorySelectionContainer } from "victory";
+import { max, range} from 'd3-array';
+import { VictoryBar, VictoryChart, VictoryAxis, VictorySelectionContainer } from "victory";
+import {Button} from "@material-ui/core";
 
-const Bars = ({ type, freqData, onValueChange }) =>{
+const Bars = ({ type, freqData, onValueChange }) => {
+    const [filterVal, setFilterVal] = React.useState([]);
+
+
   const maxVal = max(freqData.map(d => d.x));
-  const handleSelection = x => {
-      onValueChange(x[0].data.map(x => x.x), type);
+  const handleBrush = points => {
+      onValueChange(points.data.map(d => d.x), type);
+      setFilterVal(points.data.map(d => d.x));
   }
-  return(
-    <div style={{ height: "150px",  width:"100%",}}>
+
+  const handleSelect = (barData, clickedState) => {
+      if(clickedState){
+          setFilterVal([...filterVal].filter(x => x !== barData));
+          onValueChange([...filterVal].filter(x => x !== barData), type);
+      }
+      else{
+          onValueChange([...filterVal, barData], type);
+          setFilterVal([...filterVal, barData]);
+      }
+  }
+
+  const handleClearSelect = () => {
+      onValueChange([], type);
+      setFilterVal([]);
+  }
+
+  return <div>
+      <div style={{display: "flex", justifyContent: 'flex-end', paddingTop: '3px'}}>
+          <Button style={{textTransform: 'none', fontSize: "12px", maxWidth: "25px",}} variant={"outlined"} size={"small"} onClick={handleClearSelect}>Clear</Button>
+      </div>
+    <div style={{ height: "150px",  width:"100%", }}>
       <VictoryChart
         domainPadding={17} minDomain={{x : 0}} height={170}
         padding={{left: 55, bottom: 20, right: 25, top: 5 }}
         containerComponent={
-          <VictorySelectionContainer
+            <VictorySelectionContainer
             selectionDimension="x"
-            onSelection={(points, bounds, props) => handleSelection(points, bounds, props)}/>
-          }>
+            onSelection={(points) => handleBrush(points[0])}
+            onSelectionCleared={handleClearSelect}
+          />
+        }
+      >
+
         <VictoryBar
           data={freqData} x="x" y="y"
-          style={{ data: { fill: ({active}) => active ? "#42a5f5" : "gray"}}}
+          style={{ data: { fill: ({active, datum}) => {
+              if(filterVal.includes(datum.x)){
+                  return "#42a5f5"
+              }
+              else{
+                  return "grey"
+              }
+                  }}}}
+          events={[
+              {
+                  target: "data",
+                  eventHandlers: {
+                      onMouseDown: e => e.stopPropagation(),
+                      onClick: () => {
+                          return [{
+                              target: "data",
+                              mutation: props => {
+                                  const clicked = filterVal.includes(props.datum.x);
+                                  handleSelect(props.datum.x, clicked);
+                              }
+                          }]
+                      }
+                  }
+              }
+          ]}
         />
         <VictoryAxis tickValues={range(maxVal+1)} label={type === "node" ? "Degree" : "Size"}/>
         <VictoryAxis dependentAxis label="Count" style={{axisLabel: {padding: 35}}}/>
       </VictoryChart>
     </div>
-  )
+  </div>
 }
 
 export default Bars

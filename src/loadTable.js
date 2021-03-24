@@ -22,21 +22,20 @@ const tableStyles = makeStyles((theme) => ({
     "& .MuiTableCell-sizeSmall": {
       whitespace: "nowrap",
       padding: "0px 0px 0px 0px",
-      fontSize: "12px",
+      fontSize: "10px",
       fontWeight: 400,
       margin: "0px",
-      height: 5
+      // height: 5
 
     },
     "& .MuiTableCell-paddingNone": {
-      padding: "0px 0px 5px 15px",
+      // padding: "0px 0px 5px 15px",
       fontSize: "13px",
       fontWeight: 500,
       align: "center",
     },
     "& .MuiButton-text": {
       padding: "0px 0px 0px 0px",
-
     },
     "& .MuiTableSortLabel-icon": {
       fontSize: "16px",
@@ -69,8 +68,8 @@ function EnhancedTableHead(props) {
   const headCells = [
     {id: 'uid', label: 'Label'},
     {id: 'value', label: datatype === "node" ? "Degree" : "Size"},
-    {id: 'visible', label: 'Visibility'},
-    {id: 'remove', label: 'Remove'},
+    {id: 'hidden', label: 'Visibility'},
+    {id: 'removed', label: 'Remove'},
     {id: 'color', label: 'Color'}
   ];
 
@@ -80,8 +79,8 @@ function EnhancedTableHead(props) {
         <TableCell padding="default">
           <Checkbox
             size="small"
-
             onChange={onSelectAllClick}
+            checked={!data.map(x => x.selected).includes(false) ? true : false}
             indeterminate={data.map(x => x.selected).includes(false) && data.map(x => x.selected).includes(true)}
           />
         </TableCell>
@@ -165,8 +164,8 @@ const LoadTable = ({ type, data, onColorChange, onVisibleChange, onSelectedChang
   }
 
   return <div style={{ margin: "0px", padding:"0px", }}>
-  <TableContainer component={Paper} style={{ maxWidth: "100%", height:"200px", border: "1px solid lightgray"}}>
-    <Table classes={{root: classes.customTable}} style={{tableLayout: "auto"}} stickyHeader aria-label="sticky table" size="small">
+  <TableContainer component={Paper} style={{ maxWidth: "100%", height:"250px", border: "1px solid lightgray"}}>
+    <Table classes={{root: classes.customTable}} style={{tableLayout: "auto"}} stickyHeader size="small">
       <EnhancedTableHead
         datatype={type}
         data={data}
@@ -179,9 +178,7 @@ const LoadTable = ({ type, data, onColorChange, onVisibleChange, onSelectedChang
       />
       <TableBody>
         {stableSort(data, getComparator(order, orderBy))
-          .map((x, i) => {
-
-            return(
+          .map((x, i) =>
               <TableRow key={i}>
                 <TableCell><CheckboxEl label={x.uid} checkState={x.selected} sendCheck={getCheck}/></TableCell>
                 <TableCell align="center" >
@@ -197,7 +194,6 @@ const LoadTable = ({ type, data, onColorChange, onVisibleChange, onSelectedChang
 
               </TableRow>
             )
-          })
         }
       </TableBody>
     </Table>

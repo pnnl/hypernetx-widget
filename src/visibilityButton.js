@@ -10,8 +10,8 @@ const VisibilityButton = ({ label, visibility, sendVisibility }) => {
   }
 
   return(
-    <div className="hoverShow">
-        <div className={visibility === false ? "show" : "hide"}>
+    <div className="hoverShowButton">
+        <div className={visibility === false ? "showButton" : "hideButton"}>
             <IconButton style={{padding: '2px'}} onClick={handleShow}>
                 {visibility ? <Visibility fontSize="small" style={{fill: "black"}} /> : <VisibilityOff fontSize="small" style={{fill: "black"}} />}
             </IconButton></div>

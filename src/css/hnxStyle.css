@@ -4,15 +4,15 @@
   overflow-y: auto;
 }
 
-.hide{
+.hideButton{
   visibility: hidden;
 }
 
-.hoverShow:hover .hide{
+.hoverShowButton:hover .hideButton{
   visibility: visible;
 }
 
-.show {
+.showButton {
   visibility: visible;
 }
 

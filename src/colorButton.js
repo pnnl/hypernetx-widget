@@ -20,8 +20,8 @@ const ColorButton = ({ label, color, onEachColorChange }) => {
     setColor(color.rgb);
   }
 
-  return <div className="hoverShow">
-      <div className={color !== "#000000" ? "show" : "hide"}>
+  return <div className="hoverShowButton">
+      <div className={color !== "#000000" ? "showButton" : "hideButton"}>
         <IconButton style={{padding:'2px'}} onClick={handleClick}>
           <Palette fontSize="small" style={{  fill:color}}/>
         </IconButton>

@@ -176,7 +176,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
           .on('mouseout', (ev, d) => d.height === 0 && onChangeTooltip())
           .classed('internal', d => d.height > 0)
           .call(encodeProps, d => d.data.uid, {nodeFill, nodeStroke, nodeStrokeWidth})
-          .call(classedByDict, {'selected': selectedNodes, 'hidden': hiddenNodes})
+          .call(classedByDict, {'selected': selectedNodes, 'hiddenState': hiddenNodes})
 
     circles.select('circle')
       .attr('cx', d => d.height === 0 ? d.x : 0)
@@ -187,7 +187,8 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
       .attr('x', d => d.x)
       .attr('y', d => d.y)
       // .attr('dx', d => d.r + 7)
-      .text(d => d.data.uid in nodeLabels ? nodeLabels[d.data.uid] : d.data.uid);
+      .text(d => d.data.uid in nodeLabels ? nodeLabels[d.data.uid] : d.data.uid)
+      .style('visibility', withNodeLabels ? undefined : 'hidden');
 
     const updateModel = throttle(() => {
       if (_model) {
@@ -242,7 +243,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
             .on('mouseout', () => onChangeTooltip())
             .on('click', onClickEdges)
             .call(forceEdgeDragBehavior, simulation)
-            .call(classedByDict, {'selected': selectedEdges, 'hidden': hiddenEdges});
+            .call(classedByDict, {'selected': selectedEdges, 'hiddenState': hiddenEdges});
 
     groups.select('path')
       .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth});

@@ -1,5 +1,6 @@
 import * as scale from 'd3-scale-chromatic';
 import { makeStyles } from '@material-ui/core/styles';
+import {descending} from "d3-array";
 
 export const descendingComparator = (a, b, orderBy) => {
   if (b[orderBy] < a[orderBy]) {
@@ -24,6 +25,7 @@ export const stableSort = (array, comparator) => {
     if (order !== 0) return order;
     return a[1] - b[1];
   });
+
   return stabilizedThis.map((el) => el[0]);
 }
 
@@ -42,8 +44,21 @@ export const rgbToHex = (r, g, b) => {
 }
 
 export const getRGB = (strRGB) => {
-  let split = strRGB.split(/[()]+/).filter(function(e) { return e; });
-  let rgbVal = split[1].split(", ");
+  // console.log(strRGB);
+  // if(strRGB !== undefined){
+    let split = strRGB.split(/[()]+/).filter(function(e) { return e; });
+    let rgbVal = split[1].split(", ");
+    // console.log(strRGB, rgbVal);
+    // console.log(rgbVal, 'here');
+    // return rgbVal
+  // }
+  // else{
+
+    // console.log('no color', ["0", "0", "0", "1"]);
+    // return ["0", "0", "0", "1"]
+  // }
+  // console.log('rgbval', rgbVal);
+
   return rgbVal
 }
 
@@ -79,7 +94,7 @@ export const getValueFreq = (obj) => {
   Array.from(valueMap).map(x => {
     results.push({x:x[0], y:x[1]})
   })
-  return results
+  return results.sort((a,b) => a.x - b.x)
 }
 
 export const showButtonStyles = makeStyles((theme) => ({
@@ -99,6 +114,9 @@ export const showButtonStyles = makeStyles((theme) => ({
 export const accordianStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
+    // '& .Mui-expanded':{
+    //   padding: 0
+    // },
     "& .MuiAccordionDetails-root": {
       padding: "3px 3px 3px 3px"
     },
