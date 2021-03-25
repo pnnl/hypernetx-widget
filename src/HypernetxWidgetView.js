@@ -34,21 +34,53 @@ const encodeProps = (selection, key, props) => {
   })
 }
 
-const forceDragBehavior = (selection, simulation, unpinned) => {
+const forceMultiDragBehavior = (selection, simulation, elements, unpinned) => {
     const [width, height] = simulation.size;
 
     function dragstarted(event) {
       if (!event.active) simulation.alphaTarget(0.3).restart();
-      event.subject.fx = event.subject.x;
-      event.subject.fy = event.subject.y;
+
+      // subject.x, subject.y is the location of node
+      const {x, y, uid} = event.subject;
+
+      if (sum(elements, d => d.uid === uid) === 0) {
+        elements = [event.subject];
+      }
+
+      // loop over each child group of nodes
+      elements.forEach(d => {
+        d.dx = d.x - x;
+        d.dy = d.y - y;
+      });
+
+      event.subject.dxRange = [
+        min(elements, d => d.dx - d.r),
+        max(elements, d => d.dx + d.r)
+      ];
+
+
+      event.subject.dyRange = [
+        min(elements, d => d.dy - d.r),
+        max(elements, d => d.dy + d.r)
+      ];
     }
 
     function dragged(event) {
-      const {x, y} = event;
-      const {r} = event.subject;
-      event.subject.fx = Math.min(width - r, (Math.max(x, r)));
-      event.subject.fy = Math.min(height - r, (Math.max(y, r)));
-      event.subject.pinned = now();
+      // event.x, event.y is the location of the drag
+      const {dx, dy, dxRange, dyRange} = event.subject;
+      const [minDx, maxDx] = dxRange;
+      const [minDy, maxDy] = dyRange;
+
+      let {x, y} = event;
+
+      x = Math.min(width - maxDx, Math.max(x, -minDx));
+      y = Math.min(height - maxDy, Math.max(y, -minDy));
+
+      elements.forEach(d => {
+        d.fx = x + d.dx;
+        d.fy = y + d.dy;
+        d.pinned = now();
+      })
     }
 
     function dragended(event) {
@@ -62,8 +94,6 @@ const forceDragBehavior = (selection, simulation, unpinned) => {
 
   selection
     .each(function(d) {
-      d.ele = this;
-
       if (d.pinned < unpinned) {
         unfix(undefined, d)
       }
@@ -149,14 +179,19 @@ const classedByDict = (selection, props) =>
       selection.classed(className, d => dict[d.uid])
     )
 
-const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes, hiddenNodes, removedNodes, nodeLabels={}, unpinned, _model}) =>
+const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes={}, hiddenNodes, removedNodes, nodeLabels={}, unpinned, _model}) =>
   <g className='nodes' ref={ele => {
+    
+    const selectedInternals = internals.filter(({children}) =>
+      sum(children, d => selectedNodes[d.uid])
+    );
+
     const groups = select(ele)
       .selectAll('g.group')
         .data(internals)
           .join('g')
             .classed('group', true)
-            .call(forceDragBehavior, simulation, unpinned);
+            .call(forceMultiDragBehavior, simulation, selectedInternals, unpinned);
 
     const circles = groups.selectAll('g')
       .data(d => d.descendants())
@@ -362,8 +397,12 @@ const LineGraphLinks = ({links, simulation}) =>
 
   }}/>
 
-const LineGraphEdges = ({edges, simulation, edgeLabels, edgeData, edgeStroke, edgeStrokeWidth, onClickEdges=Object, onChangeTooltip=Object}) =>
+const LineGraphEdges = ({internals, edges, simulation, edgeLabels, edgeData, edgeStroke, edgeStrokeWidth, selectedNodes={}, unpinned, onClickEdges=Object, onChangeTooltip=Object}) =>
   <g className='edges' ref={ele => {
+    const selectedInternals = internals.filter(({children}) =>
+      sum(children, d => selectedNodes[d.uid])
+    );
+
     const rectDimensions = selection =>
       selection
         .attr('width', d => d.width)
@@ -393,7 +432,7 @@ const LineGraphEdges = ({edges, simulation, edgeLabels, edgeData, edgeStroke, ed
               onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
             )
             .on('mouseout', () => onChangeTooltip())
-            .call(forceDragBehavior, simulation)
+            .call(forceMultiDragBehavior, simulation, selectedInternals, unpinned)
             .on('click', onClickEdges)
 
     simulation.on('tick.lineGraph-edges', d => {
