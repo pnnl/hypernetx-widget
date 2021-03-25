@@ -79,7 +79,7 @@ const forceMultiDragBehavior = (selection, simulation, elements, unpinned) => {
       elements.forEach(d => {
         d.fx = x + d.dx;
         d.fy = y + d.dy;
-        d.pinned = now();
+        d.pinned = new Date().toLocaleString();
       })
     }
 
@@ -147,7 +147,7 @@ const forceEdgeDragBehavior = (selection, simulation) => {
       elements.forEach(d => {
         d.fx = x + d.dx;
         d.fy = y + d.dy;
-        d.pinned = now();
+        d.pinned = new Date().toLocaleString();
       })
     }
 

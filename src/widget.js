@@ -73,6 +73,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [hiddenEdges, setHiddenEdges] = React.useState(props.edgeHidden || Object.fromEntries(edgeHiddenMap));
   const [removedEdges, setRemovedEdges] = React.useState(props.edgeRemoved || Object.fromEntries(edgeRemovedMap));
 
+  const [unpinned, setUnpinned] = React.useState(null);
   const handleColorChange = (datatype, uid, color) => {
     if(datatype === "node"){
       setNodeFill({...nodeFill, [uid]:`rgba(${ color.r }, ${ color.g }, ${ color.b }, ${ color.a })`});
@@ -331,6 +332,11 @@ const Widget = ({ nodes, edges, ...props }) => {
         setSelectedEdges(Object.fromEntries(noEdgeSelectMap));
       }
     }
+    else if(selectionType === "unpin"){
+      // const date = new Date();
+      // console.log(new Date().toLocaleString())
+      setUnpinned(new Date().toLocaleString());
+    }
     else{
       handleOriginal(dataType);
     }
@@ -344,11 +350,10 @@ const Widget = ({ nodes, edges, ...props }) => {
     else{
       setWithEdgeLabels(states.showLabels);
       setLineGraph(states.linegraph);
-
     }
   }
 
-  // console.log(lineGraph, collapseNodes);
+
   return <div>
     <Grid container spacing={1}>
       <Grid item xs={12} sm={!navOpen ? 1 : 4} >
@@ -429,7 +434,7 @@ const Widget = ({ nodes, edges, ...props }) => {
 
       <HypernetxWidgetView
         {...props}
-        {...{nodes, edges, nodeFill, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges, withNodeLabels, withEdgeLabels, collapseNodes, lineGraph}}
+        {...{nodes, edges, nodeFill, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges, withNodeLabels, withEdgeLabels, collapseNodes, lineGraph, unpinned}}
         onClickNodes={getClickedNodes} onClickEdges={getClickedEdges}
         />
     </Grid>

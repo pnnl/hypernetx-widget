@@ -8,6 +8,7 @@ import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
 import BubbleChartIcon from '@material-ui/icons/BubbleChart';
 import BlurOnIcon from '@material-ui/icons/BlurOn';
 import BlurOffIcon from '@material-ui/icons/BlurOff';
+import LocationOffIcon from '@material-ui/icons/LocationOff';
 import Tooltip from '@material-ui/core/Tooltip';
 import {makeStyles} from "@material-ui/core/styles";
 
@@ -81,6 +82,14 @@ const Toolbar = ({ dataType, selectionState, onSelectionChange }) => {
                       <BubbleChartIcon />
                   </Tooltip>
               </ToggleButton>
+
+              {dataType === "node" &&
+                <ToggleButton value={"unpin"}>
+                    <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Unpin all</div>}>
+                        <LocationOffIcon />
+                    </Tooltip>
+                </ToggleButton>
+              }
 
               <ToggleButton value={"all"}>
                   <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Select all</div>}>
