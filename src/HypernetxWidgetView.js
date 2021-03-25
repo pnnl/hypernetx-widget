@@ -397,8 +397,12 @@ const LineGraphLinks = ({links, simulation}) =>
 
   }}/>
 
-const LineGraphEdges = ({edges, simulation, edgeLabels, edgeData, edgeStroke, edgeStrokeWidth, onClickEdges=Object, onChangeTooltip=Object}) =>
+const LineGraphEdges = ({internals, edges, simulation, edgeLabels, edgeData, edgeStroke, edgeStrokeWidth, selectedNodes={}, unpinned, onClickEdges=Object, onChangeTooltip=Object}) =>
   <g className='edges' ref={ele => {
+    const selectedInternals = internals.filter(({children}) =>
+      sum(children, d => selectedNodes[d.uid])
+    );
+
     const rectDimensions = selection =>
       selection
         .attr('width', d => d.width)
@@ -428,7 +432,7 @@ const LineGraphEdges = ({edges, simulation, edgeLabels, edgeData, edgeStroke, ed
               onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
             )
             .on('mouseout', () => onChangeTooltip())
-            .call(forceDragBehavior, simulation)
+            .call(forceMultiDragBehavior, simulation, selectedInternals, unpinned)
             .on('click', onClickEdges)
 
     simulation.on('tick.lineGraph-edges', d => {
