@@ -10,13 +10,13 @@ export default {
 };
 
 export const Euler = () =>
-  <HypernetxWidgetView {...props} />
+  <HypernetxWidgetView collapseNodes={false} {...props} />
 
 export const EulerWithoutPlanarForce = () =>
   <HypernetxWidgetView {...props} ignorePlanarForce />
 
 export const EulerCollapsed = () =>
-  <HypernetxWidgetView collapseNodes {...props} />
+  <HypernetxWidgetView collapseNodes={true} {...props} />
 
 export const EulerCollapsedWithoutPlanarForce = () =>
   <HypernetxWidgetView collapseNodes {...props} ignorePlanarForce />

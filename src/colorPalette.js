@@ -56,6 +56,7 @@ const ColorPalette = ({nodeData, edgeData, onNodePaletteChange, onEdgePaletteCha
 
 
   const getEachColors = (group, palette, data) => {
+
     const colorMap = new Map();
     if(group === "each"){
       const bins = Object.values(data).length;
@@ -108,6 +109,17 @@ const ColorPalette = ({nodeData, edgeData, onNodePaletteChange, onEdgePaletteCha
         onCurrDataChange(group, palette, type);
       }
     }
+    else{
+      const defaultMap = new Map();
+      if(type === "node"){
+        Object.keys(nodeData).map(x => defaultMap.set(x, "rgba(105, 105, 105, 1)"));
+        onNodePaletteChange(Object.fromEntries(defaultMap));
+      }
+      else{
+        Object.keys(edgeData).map(x => defaultMap.set(x, "rgba(0, 0, 0, 1)"));
+        onEdgePaletteChange(Object.fromEntries(defaultMap));
+      }
+    }
   }
 
   const handleReset = event => {
@@ -153,7 +165,7 @@ const ColorPalette = ({nodeData, edgeData, onNodePaletteChange, onEdgePaletteCha
             value={palette}
             onChange={handlePalette}
           >
-            <MenuItem classes={{root: classes.menuItem}} value={"black"} disabled>Black (default)</MenuItem>
+            <MenuItem classes={{root: classes.menuItem}} value={"black"}>Black (default)</MenuItem>
             {allPalettes.map(c => <MenuItem classes={{root: classes.menuItem}} key={c} value={c}>
                 <Colorscale onClick={() => {}}
                   colorscale={getColorArray(c)} maxWidth={80} label={c}

@@ -50,7 +50,7 @@ const edgeColorDict = {
 export const MainComponent = () => <div>
   <Widget nodes={props.nodes} edges={props.edges} withEdgeLabels={true} withNodeLabels={true}
           nodeColors={nodeColorDict}
-    edgeColors={edgeColorDict}
+    // edgeColors={edgeColorDict}
           // nodeRemoved={nodeRemovedDict}
           // edgeHidden={edgeHiddenDict}
     // edgeRemoved={edgeRemovedDict}

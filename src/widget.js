@@ -13,6 +13,7 @@ import LoadTable from './loadTable.js';
 import Bars from './bars.js';
 import { getRGB, rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianStyles } from './functions.js';
 import Toolbar from "./toolbar";
+import Switches from "./switches";
 
 const Widget = ({ nodes, edges, ...props }) => {
 
@@ -56,6 +57,11 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const edgesInNodesMap = new Map();
   edges.map(x => edgesInNodesMap.set(x.uid.toString(), false));
+
+  const [withNodeLabels, setWithNodeLabels] = React.useState(true);
+  const [withEdgeLabels, setWithEdgeLabels] = React.useState(true);
+  const [collapseNodes, setCollapseNodes] = React.useState(false);
+  const [lineGraph, setLineGraph] = React.useState(false);
 
   const [nodeFill, setNodeFill] = React.useState(props.nodeColors || Object.fromEntries(nodeColorMap));
   const [selectedNodes, setSelectedNodes] = React.useState(Object.fromEntries(noNodeSelectMap));
@@ -309,11 +315,40 @@ const Widget = ({ nodes, edges, ...props }) => {
         handleOtherSelect("nodes in edges");
       }
     }
+    else if(selectionType === "all"){
+      if(dataType === "node"){
+        setSelectedNodes(Object.fromEntries(nodeSelectMap))
+      }
+      else{
+        setSelectedEdges(Object.fromEntries(edgeSelectMap));
+      }
+    }
+    else if(selectionType === "none"){
+      if(dataType === "node"){
+        setSelectedNodes(Object.fromEntries(noNodeSelectMap));
+      }
+      else{
+        setSelectedEdges(Object.fromEntries(noEdgeSelectMap));
+      }
+    }
     else{
       handleOriginal(dataType);
     }
   }
 
+  const handleSwitch = (dataType, states) => {
+    if(dataType === "node"){
+      setWithNodeLabels(states.showLabels);
+      setCollapseNodes(states.collapseNodes);
+    }
+    else{
+      setWithEdgeLabels(states.showLabels);
+      setLineGraph(states.linegraph);
+
+    }
+  }
+
+  // console.log(lineGraph, collapseNodes);
   return <div>
     <Grid container spacing={1}>
       <Grid item xs={12} sm={!navOpen ? 1 : 4} >
@@ -341,7 +376,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                   onSelectAllChange={handleSelectAll}
                 />
                 <Bars type={"node"} freqData={getValueFreq(nodeDegList)} onValueChange={handleBarSelect} />
-
+                <Switches dataType={"node"} onSwitchChange={handleSwitch}/>
               </div>
 
               </AccordionDetails>
@@ -363,6 +398,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                     onSelectAllChange={handleSelectAll}
                   />
                   <Bars type={"edge"} freqData={getValueFreq(edgeSizeList)} onValueChange={handleBarSelect}/>
+                  <Switches dataType={"edge"} onSwitchChange={handleSwitch}/>
                 </div>
               </AccordionDetails>
             </Accordion>
@@ -386,16 +422,14 @@ const Widget = ({ nodes, edges, ...props }) => {
     <Grid item xs={12}  sm={!navOpen ? 11 : 8}>
       <div>
         <div style={{ display: "flex", justifyContent: "flex-start", flexFlow: "row wrap"}}>
-          {/*<div style={{ border: "2px solid #878787"}}>*/}
-            <Toolbar dataType={"node"} onSelectionChange={handleToolbarSelection}/>
-            <Toolbar dataType={"edge"} onSelectionChange={handleToolbarSelection}/>
-          {/*</div>*/}
+            <Toolbar dataType={"node"} selectionState={selectedNodes} onSelectionChange={handleToolbarSelection}/>
+            <Toolbar dataType={"edge"} selectionState={selectedEdges} onSelectionChange={handleToolbarSelection}/>
         </div>
       </div>
 
       <HypernetxWidgetView
         {...props}
-        {...{nodes, edges, nodeFill, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges}}
+        {...{nodes, edges, nodeFill, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges, withNodeLabels, withEdgeLabels, collapseNodes, lineGraph}}
         onClickNodes={getClickedNodes} onClickEdges={getClickedEdges}
         />
     </Grid>

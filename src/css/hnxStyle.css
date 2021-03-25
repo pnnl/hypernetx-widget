@@ -21,7 +21,7 @@
   border-style: solid;
   border-color: black;
   width:25px;
-  height:10px;
+  /*height:10px;*/
   margin-right: 5px;
   display: inline-block;
 }

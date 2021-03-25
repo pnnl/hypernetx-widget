@@ -3,16 +3,19 @@ import {ToggleButtonGroup} from "@material-ui/lab";
 import {ToggleButton} from "@material-ui/lab";
 import SettingsBackupRestoreIcon from '@material-ui/icons/SettingsBackupRestore';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
+import VisibilityIcon from '@material-ui/icons/Visibility';
 import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
 import BubbleChartIcon from '@material-ui/icons/BubbleChart';
+import BlurOnIcon from '@material-ui/icons/BlurOn';
+import BlurOffIcon from '@material-ui/icons/BlurOff';
 import Tooltip from '@material-ui/core/Tooltip';
 import {makeStyles} from "@material-ui/core/styles";
 
 const toggleStyle = makeStyles((theme) => ({
     toggleButton: {
         "& .MuiToggleButton-root": {
-            color: "#d3d3d3",
-            border: "1px solid #605f5f",
+            // color: "#d3d3d3",
+            // border: "1px solid #605f5f",
             fontSize: "9px",
             height: 30,
             maxWidth: 100,
@@ -20,15 +23,15 @@ const toggleStyle = makeStyles((theme) => ({
         },
         "& .Mui-selected":{
             color: "black",
-            backgroundColor: "#ECECEC"
+            // backgroundColor: "#ECECEC"
         },
         "& .Mui-disabled":{
-            color: "#d3d3d3"
+            // color: "#d3d3d3"
         }
     },
 
 }))
-const Toolbar = ({ dataType, onSelectionChange }) => {
+const Toolbar = ({ dataType, selectionState, onSelectionChange }) => {
 
     const classes = toggleStyle();
     const [selectionType, setSelectionType] = React.useState("original");
@@ -42,7 +45,6 @@ const Toolbar = ({ dataType, onSelectionChange }) => {
             onSelectionChange(dataType, newSelection);
         }
     }
-
 
     return(
       <div style={{ paddingRight: "7px",}}>
@@ -62,9 +64,9 @@ const Toolbar = ({ dataType, onSelectionChange }) => {
                   </Tooltip>
               </ToggleButton>
 
-              <ToggleButton value={"hidden"}>
+              <ToggleButton value={"hidden"} disabled={!Object.values(selectionState).includes(true)}>
                   <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Hide selected</div>}>
-                      <VisibilityOffIcon />
+                      {Object.values(selectionState).includes(true) ? <VisibilityOffIcon /> : <VisibilityIcon />}
                   </Tooltip>
               </ToggleButton>
 
@@ -72,14 +74,24 @@ const Toolbar = ({ dataType, onSelectionChange }) => {
                   <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Remove selected</div>}>
                       <RemoveCircleOutlineIcon />
                   </Tooltip>
-
               </ToggleButton>
 
               <ToggleButton value={"other"}>
                   <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>{dataType === "node" ? "Select all edges containing selected nodes " : "Select all nodes in selected edges"}</div>}>
                       <BubbleChartIcon />
                   </Tooltip>
+              </ToggleButton>
 
+              <ToggleButton value={"all"}>
+                  <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Select all</div>}>
+                      <BlurOnIcon/>
+                  </Tooltip>
+              </ToggleButton>
+
+              <ToggleButton value={"none"}>
+                  <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Unselect all</div>}>
+                      <BlurOffIcon/>
+                  </Tooltip>
               </ToggleButton>
 
 
