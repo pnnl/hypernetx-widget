@@ -46,16 +46,19 @@
 	fill-opacity: 0;
 }
 
-.hnx-widget-view .edges rect:first-child {
+.hnx-widget-view .edges rect {
 	fill-opacity: 1;
 	fill: white;
+}
+
+.hnx-widget-view .edges :hover path{
+	fill-opacity: .5;
 }
 
 .hnx-widget-view .edges :hover path,
 .hnx-widget-view .edges :hover rect {
 	/*stroke-dasharray: 6,3;*/
 	stroke-width: 3;
-	fill-opacity: .5;
 	cursor: pointer;
 }
 
