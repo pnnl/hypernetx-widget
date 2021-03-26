@@ -702,8 +702,7 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, w
         d.y -= d.parent.y;
       });
 
-      const internals = tree.descendants()
-        .filter(d => d.height > 0 && d.depth > 0);
+      const internals = tree.children;
 
       // setup the force simulation
 
@@ -714,29 +713,36 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, w
         )
       );
 
-      function boundNode(d) {
-        const {r=0} = d;
-        d.x = Math.max(r, Math.min(width - r, d.x));
-        d.y = Math.max(r, Math.min(height - r, d.y));
-      }
-
-      let simulation = forceSimulation([...tree.children, ...edges])
-        .force('charge', forceManyBody().strength(-150).distanceMax(300))
-        .force('link', forceLink(links).distance(30))
-        .force('center', forceCenter(width/2, height/2))
-        .force('collide', forceCollide().radius(d => 2*d.r || 0))
-        .force('bound', () => simulation.nodes().forEach(boundNode));
-
-      if (!lineGraph && !ignorePlanarForce) {
-        simulation.force('planar', planarForce(internals, edges));
-      }
-
-      simulation.size = [width, height];
-
-      return {links, edges, internals, simulation};
+      return {links, edges, internals};
     },
-    [nodes, edges, removedNodes, removedEdges, collapseNodes, width, height]
+    [nodes, edges, removedNodes, removedEdges, collapseNodes]
   );
+
+  const simulation = useMemo(() => {
+    const {links, edges, internals} = derivedProps;
+
+    function boundNode(d) {
+      const {r=0} = d;
+      d.x = Math.max(r, Math.min(width - r, d.x));
+      d.y = Math.max(r, Math.min(height - r, d.y));
+    }
+
+    let simulation = forceSimulation([...internals, ...edges])
+      .force('charge', forceManyBody().strength(-150).distanceMax(300))
+      .force('link', forceLink(links).distance(30))
+      .force('center', forceCenter(width/2, height/2))
+      .force('collide', forceCollide().radius(d => 2*d.r || 0))
+      .force('bound', () => simulation.nodes().forEach(boundNode));
+
+    if (!lineGraph && !ignorePlanarForce) {
+      simulation.force('planar', planarForce(internals, edges));
+    }
+
+    simulation.size = [width, height];
+
+    return simulation;
+
+  }, [derivedProps, lineGraph, width, height]);
 
   const [tooltip, setTooltip] = React.useState();
 
@@ -745,6 +751,7 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, w
   const handleTooltip = debounce(setTooltip, 200);
 
   const allProps = {
+    simulation,
     ...derivedProps,
     ...props,
     onChangeTooltip: handleTooltip
