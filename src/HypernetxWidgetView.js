@@ -735,7 +735,7 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, w
 
       return {links, edges, internals, simulation};
     },
-    [nodes, edges, removedNodes, removedEdges, collapseNodes, width, height]
+    [nodes, edges, removedNodes, removedEdges, lineGraph, width, height]
   );
 
   const [tooltip, setTooltip] = React.useState();
