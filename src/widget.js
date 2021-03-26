@@ -15,7 +15,7 @@ import { getRGB, rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianSt
 import Toolbar from "./toolbar";
 import Switches from "./switches";
 
-const Widget = ({ nodes, edges, ...props }) => {
+const Widget = ({ nodes, edges, _model, ...props }) => {
 
   const classes = accordianStyles();
 
@@ -74,6 +74,19 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [removedEdges, setRemovedEdges] = React.useState(props.edgeRemoved || Object.fromEntries(edgeRemovedMap));
 
   const [unpinned, setUnpinned] = React.useState(null);
+
+  // update the python model with state
+  if (_model !== undefined) {
+    _model.set('node_fill', nodeFill);
+    console.log('Setting node_fill to', nodeFill);
+
+    // more
+
+    // do once
+    _model.save();
+  }
+
+
   const handleColorChange = (datatype, uid, color) => {
     if(datatype === "node"){
       setNodeFill({...nodeFill, [uid]:`rgba(${ color.r }, ${ color.g }, ${ color.b }, ${ color.a })`});
