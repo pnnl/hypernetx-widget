@@ -15,7 +15,7 @@ import { getRGB, rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianSt
 import Toolbar from "./toolbar";
 import Switches from "./switches";
 
-const Widget = ({ nodes, edges, _model, ...props }) => {
+const Widget = ({ nodes, edges, ...props }) => {
 
   const classes = accordianStyles();
 
@@ -76,6 +76,8 @@ const Widget = ({ nodes, edges, _model, ...props }) => {
   const [unpinned, setUnpinned] = React.useState(null);
 
   // update the python model with state
+  const {_model} = props;
+  
   if (_model !== undefined) {
     _model.set('node_fill', nodeFill);
     console.log('Setting node_fill to', nodeFill);
