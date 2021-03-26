@@ -407,6 +407,8 @@ const LineGraphEdges = ({internals, edges, simulation, edgeLabels, edgeData, edg
       selection
         .attr('width', d => d.width)
         .attr('height', d => d.width)
+        .attr('x', d => -d.width/2)
+        .attr('y', d => -d.width/2);
 
     const groups = select(ele)
       .selectAll('g')
@@ -414,9 +416,6 @@ const LineGraphEdges = ({internals, edges, simulation, edgeLabels, edgeData, edg
           .join(enter => {
             const g = enter.append('g')
               .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
-
-            g.append('rect')
-              .call(rectDimensions);
 
             g.append('rect')
               .call(rectDimensions)
@@ -436,14 +435,7 @@ const LineGraphEdges = ({internals, edges, simulation, edgeLabels, edgeData, edg
             .on('click', onClickEdges)
 
     simulation.on('tick.lineGraph-edges', d => {
-      groups
-        .selectAll('rect')
-          .attr('x', d => d.x - d.width/2)
-          .attr('y', d => d.y - d.width/2);
-
-      groups.select('text')
-        .attr('x', d => d.x)
-        .attr('y', d => d.y);
+      groups.attr('transform', d => `translate(${d.x},${d.y})`)
     });
 
   }}/>
