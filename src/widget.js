@@ -198,13 +198,13 @@ const Widget = ({ nodes, edges, ...props }) => {
     return Object.values(copy);
   }
 
-  const [colGroup, setColGroup] = React.useState("each");
-  const [colPalette, setColPalette] = React.useState("black");
-  const [colType, setColType] = React.useState("node");
-  const handleCurrData = (group, palette, type) => {
-    setColGroup(group);
-    setColPalette(palette);
-    setColType(type);
+  const [colGroup, setColGroup] = React.useState({node: "each", edge: "each"});
+  const [colPalette, setColPalette] = React.useState({node: "black", edge: "black"});
+  // const [colType, setColType] = React.useState("node");
+  const handleCurrData = (group, palette, dataType) => {
+    setColGroup({...colGroup, [dataType]:group});
+    setColPalette({...colPalette, [dataType]: palette});
+    // setColType(type);
   }
 
   const getClickedNodes = (event, data) => {
@@ -333,8 +333,6 @@ const Widget = ({ nodes, edges, ...props }) => {
       }
     }
     else if(selectionType === "unpin"){
-      // const date = new Date();
-      // console.log(new Date().toLocaleString())
       setUnpinned(new Date().toLocaleString());
     }
     else{
@@ -353,6 +351,14 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
+  const handlePaletteChange = (dataType, newPalette) => {
+    if(dataType === "node"){
+      setNodeFill(newPalette);
+    }
+    else{
+      setEdgeStroke(newPalette);
+    }
+  }
 
   return <div>
     <Grid container spacing={1}>
@@ -381,6 +387,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                   onSelectAllChange={handleSelectAll}
                 />
                 <Bars type={"node"} freqData={getValueFreq(nodeDegList)} onValueChange={handleBarSelect} />
+                <ColorPalette type={"node"} data={nodeDegList} onPaletteChange={handlePaletteChange} currGroup={colGroup.node} currPalette={colPalette.node} onCurrDataChange={handleCurrData}/>
                 <Switches dataType={"node"} onSwitchChange={handleSwitch}/>
               </div>
 
@@ -403,24 +410,25 @@ const Widget = ({ nodes, edges, ...props }) => {
                     onSelectAllChange={handleSelectAll}
                   />
                   <Bars type={"edge"} freqData={getValueFreq(edgeSizeList)} onValueChange={handleBarSelect}/>
+                  <ColorPalette type={"edge"} data={edgeSizeList} onPaletteChange={handlePaletteChange} currGroup={colGroup.edge} currPalette={colPalette.edge} onCurrDataChange={handleCurrData}/>
                   <Switches dataType={"edge"} onSwitchChange={handleSwitch}/>
                 </div>
               </AccordionDetails>
             </Accordion>
 
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}}/>} >
-                <Typography style={{fontSize: "14px", fontWeight: "bold"}}>Color</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <div style={{width: "100%"}}>
-                  <ColorPalette nodeData={nodeDegList} edgeData={edgeSizeList}
-                  onNodePaletteChange={palette => setNodeFill(palette)} onEdgePaletteChange={palette => setEdgeStroke(palette)}
-                  currGroup={colGroup} currPalette={colPalette} currType={colType} onCurrDataChange={handleCurrData}
-                  />
-                </div>
-              </AccordionDetails>
-            </Accordion>
+            {/*<Accordion>*/}
+            {/*  <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}}/>} >*/}
+            {/*    <Typography style={{fontSize: "14px", fontWeight: "bold"}}>Color</Typography>*/}
+            {/*  </AccordionSummary>*/}
+            {/*  <AccordionDetails>*/}
+            {/*    <div style={{width: "100%"}}>*/}
+            {/*      <ColorPalette nodeData={nodeDegList} edgeData={edgeSizeList}*/}
+            {/*      onNodePaletteChange={palette => setNodeFill(palette)} onEdgePaletteChange={palette => setEdgeStroke(palette)}*/}
+            {/*      currGroup={colGroup} currPalette={colPalette} currType={colType} onCurrDataChange={handleCurrData}*/}
+            {/*      />*/}
+            {/*    </div>*/}
+            {/*  </AccordionDetails>*/}
+            {/*</Accordion>*/}
           </div> : null }
     </Grid>
 
