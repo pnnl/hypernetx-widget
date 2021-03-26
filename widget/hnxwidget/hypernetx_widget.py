@@ -79,6 +79,14 @@ def _forwards_compatible_collapse(H):
 @widgets.register
 class HypernetxWidgetView(ReactJupyterWidget):
     pos = Dict().tag(sync=True)
+    node_fill = Dict().tag(sync=True)
+
+    @property
+    def state(self):
+        return {
+            'pos': self.pos,
+            'node_fill': self.node_fill
+        }
 
     def __init__(self, H,
         collapse=True,
