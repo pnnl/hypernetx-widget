@@ -31,6 +31,7 @@ const toggleStyle = makeStyles((theme) => ({
             // backgroundColor: "#ECECEC"
         },
         "& .Mui-disabled":{
+            pointerEvents: "auto"
             // color: "#d3d3d3"
         }
     },
@@ -69,19 +70,19 @@ const Toolbar = ({ dataType, selectionState, onSelectionChange }) => {
                   </Tooltip>
               </ToggleButton>
 
-              <ToggleButton value={"hidden"} disabled={!Object.values(selectionState).includes(true)}>
+              <ToggleButton value={"hidden"} disabled={!Object.values(selectionState).includes(true)} >
                   <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Hide selected</div>}>
                       {Object.values(selectionState).includes(true) ? <VisibilityOffIcon /> : <VisibilityIcon />}
                   </Tooltip>
               </ToggleButton>
 
-              <ToggleButton value={"removed"}>
+              <ToggleButton value={"removed"} disabled={!Object.values(selectionState).includes(true)}>
                   <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Remove selected</div>}>
                       <RemoveCircleOutlineIcon />
                   </Tooltip>
               </ToggleButton>
 
-              <ToggleButton value={"other"}>
+              <ToggleButton value={"other"} disabled={!Object.values(selectionState).includes(true)}>
                   <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>{dataType === "node" ? "Select all edges containing selected nodes " : "Select all nodes in selected edges"}</div>}>
                       <BubbleChartIcon />
                   </Tooltip>
@@ -101,7 +102,7 @@ const Toolbar = ({ dataType, selectionState, onSelectionChange }) => {
                   </Tooltip>
               </ToggleButton>
 
-              <ToggleButton value={"none"}>
+              <ToggleButton value={"none"} disabled={!Object.values(selectionState).includes(true)}>
                   <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Unselect all</div>}>
                       <ClearIcon/>
                   </Tooltip>
