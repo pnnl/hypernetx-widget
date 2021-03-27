@@ -621,7 +621,9 @@ const planarForce = (nodes, edges) => {
   return force;
 }
 
-export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, width=600, height=600, lineGraph, ignorePlanarForce, pos={}, collapseNodes, ...props}) => {
+export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, height=600, lineGraph, ignorePlanarForce, pos={}, collapseNodes, navOpen, ...props}) => {
+  const width = navOpen ? 600 : 800;
+  // const width = 600;
   const derivedProps = useMemo(
     () => {
       removedNodes = removedNodes || {};

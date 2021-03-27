@@ -80,12 +80,26 @@ def _forwards_compatible_collapse(H):
 class HypernetxWidgetView(ReactJupyterWidget):
     pos = Dict().tag(sync=True)
     node_fill = Dict().tag(sync=True)
+    edge_stroke = Dict().tag(sync=True)
+    selected_nodes = Dict().tag(sync=True)
+    selected_edges = Dict().tag(sync=True)
+    hidden_nodes = Dict().tag(sync=True)
+    hidden_edges = Dict().tag(sync=True)
+    removed_nodes = Dict().tag(sync=True)
+    removed_edges = Dict().tag(sync=True)
 
     @property
     def state(self):
         return {
             'pos': self.pos,
-            'node_fill': self.node_fill
+            'node_fill': self.node_fill,
+            'edge_stroke': self.edge_stroke,
+            'selected_nodes': self.selected_nodes,
+            'selected_edges': self.selected_edges,
+            'hidden_nodes': self.hidden_nodes,
+            'hidden_edges': self.hidden_edges,
+            'removed_nodes': self.removed_nodes,
+            'removed_edges': self.removed_edges
         }
 
     def __init__(self, H,

@@ -80,9 +80,16 @@ const Widget = ({ nodes, edges, ...props }) => {
   
   if (_model !== undefined) {
     _model.set('node_fill', nodeFill);
-    console.log('Setting node_fill to', nodeFill);
+    // console.log('Setting node_fill to', nodeFill);
 
-    // more
+    _model.set('edge_stroke', edgeStroke);
+    _model.set('selected_nodes', selectedNodes);
+    _model.set('selected_edges', selectedEdges);
+    _model.set('hidden_nodes', hiddenNodes);
+    _model.set('hidden_edges', hiddenEdges);
+    _model.set('removed_nodes', removedNodes);
+    _model.set('removed_edges', removedEdges)
+
 
     // do once
     _model.save();
@@ -448,16 +455,17 @@ const Widget = ({ nodes, edges, ...props }) => {
     </Grid>
 
     <Grid item xs={12}  sm={!navOpen ? 11 : 8}>
-      <div>
+    {/*<Grid item xs={12} sm={navOpen && 8}>*/}
+    {/*  <div>*/}
         <div style={{ display: "flex", justifyContent: "flex-start", flexFlow: "row wrap"}}>
             <Toolbar dataType={"node"} selectionState={selectedNodes} onSelectionChange={handleToolbarSelection}/>
             <Toolbar dataType={"edge"} selectionState={selectedEdges} onSelectionChange={handleToolbarSelection}/>
         </div>
-      </div>
+      {/*</div>*/}
 
       <HypernetxWidgetView
         {...props}
-        {...{nodes, edges, nodeFill, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges, withNodeLabels, withEdgeLabels, collapseNodes, lineGraph, unpinned}}
+        {...{nodes, edges, nodeFill, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges, withNodeLabels, withEdgeLabels, collapseNodes, lineGraph, unpinned, navOpen}}
         onClickNodes={getClickedNodes} onClickEdges={getClickedEdges}
         />
     </Grid>
