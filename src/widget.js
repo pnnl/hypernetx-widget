@@ -16,7 +16,6 @@ import Toolbar from "./toolbar";
 import Switches from "./switches";
 
 const Widget = ({ nodes, edges, ...props }) => {
-
   const classes = accordianStyles();
 
   const nodeDegMap = new Map();
@@ -28,7 +27,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   const edgeSizeList = Object.fromEntries(edgeSizeMap);
 
   const nodeColorMap = new Map();
-  nodes.map(x => nodeColorMap.set(x.uid, "rgba(0, 0, 0, 0.6)"));
+  nodes.map(x => nodeColorMap.set(x.uid,"rgba(0, 0, 0, 0.6)"));
   const edgeColorMap = new Map();
   edges.map(x => edgeColorMap.set(x.uid.toString(), "rgba(0, 0, 0, 1)"));
 
@@ -195,6 +194,7 @@ const Widget = ({ nodes, edges, ...props }) => {
       uid: x.uid,
       value: nodeDegList[x.uid],
       color:  {"r": getRGB(nodeFill[x.uid])[0], "g":getRGB(nodeFill[x.uid])[1], "b":getRGB(nodeFill[x.uid])[2], "a":getRGB(nodeFill[x.uid])[3]},
+      // color: nodeFill[x.uid],
       selected: selectedNodes[x.uid],
       hidden: hiddenNodes[x.uid],
       removed: removedNodes[x.uid],
