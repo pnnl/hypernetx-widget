@@ -38,7 +38,6 @@ const forceMultiDragBehavior = (selection, simulation, elements, unpinned) => {
     const [width, height] = simulation.size;
 
     function dragstarted(event) {
-      if (!event.active) simulation.alphaTarget(0.3).restart();
 
       // subject.x, subject.y is the location of node
       const {x, y, uid} = event.subject;
@@ -66,6 +65,9 @@ const forceMultiDragBehavior = (selection, simulation, elements, unpinned) => {
     }
 
     function dragged(event) {
+
+      simulation.alphaTarget(0.3).restart();
+
       // event.x, event.y is the location of the drag
       const {dx, dy, dxRange, dyRange} = event.subject;
       const [minDx, maxDx] = dxRange;
@@ -110,7 +112,6 @@ const forceEdgeDragBehavior = (selection, simulation) => {
     const [width, height] = simulation.size;
 
     function dragstarted(event) {
-      if (!event.active) simulation.alphaTarget(0.3).restart();
 
       // subject.x, subject.y is the location of node
       const {x, y, elements} = event.subject;
@@ -134,6 +135,8 @@ const forceEdgeDragBehavior = (selection, simulation) => {
     }
 
     function dragged(event) {
+      simulation.alphaTarget(0.3).restart();
+
       // event.x, event.y is the location of the drag
       const {dx, dy, elements, dxRange, dyRange} = event.subject;
       const [minDx, maxDx] = dxRange;
@@ -203,7 +206,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
             return g;
           }
         )
-          .on('click', onClickNodes)
+          .on('click', (ev, d) => ev.stopPropagation() || onClickNodes(ev, d))
           .on('mouseover', (ev, d) => 
             d.height === 0 &&
             onChangeTooltip(createTooltipData(ev, d.data.uid, {xOffset: d.r + 3, labels: nodeLabels, data: nodeData}))
@@ -736,7 +739,7 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, h
 
     return simulation;
 
-  }, [derivedProps, lineGraph, width, height]);
+  }, [derivedProps, lineGraph, width, height, props.unpinned]);
 
   const [tooltip, setTooltip] = React.useState();
 
