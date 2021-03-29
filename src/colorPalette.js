@@ -33,13 +33,13 @@ const useStyles = makeStyles((theme) => ({
 
 
 
-const ColorPalette = ({nodeData, edgeData, onNodePaletteChange, onEdgePaletteChange, currGroup, currPalette, currType, onCurrDataChange}) => {
+const ColorPalette = ({type, data, onPaletteChange, currGroup, currPalette, onCurrDataChange}) => {
 
   const classes = useStyles();
 
   const [group, setGroup] = React.useState(currGroup);
   const [palette, setPalette] = React.useState(currPalette);
-  const [type, setType] = React.useState(currType);
+  // const [type, setType] = React.useState(currType);
 
   const handlePalette = event => {
     setPalette(event.target.value);
@@ -49,9 +49,9 @@ const ColorPalette = ({nodeData, edgeData, onNodePaletteChange, onEdgePaletteCha
     setGroup(event.target.value);
   }
 
-  const handleType = event => {
-    setType(event.target.value);
-  }
+  // const handleType = event => {
+  //   setType(event.target.value);
+  // }
 
 
 
@@ -99,41 +99,45 @@ const ColorPalette = ({nodeData, edgeData, onNodePaletteChange, onEdgePaletteCha
   const handleSubmit = event => {
     if(palette !== "black"){
       if(type === "node"){
-        const nodeColorPalette = getEachColors(group, palette, nodeData);
-        onNodePaletteChange(Object.fromEntries(nodeColorPalette));
+        const nodeColorPalette = getEachColors(group, palette, data);
+        // onNodePaletteChange(Object.fromEntries(nodeColorPalette));
+        onPaletteChange(type, Object.fromEntries(nodeColorPalette))
         onCurrDataChange(group, palette, type);
       }
       else{
-        const edgeColorPalette = getEachColors(group, palette, edgeData);
-        onEdgePaletteChange(Object.fromEntries(edgeColorPalette));
+        const edgeColorPalette = getEachColors(group, palette, data);
+        onPaletteChange(type, Object.fromEntries(edgeColorPalette));
+        // onEdgePaletteChange(Object.fromEntries(edgeColorPalette));
         onCurrDataChange(group, palette, type);
       }
     }
     else{
       const defaultMap = new Map();
       if(type === "node"){
-        Object.keys(nodeData).map(x => defaultMap.set(x, "rgba(105, 105, 105, 1)"));
-        onNodePaletteChange(Object.fromEntries(defaultMap));
+        Object.keys(data).map(x => defaultMap.set(x, "rgba(105, 105, 105, 1)"));
+        onPaletteChange(type, Object.fromEntries(defaultMap));
+        // onNodePaletteChange(Object.fromEntries(defaultMap));
       }
       else{
-        Object.keys(edgeData).map(x => defaultMap.set(x, "rgba(0, 0, 0, 1)"));
-        onEdgePaletteChange(Object.fromEntries(defaultMap));
+        Object.keys(data).map(x => defaultMap.set(x, "rgba(0, 0, 0, 1)"));
+        onPaletteChange(type, Object.fromEntries(defaultMap));
+        // onEdgePaletteChange(Object.fromEntries(defaultMap));
       }
     }
   }
 
-  const handleReset = event => {
-    setPalette("black");
-    const defaultMap = new Map();
-    if(type === "node"){
-      Object.keys(nodeData).map(x => defaultMap.set(x, "rgba(105, 105, 105, 1)"));
-      onNodePaletteChange(Object.fromEntries(defaultMap));
-    }
-    else{
-      Object.keys(edgeData).map(x => defaultMap.set(x, "rgba(0, 0, 0, 1)"));
-      onEdgePaletteChange(Object.fromEntries(defaultMap));
-    }
-  }
+  // const handleReset = event => {
+  //   setPalette("black");
+  //   const defaultMap = new Map();
+  //   if(type === "node"){
+  //     Object.keys(data).map(x => defaultMap.set(x, "rgba(105, 105, 105, 1)"));
+  //     onNodePaletteChange(Object.fromEntries(defaultMap));
+  //   }
+  //   else{
+  //     Object.keys(data).map(x => defaultMap.set(x, "rgba(0, 0, 0, 1)"));
+  //     onEdgePaletteChange(Object.fromEntries(defaultMap));
+  //   }
+  // }
 
   const getColorArray = (name) => {
     const colorScheme = getScheme(name);
@@ -143,13 +147,13 @@ const ColorPalette = ({nodeData, edgeData, onNodePaletteChange, onEdgePaletteCha
   }
 
   return <div style={{padding: "5px", width:"100%"}}>
-        <FormControl classes={{root: classes.customSelect}}>
-          <InputLabel>Data</InputLabel>
-          <Select value={type} onChange={handleType}>
-            <MenuItem classes={{root: classes.menuItem}} value={"node"}>Nodes</MenuItem>
-            <MenuItem classes={{root: classes.menuItem}} value={"edge"}>Edges</MenuItem>
-          </Select>
-        </FormControl>
+        {/*<FormControl classes={{root: classes.customSelect}}>*/}
+        {/*  <InputLabel>Data</InputLabel>*/}
+        {/*  <Select value={type} onChange={handleType}>*/}
+        {/*    <MenuItem classes={{root: classes.menuItem}} value={"node"}>Nodes</MenuItem>*/}
+        {/*    <MenuItem classes={{root: classes.menuItem}} value={"edge"}>Edges</MenuItem>*/}
+        {/*  </Select>*/}
+        {/*</FormControl>*/}
 
         <FormControl classes={{root: classes.customSelect}}>
           <InputLabel>Group</InputLabel>
@@ -177,7 +181,7 @@ const ColorPalette = ({nodeData, edgeData, onNodePaletteChange, onEdgePaletteCha
 
       <div className="colorButtonCont">
         <Button onClick={handleSubmit} type="button" variant="outlined" color="primary">Update</Button>
-        <Button onClick={handleReset} type="button" variant="outlined" color="primary">Reset</Button>
+        {/*<Button onClick={handleReset} type="button" variant="outlined" color="primary">Reset</Button>*/}
       </div>
     </div>
 

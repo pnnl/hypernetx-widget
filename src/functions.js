@@ -114,11 +114,12 @@ export const showButtonStyles = makeStyles((theme) => ({
 export const accordianStyles = makeStyles((theme) => ({
   root: {
     width: '100%',
+
     // '& .Mui-expanded':{
     //   padding: 0
     // },
     "& .MuiAccordionDetails-root": {
-      padding: "3px 3px 3px 3px"
+      padding: 0
     },
     "& .MuiAccordianSummary-root.Mui-expanded": {
       minHeight: "30px",

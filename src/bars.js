@@ -30,13 +30,14 @@ const Bars = ({ type, freqData, onValueChange }) => {
   }
 
   return <div>
-      <div style={{display: "flex", justifyContent: 'flex-end', paddingTop: '3px'}}>
-          <Button style={{textTransform: 'none', fontSize: "12px", maxWidth: "25px",}} variant={"outlined"} size={"small"} onClick={handleClearSelect}>Clear</Button>
-      </div>
-    <div style={{ height: "150px",  width:"100%", }}>
+    <div style={{fontFamily: "Arial", fontSize: "13px", paddingLeft: "15px", paddingTop: "8px"}}>{type === "node" ? "Node degree distribution" : "Edge Size Distribution"}</div>
+    <div style={{display: "flex", justifyContent: 'flex-end',}}>
+      <Button style={{textTransform: 'none', fontSize: "11px", minWidth: '40px', maxWidth: "50px", minHeight: '15px', maxHeight: "25px"}} variant={"outlined"} size={"small"} onClick={handleClearSelect}>Clear</Button>
+    </div>
+    <div style={{ height: "125px",  width:"100%", }}>
       <VictoryChart
-        domainPadding={17} minDomain={{x : 0}} height={170}
-        padding={{left: 55, bottom: 20, right: 25, top: 5 }}
+        domainPadding={17} minDomain={{x : 0}} height={135}
+        padding={{left: 55, bottom: 20, right: 25, top: 0 }}
         containerComponent={
             <VictorySelectionContainer
             selectionDimension="x"
@@ -74,8 +75,8 @@ const Bars = ({ type, freqData, onValueChange }) => {
               }
           ]}
         />
-        <VictoryAxis tickValues={range(maxVal+1)} label={type === "node" ? "Degree" : "Size"}/>
-        <VictoryAxis dependentAxis label="Count" style={{axisLabel: {padding: 35}}}/>
+        <VictoryAxis tickValues={range(maxVal+1)} label={type === "node" ? "Degree" : "Size"} style={{axisLabel: {fontSize: "14px"}}}/>
+        <VictoryAxis dependentAxis label="Count" style={{axisLabel: {padding: 35, fontSize: "14px"}}}/>
       </VictoryChart>
     </div>
   </div>

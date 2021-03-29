@@ -16,7 +16,6 @@ import Toolbar from "./toolbar";
 import Switches from "./switches";
 
 const Widget = ({ nodes, edges, ...props }) => {
-
   const classes = accordianStyles();
 
   const nodeDegMap = new Map();
@@ -28,7 +27,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   const edgeSizeList = Object.fromEntries(edgeSizeMap);
 
   const nodeColorMap = new Map();
-  nodes.map(x => nodeColorMap.set(x.uid, "rgba(0, 0, 0, 0.6)"));
+  nodes.map(x => nodeColorMap.set(x.uid,"rgba(0, 0, 0, 0.6)"));
   const edgeColorMap = new Map();
   edges.map(x => edgeColorMap.set(x.uid.toString(), "rgba(0, 0, 0, 1)"));
 
@@ -80,9 +79,16 @@ const Widget = ({ nodes, edges, ...props }) => {
   
   if (_model !== undefined) {
     _model.set('node_fill', nodeFill);
-    console.log('Setting node_fill to', nodeFill);
+    // console.log('Setting node_fill to', nodeFill);
 
-    // more
+    _model.set('edge_stroke', edgeStroke);
+    _model.set('selected_nodes', selectedNodes);
+    _model.set('selected_edges', selectedEdges);
+    _model.set('hidden_nodes', hiddenNodes);
+    _model.set('hidden_edges', hiddenEdges);
+    _model.set('removed_nodes', removedNodes);
+    _model.set('removed_edges', removedEdges)
+
 
     // do once
     _model.save();
@@ -188,6 +194,7 @@ const Widget = ({ nodes, edges, ...props }) => {
       uid: x.uid,
       value: nodeDegList[x.uid],
       color:  {"r": getRGB(nodeFill[x.uid])[0], "g":getRGB(nodeFill[x.uid])[1], "b":getRGB(nodeFill[x.uid])[2], "a":getRGB(nodeFill[x.uid])[3]},
+      // color: nodeFill[x.uid],
       selected: selectedNodes[x.uid],
       hidden: hiddenNodes[x.uid],
       removed: removedNodes[x.uid],
@@ -213,13 +220,13 @@ const Widget = ({ nodes, edges, ...props }) => {
     return Object.values(copy);
   }
 
-  const [colGroup, setColGroup] = React.useState("each");
-  const [colPalette, setColPalette] = React.useState("black");
-  const [colType, setColType] = React.useState("node");
-  const handleCurrData = (group, palette, type) => {
-    setColGroup(group);
-    setColPalette(palette);
-    setColType(type);
+  const [colGroup, setColGroup] = React.useState({node: "each", edge: "each"});
+  const [colPalette, setColPalette] = React.useState({node: "black", edge: "black"});
+  // const [colType, setColType] = React.useState("node");
+  const handleCurrData = (group, palette, dataType) => {
+    setColGroup({...colGroup, [dataType]:group});
+    setColPalette({...colPalette, [dataType]: palette});
+    // setColType(type);
   }
 
   const getClickedNodes = (event, data) => {
@@ -348,8 +355,6 @@ const Widget = ({ nodes, edges, ...props }) => {
       }
     }
     else if(selectionType === "unpin"){
-      // const date = new Date();
-      // console.log(new Date().toLocaleString())
       setUnpinned(new Date().toLocaleString());
     }
     else{
@@ -368,6 +373,14 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
+  const handlePaletteChange = (dataType, newPalette) => {
+    if(dataType === "node"){
+      setNodeFill(newPalette);
+    }
+    else{
+      setEdgeStroke(newPalette);
+    }
+  }
 
   return <div>
     <Grid container spacing={1}>
@@ -396,6 +409,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                   onSelectAllChange={handleSelectAll}
                 />
                 <Bars type={"node"} freqData={getValueFreq(nodeDegList)} onValueChange={handleBarSelect} />
+                <ColorPalette type={"node"} data={nodeDegList} onPaletteChange={handlePaletteChange} currGroup={colGroup.node} currPalette={colPalette.node} onCurrDataChange={handleCurrData}/>
                 <Switches dataType={"node"} onSwitchChange={handleSwitch}/>
               </div>
 
@@ -418,38 +432,40 @@ const Widget = ({ nodes, edges, ...props }) => {
                     onSelectAllChange={handleSelectAll}
                   />
                   <Bars type={"edge"} freqData={getValueFreq(edgeSizeList)} onValueChange={handleBarSelect}/>
+                  <ColorPalette type={"edge"} data={edgeSizeList} onPaletteChange={handlePaletteChange} currGroup={colGroup.edge} currPalette={colPalette.edge} onCurrDataChange={handleCurrData}/>
                   <Switches dataType={"edge"} onSwitchChange={handleSwitch}/>
                 </div>
               </AccordionDetails>
             </Accordion>
 
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}}/>} >
-                <Typography style={{fontSize: "14px", fontWeight: "bold"}}>Color</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <div style={{width: "100%"}}>
-                  <ColorPalette nodeData={nodeDegList} edgeData={edgeSizeList}
-                  onNodePaletteChange={palette => setNodeFill(palette)} onEdgePaletteChange={palette => setEdgeStroke(palette)}
-                  currGroup={colGroup} currPalette={colPalette} currType={colType} onCurrDataChange={handleCurrData}
-                  />
-                </div>
-              </AccordionDetails>
-            </Accordion>
+            {/*<Accordion>*/}
+            {/*  <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}}/>} >*/}
+            {/*    <Typography style={{fontSize: "14px", fontWeight: "bold"}}>Color</Typography>*/}
+            {/*  </AccordionSummary>*/}
+            {/*  <AccordionDetails>*/}
+            {/*    <div style={{width: "100%"}}>*/}
+            {/*      <ColorPalette nodeData={nodeDegList} edgeData={edgeSizeList}*/}
+            {/*      onNodePaletteChange={palette => setNodeFill(palette)} onEdgePaletteChange={palette => setEdgeStroke(palette)}*/}
+            {/*      currGroup={colGroup} currPalette={colPalette} currType={colType} onCurrDataChange={handleCurrData}*/}
+            {/*      />*/}
+            {/*    </div>*/}
+            {/*  </AccordionDetails>*/}
+            {/*</Accordion>*/}
           </div> : null }
     </Grid>
 
     <Grid item xs={12}  sm={!navOpen ? 11 : 8}>
-      <div>
+    {/*<Grid item xs={12} sm={navOpen && 8}>*/}
+    {/*  <div>*/}
         <div style={{ display: "flex", justifyContent: "flex-start", flexFlow: "row wrap"}}>
             <Toolbar dataType={"node"} selectionState={selectedNodes} onSelectionChange={handleToolbarSelection}/>
             <Toolbar dataType={"edge"} selectionState={selectedEdges} onSelectionChange={handleToolbarSelection}/>
         </div>
-      </div>
+      {/*</div>*/}
 
       <HypernetxWidgetView
         {...props}
-        {...{nodes, edges, nodeFill, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges, withNodeLabels, withEdgeLabels, collapseNodes, lineGraph, unpinned}}
+        {...{nodes, edges, nodeFill, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges, withNodeLabels, withEdgeLabels, collapseNodes, lineGraph, unpinned, navOpen}}
         onClickNodes={getClickedNodes} onClickEdges={getClickedEdges}
         />
     </Grid>
