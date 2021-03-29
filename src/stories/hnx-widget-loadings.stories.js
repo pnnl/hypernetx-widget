@@ -48,15 +48,15 @@ const edgeColorDict = {
   7: 'rgba(0, 0, 0, 1)'
 }
 
-
+console.log({...props});
 export const MainComponent = () => <div>
-  <Widget withEdgeLabels={true} withNodeLabels={true}
-          // nodeColors={nodeColorDict}
-    // edgeColors={edgeColorDict}
+  <Widget {...props} withEdgeLabels={true} withNodeLabels={true}
+          // nodeFill={nodeColorDict}
+
+    // edgeStroke={{}}
           // nodeRemoved={nodeRemovedDict}
           // edgeHidden={edgeHiddenDict}
     // edgeRemoved={edgeRemovedDict}
-          {...props}
   />
 </div>
 

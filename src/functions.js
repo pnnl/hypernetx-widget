@@ -39,26 +39,19 @@ export const hexToRgb = hex => {
   return result ? `rgba(${r}, ${g}, ${b}, ${a})`: null;
 }
 
-export const rgbToHex = (r, g, b) => {
+export const rgbToHex = (rgbString) => {
+  // console.log("rgbString", rgbString);
+  // const rgbString ="rgba(0, 0, 0, 0.6)"
+  const tmp = rgbString.substr(5, 12).replace(/ /g, '').split(',');
+  const [r, g, b] = tmp.map(x => parseInt(x));
+  // console.log(r, g, b, "RGB");
+  // console.log(R, G, B);
   return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 
 export const getRGB = (strRGB) => {
-  // console.log(strRGB);
-  // if(strRGB !== undefined){
     let split = strRGB.split(/[()]+/).filter(function(e) { return e; });
     let rgbVal = split[1].split(", ");
-    // console.log(strRGB, rgbVal);
-    // console.log(rgbVal, 'here');
-    // return rgbVal
-  // }
-  // else{
-
-    // console.log('no color', ["0", "0", "0", "1"]);
-    // return ["0", "0", "0", "1"]
-  // }
-  // console.log('rgbval', rgbVal);
-
   return rgbVal
 }
 

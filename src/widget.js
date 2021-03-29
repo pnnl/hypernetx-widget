@@ -16,6 +16,7 @@ import Toolbar from "./toolbar";
 import Switches from "./switches";
 
 const Widget = ({ nodes, edges, ...props }) => {
+  console.log("props", props);
   const classes = accordianStyles();
 
   const nodeDegMap = new Map();
@@ -62,26 +63,35 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [collapseNodes, setCollapseNodes] = React.useState(false);
   const [lineGraph, setLineGraph] = React.useState(false);
 
-  const [nodeFill, setNodeFill] = React.useState(props.nodeColors || Object.fromEntries(nodeColorMap));
+  const [nodeFill, setNodeFill] = React.useState(props.nodeFill || Object.fromEntries(nodeColorMap));
   const [selectedNodes, setSelectedNodes] = React.useState(Object.fromEntries(noNodeSelectMap));
   const [hiddenNodes, setHiddenNodes] = React.useState(props.nodeHidden || Object.fromEntries(nodeHiddenMap));
   const [removedNodes, setRemovedNodes] = React.useState(props.nodeRemoved || Object.fromEntries(nodeRemovedMap));
 
-  const [edgeStroke, setEdgeStroke] = React.useState(props.edgeColors || Object.fromEntries(edgeColorMap));
+  const [edgeStroke, setEdgeStroke] = React.useState(props.edgeStroke || Object.fromEntries(edgeColorMap));
   const [selectedEdges, setSelectedEdges] = React.useState(Object.fromEntries(noEdgeSelectMap));
   const [hiddenEdges, setHiddenEdges] = React.useState(props.edgeHidden || Object.fromEntries(edgeHiddenMap));
   const [removedEdges, setRemovedEdges] = React.useState(props.edgeRemoved || Object.fromEntries(edgeRemovedMap));
 
-  const [unpinned, setUnpinned] = React.useState(null);
+  const [unpinned, setUnpinned] = React.useState(new Date().toLocaleString());
 
   // update the python model with state
   const {_model} = props;
-  
-  if (_model !== undefined) {
-    _model.set('node_fill', nodeFill);
-    // console.log('Setting node_fill to', nodeFill);
 
-    _model.set('edge_stroke', edgeStroke);
+
+  if (_model !== undefined) {
+    const nodeHex = new Map(Object.entries(nodeFill));
+    nodeHex.forEach((value, key) =>
+      nodeHex.set(key, rgbToHex(value))
+    );
+
+    const edgeHex = new Map(Object.entries(edgeStroke));
+    edgeHex.forEach((value, key) =>
+      edgeHex.set(key, rgbToHex(value))
+    );
+
+    _model.set('node_fill', Object.fromEntries(nodeHex));
+    _model.set('edge_stroke', Object.fromEntries(edgeHex));
     _model.set('selected_nodes', selectedNodes);
     _model.set('selected_edges', selectedEdges);
     _model.set('hidden_nodes', hiddenNodes);
@@ -89,8 +99,6 @@ const Widget = ({ nodes, edges, ...props }) => {
     _model.set('removed_nodes', removedNodes);
     _model.set('removed_edges', removedEdges)
 
-
-    // do once
     _model.save();
   }
 
@@ -193,8 +201,8 @@ const Widget = ({ nodes, edges, ...props }) => {
     return {
       uid: x.uid,
       value: nodeDegList[x.uid],
-      color:  {"r": getRGB(nodeFill[x.uid])[0], "g":getRGB(nodeFill[x.uid])[1], "b":getRGB(nodeFill[x.uid])[2], "a":getRGB(nodeFill[x.uid])[3]},
-      // color: nodeFill[x.uid],
+      // color:  {"r": getRGB(nodeFill[x.uid])[0], "g":getRGB(nodeFill[x.uid])[1], "b":getRGB(nodeFill[x.uid])[2], "a":getRGB(nodeFill[x.uid])[3]},
+      color: nodeFill[x.uid],
       selected: selectedNodes[x.uid],
       hidden: hiddenNodes[x.uid],
       removed: removedNodes[x.uid],
@@ -205,23 +213,28 @@ const Widget = ({ nodes, edges, ...props }) => {
     return {
       uid: x.uid.toString(),
       value: edgeSizeList[x.uid.toString()],
-      color: {"r": getRGB(edgeStroke[x.uid.toString()])[0], "g":getRGB(edgeStroke[x.uid.toString()])[1], "b":getRGB(edgeStroke[x.uid.toString()])[2], "a":getRGB(edgeStroke[x.uid.toString()])[3]},
+      // color: {"r": getRGB(edgeStroke[x.uid.toString()])[0], "g":getRGB(edgeStroke[x.uid.toString()])[1], "b":getRGB(edgeStroke[x.uid.toString()])[2], "a":getRGB(edgeStroke[x.uid.toString()])[3]},
+      color: edgeStroke[x.uid.toString()],
       selected: selectedEdges[x.uid.toString()],
       hidden: hiddenEdges[x.uid.toString()],
       removed: removedEdges[x.uid.toString()]
     }
   })
 
-  const convertData = data => {
-    const copy = {...data};
-    Object.values(copy).forEach(val => {
-      val["color"] = rgbToHex(parseInt(val.color.r), parseInt(val.color.g), parseInt(val.color.b));
-    });
-    return Object.values(copy);
-  }
+  // const convertData = data => {
+  //   const copy = {...data};
+  //   Object.values(copy).forEach(val => {
+  //     console.log(val.color, "here");
+  //     // val["color"] = rgbToHex(parseInt(val.color.r), parseInt(val.color.g), parseInt(val.color.b));
+  //     val["color"] = rgbToHex(val.color.toString());
+  //     console.log(val, val.color.toString())
+  //     // console.log(rgbToHex(val.color.toString()))
+  //   });
+  //   return Object.values(copy);
+  // }
 
   const [colGroup, setColGroup] = React.useState({node: "each", edge: "each"});
-  const [colPalette, setColPalette] = React.useState({node: "black", edge: "black"});
+  const [colPalette, setColPalette] = React.useState({node: "default", edge: "default"});
   // const [colType, setColType] = React.useState("node");
   const handleCurrData = (group, palette, dataType) => {
     setColGroup({...colGroup, [dataType]:group});
@@ -401,7 +414,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               <div style={{width: "100%"}}>
                 <LoadTable
                   type={"node"}
-                  data={convertData(transNodeData)}
+                  data={transNodeData}
                   onColorChange={handleColorChange}
                   onVisibleChange={handleVisibilityChange}
                   onSelectedChange={handleSelectedChange}
@@ -409,7 +422,10 @@ const Widget = ({ nodes, edges, ...props }) => {
                   onSelectAllChange={handleSelectAll}
                 />
                 <Bars type={"node"} freqData={getValueFreq(nodeDegList)} onValueChange={handleBarSelect} />
-                <ColorPalette type={"node"} data={nodeDegList} onPaletteChange={handlePaletteChange} currGroup={colGroup.node} currPalette={colPalette.node} onCurrDataChange={handleCurrData}/>
+                <ColorPalette type={"node"} data={nodeDegList} defaultColors={props.nodeFill || Object.fromEntries(nodeColorMap)}
+                              onPaletteChange={handlePaletteChange}
+                              currGroup={colGroup.node} currPalette={colPalette.node} onCurrDataChange={handleCurrData}
+                />
                 <Switches dataType={"node"} onSwitchChange={handleSwitch}/>
               </div>
 
@@ -424,7 +440,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                 <div style={{width: "100%"}}>
                   <LoadTable
                     type={"edge"}
-                    data={convertData(transEdgeData)}
+                    data={transEdgeData}
                     onColorChange={handleColorChange}
                     onVisibleChange={handleVisibilityChange}
                     onSelectedChange={handleSelectedChange}
@@ -432,7 +448,10 @@ const Widget = ({ nodes, edges, ...props }) => {
                     onSelectAllChange={handleSelectAll}
                   />
                   <Bars type={"edge"} freqData={getValueFreq(edgeSizeList)} onValueChange={handleBarSelect}/>
-                  <ColorPalette type={"edge"} data={edgeSizeList} onPaletteChange={handlePaletteChange} currGroup={colGroup.edge} currPalette={colPalette.edge} onCurrDataChange={handleCurrData}/>
+                  <ColorPalette type={"edge"} data={edgeSizeList} defaultColors={props.edgeColors || Object.fromEntries(edgeColorMap)}
+                                onPaletteChange={handlePaletteChange}
+                                currGroup={colGroup.edge} currPalette={colPalette.edge} onCurrDataChange={handleCurrData}
+                  />
                   <Switches dataType={"edge"} onSwitchChange={handleSwitch}/>
                 </div>
               </AccordionDetails>
