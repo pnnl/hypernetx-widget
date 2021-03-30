@@ -166,7 +166,7 @@ const forceEdgeDragBehavior = (selection, simulation) => {
     );
 }
 
-const createTooltipData = (ev, uid, {xOffset=3, labels, data}) => {
+const createTooltipData = (ev, uid, {xOffset=3, labels={}, data}) => {
   return {
     x: ev.offsetX,
     y: ev.offsetY,
