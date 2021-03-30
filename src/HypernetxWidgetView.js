@@ -14,8 +14,8 @@ import {TopologicalSort, DiGraph} from 'js-graph-algorithms'
 
 import './hnx-widget.css'
 
-export const now = () => +(new Date());
-
+// export const now = () => +(new Date());
+export const now = () => new Date().toLocaleString();
 
 const throttledConsole = throttle(console.log, 1000);
 
@@ -688,6 +688,7 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, h
           if (children.length > 0) {
             d.fx = mean(children, c => pos[c.data.uid][0]);
             d.fy = mean(children, c => pos[c.data.uid][1]);
+            d.pinned = now();
           }
         }
       })
