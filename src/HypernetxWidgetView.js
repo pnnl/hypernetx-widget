@@ -255,7 +255,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
     });
   }}/>
 
-const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, edgeStrokeWidth, selectedEdges, hiddenEdges, removedEdges, edgeLabels={}, edgeLabelStyle, onClickEdges=Object, onChangeTooltip=Object}) =>
+const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, edgeStrokeWidth, selectedEdges, hiddenEdges, removedEdges, edgeLabels={}, edgeLabelStyle, onClickEdges=Object, onChangeTooltip=Object}) =>
   <g className='edges' ref={ele => {
     const controlPoints = range(nControlPoints)
       .map(i => {
@@ -273,12 +273,17 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
             g.append('path')
               .attr('stroke', 'black');
 
-            g.append('text')
-              .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid);
+            if (edgeLabelStyle === 'callout') {
+              g.append('rect')
+            }
 
             g.append('circle');
 
-            g.append('line')
+            g.append('text')
+              .attr('x', dx)
+              .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid);
+
+
 
             return g;
           })
@@ -368,16 +373,26 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dr=5, nControlPoint
 
 
       if (edgeLabelStyle === 'callout') {
+
+        const mx = d => d.markerLocation[0];
+        const my = d => d.markerLocation[1];
+
+
         groups.select('circle')
-          .attr('cx', d => d.markerLocation[0])
-          .attr('cy', d => d.markerLocation[1])
+          .attr('cx', mx)
+          .attr('cy', my)
           .attr('r', 3);
 
+        groups.select('rect')
+          .attr('x', mx)
+          .attr('y', d => my(d) - .75)
+          .attr('width', dx)
+          .attr('height', 1.5);
+
         groups.select('text')
-          .attr('transform',
-            d => `translate(${d.markerLocation[0]},${d.markerLocation[1]})`
-          )
-          .attr('dx', 5)
+          .attr('x', mx)
+          .attr('y', my)
+          .attr('dx', dx + 2)
           .style('text-anchor', 'start');
 
       } else {
