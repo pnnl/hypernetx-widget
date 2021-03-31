@@ -405,7 +405,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
   }}/>
 
 const BipartiteLinks = ({links, simulation}) =>
-  <g ref={ele => {
+  <g className='bipartite' ref={ele => {
     const lines = select(ele)
       .selectAll('line')
         .data(links)
@@ -423,7 +423,7 @@ const BipartiteLinks = ({links, simulation}) =>
   }}/>
 
 const BipartiteEdges = ({internals, edges, simulation, edgeLabels, edgeData, edgeStroke, edgeStrokeWidth, selectedNodes={}, unpinned, onClickEdges=Object, onChangeTooltip=Object}) =>
-  <g className='edges' ref={ele => {
+  <g className='bipartite edges' ref={ele => {
     const selectedInternals = internals.filter(({children}) =>
       sum(children, d => selectedNodes[d.uid])
     );

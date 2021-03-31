@@ -60,7 +60,7 @@
 	fill-opacity: 0;
 }
 
-.hnx-widget-view .edges rect {
+.hnx-widget-view .bipartite.edges rect {
 	fill-opacity: 1;
 	fill: white;
 }
