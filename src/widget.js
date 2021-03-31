@@ -7,7 +7,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Typography from '@material-ui/core/Typography';
 import { ArrowForwardIos, ArrowBackIos } from '@material-ui/icons';
 import Button from '@material-ui/core/Button';
-import { HypernetxWidgetView } from './HypernetxWidgetView';
+import {HypernetxWidgetView, now} from './HypernetxWidgetView';
 import ColorPalette  from './colorPalette.js';
 import LoadTable from './loadTable.js';
 import Bars from './bars.js';
@@ -16,7 +16,7 @@ import Toolbar from "./toolbar";
 import Switches from "./switches";
 
 const Widget = ({ nodes, edges, ...props }) => {
-  console.log("props", props);
+  // console.log("props", props);
   const classes = accordianStyles();
 
   const nodeDegMap = new Map();
@@ -28,9 +28,9 @@ const Widget = ({ nodes, edges, ...props }) => {
   const edgeSizeList = Object.fromEntries(edgeSizeMap);
 
   const nodeColorMap = new Map();
-  nodes.map(x => nodeColorMap.set(x.uid,"rgba(0, 0, 0, 0.6)"));
+  nodes.map(x => nodeColorMap.set(x.uid,"#000000ff"));
   const edgeColorMap = new Map();
-  edges.map(x => edgeColorMap.set(x.uid.toString(), "rgba(0, 0, 0, 1)"));
+  edges.map(x => edgeColorMap.set(x.uid.toString(), "#000000ff"));
 
   const nodeHiddenMap = new Map();
   nodes.map(x => nodeHiddenMap.set(x.uid, false));
@@ -73,7 +73,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [hiddenEdges, setHiddenEdges] = React.useState(props.edgeHidden || Object.fromEntries(edgeHiddenMap));
   const [removedEdges, setRemovedEdges] = React.useState(props.edgeRemoved || Object.fromEntries(edgeRemovedMap));
 
-  const [unpinned, setUnpinned] = React.useState(new Date().toLocaleString());
+  const [unpinned, setUnpinned] = React.useState(now());
 
   // update the python model with state
   const {_model} = props;
@@ -105,10 +105,13 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const handleColorChange = (datatype, uid, color) => {
     if(datatype === "node"){
-      setNodeFill({...nodeFill, [uid]:`rgba(${ color.r }, ${ color.g }, ${ color.b }, ${ color.a })`});
+      // setNodeFill({...nodeFill, [uid]:`rgba(${ color.r }, ${ color.g }, ${ color.b }, ${ color.a })`});
+      // setNodeFill({...nodeFill, [uid]:color});
+      setNodeFill({...nodeFill, [uid]:rgbToHex(color)});
     }
     else{
-      setEdgeStroke({...edgeStroke, [uid]:`rgba(${ color.r }, ${ color.g }, ${ color.b }, ${ color.a })`});
+      // setEdgeStroke({...edgeStroke, [uid]:`rgba(${ color.r }, ${ color.g }, ${ color.b }, ${ color.a })`});
+      setEdgeStroke({...edgeStroke, [uid]:rgbToHex(color)})
     }
   }
 
@@ -368,7 +371,7 @@ const Widget = ({ nodes, edges, ...props }) => {
       }
     }
     else if(selectionType === "unpin"){
-      setUnpinned(new Date().toLocaleString());
+      setUnpinned(now());
     }
     else{
       handleOriginal(dataType);
@@ -395,6 +398,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
+    console.log(transNodeData);
   return <div>
     <Grid container spacing={1}>
       <Grid item xs={12} sm={!navOpen ? 1 : 4} >
@@ -408,7 +412,7 @@ const Widget = ({ nodes, edges, ...props }) => {
           {navOpen ? <div className={classes.root}>
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}} />} >
-                <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Key Statistics - Nodes" + " (" +  String(nodes.length) + ")"}</Typography>
+                <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Nodes" + " (" +  String(nodes.length) + ")"}</Typography>
               </AccordionSummary>
               <AccordionDetails>
               <div style={{width: "100%"}}>
@@ -431,10 +435,9 @@ const Widget = ({ nodes, edges, ...props }) => {
 
               </AccordionDetails>
             </Accordion>
-
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}} />} >
-                <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Key Statistics - Edges" + " (" +  String(edges.length) + ")"}</Typography>
+                <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Edges" + " (" +  String(edges.length) + ")"}</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <div style={{width: "100%"}}>
@@ -484,7 +487,8 @@ const Widget = ({ nodes, edges, ...props }) => {
 
       <HypernetxWidgetView
         {...props}
-        {...{nodes, edges, nodeFill, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges, withNodeLabels, withEdgeLabels, collapseNodes, lineGraph, unpinned, navOpen}}
+        {...{nodes, edges, nodeFill, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges,
+          withNodeLabels, withEdgeLabels, collapseNodes, lineGraph, unpinned, navOpen}}
         onClickNodes={getClickedNodes} onClickEdges={getClickedEdges}
         />
     </Grid>

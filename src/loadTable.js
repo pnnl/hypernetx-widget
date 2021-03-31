@@ -34,6 +34,9 @@ const tableStyles = makeStyles((theme) => ({
       fontWeight: 500,
       align: "center",
     },
+    "& .MuiTableCell-alignLeft": {
+      paddingLeft: "10px"
+    },
     "& .MuiButton-text": {
       padding: "0px 0px 0px 0px",
     },
@@ -181,16 +184,20 @@ const LoadTable = ({ type, data, onColorChange, onVisibleChange, onSelectedChang
           .map((x, i) =>
               <TableRow key={i}>
                 <TableCell><CheckboxEl label={x.uid} checkState={x.selected} sendCheck={getCheck}/></TableCell>
-                <TableCell align="center" >
+                <TableCell align="left">
+                    <div style={{ display: "inline-block"}}>{x.uid}</div>
+                </TableCell>
+                <TableCell align="left">
                     <div className="hbarCont">
                       <div className="hbar" style={{ width: calcBar(x.value) }}/>
                     </div>
-                    <div style={{ display: "inline-block"}}>{x.uid}</div>
+
+                  <div style={{display: "inline-block"}}>{x.value}</div>
+
                 </TableCell>
-                <TableCell align="center">{x.value}</TableCell>
-                <TableCell align="center"><VisibilityButton label={x.uid} visibility={!x.hidden} sendVisibility={getVisibility}/></TableCell>
-                <TableCell align="center"><RemoveButton label={x.uid} remove={x.removed} onRemoveChange={getRemove}/></TableCell>
-                <TableCell align="center"><ColorButton label={x.uid} color={x.color} onEachColorChange={getColor}/></TableCell>
+                <TableCell align="left"><VisibilityButton label={x.uid} visibility={!x.hidden} sendVisibility={getVisibility}/></TableCell>
+                <TableCell align="left"><RemoveButton label={x.uid} remove={x.removed} onRemoveChange={getRemove}/></TableCell>
+                <TableCell align="left"><ColorButton label={x.uid} color={x.color} onEachColorChange={getColor}/></TableCell>
 
               </TableRow>
             )

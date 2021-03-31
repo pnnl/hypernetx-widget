@@ -9,6 +9,7 @@ const Bars = ({ type, freqData, onValueChange }) => {
 
   const maxVal = max(freqData.map(d => d.x));
   const handleBrush = points => {
+      // console.log(points);
       onValueChange(points.data.map(d => d.x), type);
       setFilterVal(points.data.map(d => d.x));
   }
@@ -37,7 +38,7 @@ const Bars = ({ type, freqData, onValueChange }) => {
     <div style={{ height: "125px",  width:"100%", }}>
       <VictoryChart
         domainPadding={17} minDomain={{x : 0}} height={135}
-        padding={{left: 55, bottom: 20, right: 25, top: 0 }}
+        padding={{left: 55, bottom: 20, right: 25, top: 5 }}
         containerComponent={
             <VictorySelectionContainer
             selectionDimension="x"

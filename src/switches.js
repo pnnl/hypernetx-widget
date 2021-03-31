@@ -49,7 +49,7 @@ const Switches = ({ dataType, onSwitchChange }) => {
 						name={"linegraph"}
 						size={"small"}
 					/>}
-					label={<div style={{fontSize: "13px"}}>Line Graph</div>}
+					label={<div style={{fontSize: "13px"}}>Bipartite</div>}
 
 				/>}
 			</FormGroup>

@@ -40,13 +40,32 @@ export const hexToRgb = hex => {
 }
 
 export const rgbToHex = (rgbString) => {
-  // console.log("rgbString", rgbString);
-  // const rgbString ="rgba(0, 0, 0, 0.6)"
+  var a,
+    rgb = rgbString.replace(/\s/g, '').match(/^rgba?\((\d+),(\d+),(\d+),?([^,\s)]+)?/i),
+    alpha = (rgb && rgb[4] || "").trim(),
+    hex = rgb ?
+      (rgb[1] | 1 << 8).toString(16).slice(1) +
+      (rgb[2] | 1 << 8).toString(16).slice(1) +
+      (rgb[3] | 1 << 8).toString(16).slice(1) : rgbString;
+  if(alpha !== ""){
+    a = alpha;
+  }
+  else{
+    a = 0o1;
+  }
+
+  a = ((a * 255) | 1 << 8).toString(16).slice(1);
+  hex = hex + a;
+  // console.log(hex);
+
   const tmp = rgbString.substr(5, 12).replace(/ /g, '').split(',');
+
   const [r, g, b] = tmp.map(x => parseInt(x));
+  // console.log(r, g, b, a);
   // console.log(r, g, b, "RGB");
-  // console.log(R, G, B);
-  return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  // console.log(R, G, B);f
+  // return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  return '#' + hex
 }
 
 export const getRGB = (strRGB) => {

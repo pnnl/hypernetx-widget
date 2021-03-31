@@ -6,7 +6,7 @@ import Button from '@material-ui/core/Button';
 import InputLabel from '@material-ui/core/InputLabel';
 import { makeStyles } from '@material-ui/core/styles';
 import {range} from 'd3-array';
-import { getScheme, hexToRgb, allPalettes } from './functions.js';
+import { getScheme, hexToRgb, allPalettes, rgbToHex } from './functions.js';
 import {Colorscale} from 'react-colorscales';
 import {ChromePicker} from "react-color";
 import { Palette } from '@material-ui/icons';
@@ -101,27 +101,29 @@ const ColorPalette = ({type, data, defaultColors, onPaletteChange, currGroup, cu
     if(group === "each"){
       const bins = Object.values(data).length;
       var scheme = range(bins).map(x => getScheme(palette)((x+1)/bins));
-      if(scheme.every(x => x.startsWith("#"))){
-        scheme = scheme.map(x => hexToRgb(x));
-      }
-      else{
-        scheme = scheme.map(x => x.replace('rgb', 'rgba').replace(')', ', 0.9)'));
-      }
+      scheme = scheme.map(x => rgbToHex(x));
+      // if(scheme.every(x => x.startsWith("#"))){
+      //   scheme = scheme.map(x => hexToRgb(x));
+      // }
+      // else{
+      //   scheme = scheme.map(x => x.replace('rgb', 'rgba').replace(')', ', 0.9)'));
+      // }
       Object.keys(data).map((x,i) => {
         colorMap.set(x, scheme[i]);
       });
     }
-    else if(group === "degree/size") {
+    else {
       const colorPalette = [];
       const uniqueValues = Array.from(new Set(Object.values(data))).sort();
       const bins = uniqueValues.length;
       var scheme = range(bins).map(x => getScheme(palette)((x+1)/bins));
-      if(scheme.every(x => x.startsWith("#"))){
-        scheme = scheme.map(x => hexToRgb(x));
-      }
-      else{
-        scheme = scheme.map(x => x.replace('rgb', 'rgba').replace(')', ', 0.9)'));
-      }
+      scheme = scheme.map(x => rgbToHex(x));
+      // if(scheme.every(x => x.startsWith("#"))){
+      //   scheme = scheme.map(x => hexToRgb(x));
+      // }
+      // else{
+      //   scheme = scheme.map(x => x.replace('rgb', 'rgba').replace(')', ', 0.9)'));
+      // }
 
       uniqueValues.map((x,i) => {
         colorPalette.push([x, scheme[i]]);
@@ -132,9 +134,9 @@ const ColorPalette = ({type, data, defaultColors, onPaletteChange, currGroup, cu
         colorMap.set(x[0], colorPalette[idx][1]);
       });
     }
-    else{
-      console.log(group, palette, data);
-    }
+    // else{
+    //   console.log(group, palette, data);
+    // }
     return colorMap
   }
 
