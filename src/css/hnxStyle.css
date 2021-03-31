@@ -52,8 +52,10 @@
 }
 
 .popover-menu{
-  /*position: absolute;*/
-  /*z-index: 10;*/
+  position: absolute;
+  /*z-index: 999;*/
+  top: 5px;
+  right: 50px;
 
 
 }

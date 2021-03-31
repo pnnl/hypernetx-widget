@@ -182,6 +182,8 @@ const ColorPalette = ({type, data, defaultColors, onPaletteChange, currGroup, cu
     return result
   }
 
+
+
   // console.log(paletteOpen);
   return <div style={{padding: "5px", width:"100%"}}>
         {/*<FormControl classes={{root: classes.customSelect}}>*/}
@@ -193,7 +195,7 @@ const ColorPalette = ({type, data, defaultColors, onPaletteChange, currGroup, cu
         {/*</FormControl>*/}
 
         <FormControl classes={{root: classes.customSelect}}>
-          <InputLabel>Group</InputLabel>
+          <InputLabel>Group by</InputLabel>
           <Select value={group} onChange={handleGroup}>
             <MenuItem classes={{root: classes.menuItem}} value={"each"}>Each</MenuItem>
             <MenuItem classes={{root: classes.menuItem}} value={"degree/size"}>{type === "node" ? "Degree" : "Size"}</MenuItem>

@@ -14,8 +14,14 @@ import ColorButton from './colorButton.js';
 import VisibilityButton from './visibilityButton.js';
 import { makeStyles } from '@material-ui/core/styles';
 import { max } from 'd3-array';
-import { getComparator, stableSort } from './functions.js';
+import {getComparator, rgbToHex, stableSort} from './functions.js';
 import RemoveButton from "./removeButton";
+import { ChromePicker } from 'react-color';
+import { Palette } from '@material-ui/icons';
+import PaletteOutlinedIcon from '@material-ui/icons/PaletteOutlined';
+import {IconButton} from '@material-ui/core';
+import './css/hnxStyle.css';
+
 
 const tableStyles = makeStyles((theme) => ({
   customTable: {
@@ -63,9 +69,31 @@ const tableStyles = makeStyles((theme) => ({
 }));
 
 function EnhancedTableHead(props) {
-  const { datatype, data, classes, onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } = props;
+  const { datatype, data, classes, onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, onAllPaletteChange } = props;
+  const sameColors = Array.from(new Set(data.map(d => d.color))).length === 1;
+
+
+  const [paletteColor, setColor] = React.useState("#000000ff");
+
+  const [paletteOpen, setPaletteOpen] = React.useState(false);
+  const handleClick = () => {
+    setPaletteOpen(!paletteOpen);
+  }
+
+  const handleClose = () => {
+    setPaletteOpen(false);
+  }
+
+  const handleChangeColor = (color) => {
+    const RGB = color.rgb;
+    const rgbaStr = "rgba(" + RGB.r + ", " + RGB.g + ", " + RGB.b + ", " + RGB.a + ")";
+    setColor(rgbToHex(rgbaStr));
+    onAllPaletteChange(rgbToHex(rgbaStr));
+  }
+
   const createSortHandler = (property) => (event) => {
-    onRequestSort(event, property);
+     onRequestSort(event, property, paletteOpen);
+
   };
 
   const headCells = [
@@ -96,9 +124,23 @@ function EnhancedTableHead(props) {
             <TableSortLabel
               active={orderBy === headCell.id}
               direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={createSortHandler(headCell.id)}
+              onClick={!paletteOpen ? createSortHandler(headCell.id) : null}
             >
               {headCell.label}
+              {headCell.id === 'color' &&
+                <div>
+                  <IconButton style={{padding:'2px'}} onClick={handleClick}>
+                    {sameColors ? <Palette style={{ fill:paletteColor, fontSize: "x-large"}}/> : <PaletteOutlinedIcon style={{color: "black", fontSize:"x-large"}}/> }
+                  </IconButton>
+                </div>
+              }
+              {(paletteOpen && headCell.id === "color") ?
+                <div className="popover-menu">
+                  <div onClick={() => handleClose()}/>
+                  <ChromePicker color={paletteColor} onChange={(c) => handleChangeColor(c)}/>
+                </div> : null
+              }
+
               {orderBy === headCell.id ? (
                 <span className={classes.visuallyHidden}>
                   {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
@@ -121,12 +163,12 @@ EnhancedTableHead.propTypes = {
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
+  onAllPaletteChange: PropTypes.func.isRequired
 };
 
 
-const LoadTable = ({ type, data, onColorChange, onVisibleChange, onSelectedChange, onRemovedChange, onSelectAllChange }) => {
+const LoadTable = ({ type, data, onColorChange, onVisibleChange, onSelectedChange, onRemovedChange, onSelectAllChange, onAllColorChange }) => {
   const classes = tableStyles();
-
   const calcBar = i => {
     const values = data.map(x => x.value);
     return String(100 * (i/max(values)))+"%";
@@ -135,10 +177,15 @@ const LoadTable = ({ type, data, onColorChange, onVisibleChange, onSelectedChang
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('label');
 
-  const handleRequestSort = (event, property) => {
+  const handleRequestSort = (event, property, paletteState) => {
+
     const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
+
+    // if(paletteState){
+      setOrder(isAsc ? 'desc' : 'asc');
+      setOrderBy(property);
+    // }
+
   };
 
   const handleSelectAllClick = event => {
@@ -166,9 +213,10 @@ const LoadTable = ({ type, data, onColorChange, onVisibleChange, onSelectedChang
     onRemovedChange(type, label, remove);
   }
 
+
   return <div style={{ margin: "0px", padding:"0px", }}>
-  <TableContainer component={Paper} style={{ maxWidth: "100%", height:"250px", border: "1px solid lightgray"}}>
-    <Table classes={{root: classes.customTable}} style={{tableLayout: "auto"}} stickyHeader size="small">
+  <TableContainer component={Paper} style={{ maxWidth: "100%", height:"265px", border: "1px solid lightgray",}}>
+    <Table classes={{root: classes.customTable}} style={{tableLayout: "auto", }} stickyHeader size="small">
       <EnhancedTableHead
         datatype={type}
         data={data}
@@ -178,6 +226,7 @@ const LoadTable = ({ type, data, onColorChange, onVisibleChange, onSelectedChang
         onSelectAllClick={handleSelectAllClick}
         onRequestSort={handleRequestSort}
         rowCount={data.length}
+        onAllPaletteChange={c => onAllColorChange(c, type)}
       />
       <TableBody>
         {stableSort(data, getComparator(order, orderBy))
@@ -187,7 +236,7 @@ const LoadTable = ({ type, data, onColorChange, onVisibleChange, onSelectedChang
                 <TableCell align="left">
                     <div style={{ display: "inline-block"}}>{x.uid}</div>
                 </TableCell>
-                <TableCell align="left">
+                <TableCell align={type === "node" ? "left" : "center"}>
                     <div className="hbarCont">
                       <div className="hbar" style={{ width: calcBar(x.value) }}/>
                     </div>

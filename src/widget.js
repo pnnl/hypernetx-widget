@@ -90,8 +90,8 @@ const Widget = ({ nodes, edges, ...props }) => {
       edgeHex.set(key, rgbToHex(value))
     );
 
-    _model.set('node_fill', Object.fromEntries(nodeHex));
-    _model.set('edge_stroke', Object.fromEntries(edgeHex));
+    _model.set('node_fill', nodeFill);
+    _model.set('edge_stroke', edgeStroke);
     _model.set('selected_nodes', selectedNodes);
     _model.set('selected_edges', selectedEdges);
     _model.set('hidden_nodes', hiddenNodes);
@@ -398,7 +398,20 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
-    console.log(transNodeData);
+  const handleAllColorChange = (color, type) => {
+    const singleColorMap = new Map();
+    if(type === 'node'){
+      Object.keys({...nodeFill}).map(d => singleColorMap.set(d, color));
+      setNodeFill(Object.fromEntries(singleColorMap));
+    }
+    else{
+      Object.keys({...edgeStroke}).map(d => singleColorMap.set(d, color));
+      setEdgeStroke(Object.fromEntries(singleColorMap));
+    }
+  }
+
+
+    // console.log(transNodeData);
   return <div>
     <Grid container spacing={1}>
       <Grid item xs={12} sm={!navOpen ? 1 : 4} >
@@ -415,23 +428,24 @@ const Widget = ({ nodes, edges, ...props }) => {
                 <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Nodes" + " (" +  String(nodes.length) + ")"}</Typography>
               </AccordionSummary>
               <AccordionDetails>
-              <div style={{width: "100%"}}>
-                <LoadTable
-                  type={"node"}
-                  data={transNodeData}
-                  onColorChange={handleColorChange}
-                  onVisibleChange={handleVisibilityChange}
-                  onSelectedChange={handleSelectedChange}
-                  onRemovedChange={handleRemovedChange}
-                  onSelectAllChange={handleSelectAll}
-                />
-                <Bars type={"node"} freqData={getValueFreq(nodeDegList)} onValueChange={handleBarSelect} />
-                <ColorPalette type={"node"} data={nodeDegList} defaultColors={props.nodeFill || Object.fromEntries(nodeColorMap)}
-                              onPaletteChange={handlePaletteChange}
-                              currGroup={colGroup.node} currPalette={colPalette.node} onCurrDataChange={handleCurrData}
-                />
-                <Switches dataType={"node"} onSwitchChange={handleSwitch}/>
-              </div>
+                <div style={{width: "100%"}}>
+                  <LoadTable
+                    type={"node"}
+                    data={transNodeData}
+                    onColorChange={handleColorChange}
+                    onVisibleChange={handleVisibilityChange}
+                    onSelectedChange={handleSelectedChange}
+                    onRemovedChange={handleRemovedChange}
+                    onSelectAllChange={handleSelectAll}
+                    onAllColorChange={handleAllColorChange}
+                  />
+                  <Bars type={"node"} freqData={getValueFreq(nodeDegList)} onValueChange={handleBarSelect} />
+                  <ColorPalette type={"node"} data={nodeDegList} defaultColors={props.nodeFill || Object.fromEntries(nodeColorMap)}
+                                onPaletteChange={handlePaletteChange}
+                                currGroup={colGroup.node} currPalette={colPalette.node} onCurrDataChange={handleCurrData}
+                  />
+                  <Switches dataType={"node"} onSwitchChange={handleSwitch}/>
+                </div>
 
               </AccordionDetails>
             </Accordion>
@@ -449,9 +463,11 @@ const Widget = ({ nodes, edges, ...props }) => {
                     onSelectedChange={handleSelectedChange}
                     onRemovedChange={handleRemovedChange}
                     onSelectAllChange={handleSelectAll}
+                    onAllColorChange={handleAllColorChange}
+
                   />
                   <Bars type={"edge"} freqData={getValueFreq(edgeSizeList)} onValueChange={handleBarSelect}/>
-                  <ColorPalette type={"edge"} data={edgeSizeList} defaultColors={props.edgeColors || Object.fromEntries(edgeColorMap)}
+                  <ColorPalette type={"edge"} data={edgeSizeList} defaultColors={props.edgeStroke || Object.fromEntries(edgeColorMap)}
                                 onPaletteChange={handlePaletteChange}
                                 currGroup={colGroup.edge} currPalette={colPalette.edge} onCurrDataChange={handleCurrData}
                   />

@@ -48,7 +48,7 @@ const edgeColorDict = {
   7: 'rgba(0, 0, 0, 1)'
 }
 
-console.log({...props});
+// console.log({...props});
 export const MainComponent = () => <div>
   <Widget {...props} withEdgeLabels={true} withNodeLabels={true}
           // nodeFill={nodeColorDict}
