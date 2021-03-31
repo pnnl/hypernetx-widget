@@ -61,7 +61,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [withNodeLabels, setWithNodeLabels] = React.useState(true);
   const [withEdgeLabels, setWithEdgeLabels] = React.useState(true);
   const [collapseNodes, setCollapseNodes] = React.useState(false);
-  const [lineGraph, setLineGraph] = React.useState(false);
+  const [bipartite, setBipartite] = React.useState(false);
 
   const [nodeFill, setNodeFill] = React.useState(props.nodeFill || Object.fromEntries(nodeColorMap));
   const [selectedNodes, setSelectedNodes] = React.useState(Object.fromEntries(noNodeSelectMap));
@@ -385,7 +385,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
     else{
       setWithEdgeLabels(states.showLabels);
-      setLineGraph(states.linegraph);
+      setBipartite(states.bipartite);
     }
   }
 
@@ -504,7 +504,7 @@ const Widget = ({ nodes, edges, ...props }) => {
       <HypernetxWidgetView
         {...props}
         {...{nodes, edges, nodeFill, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges,
-          withNodeLabels, withEdgeLabels, collapseNodes, lineGraph, unpinned, navOpen}}
+          withNodeLabels, withEdgeLabels, collapseNodes, bipartite, unpinned, navOpen}}
         onClickNodes={getClickedNodes} onClickEdges={getClickedEdges}
         />
     </Grid>

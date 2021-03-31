@@ -9,7 +9,7 @@ const Switches = ({ dataType, onSwitchChange }) => {
 	const [state, setState] = useState({
 		showLabels: true,
 		collapseNodes: false,
-		linegraph: false,
+		bipartite: false,
 	})
 
 	const handleChange = (event) => {
@@ -43,10 +43,10 @@ const Switches = ({ dataType, onSwitchChange }) => {
 					{dataType === "edge" &&
 				<FormControlLabel
 					control={<Switch
-						checked={state.linegraph}
+						checked={state.bipartite}
 						onChange={handleChange}
 						color={"primary"}
-						name={"linegraph"}
+						name={"bipartite"}
 						size={"small"}
 					/>}
 					label={<div style={{fontSize: "13px"}}>Bipartite</div>}
