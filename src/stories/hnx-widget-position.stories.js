@@ -1,7 +1,7 @@
 import React from 'react';
 
 // import {HypernetxWidget} from '..'
-import {HypernetxWidgetView} from '../HypernetxWidgetView';
+import {HypernetxWidgetView, HypernetxWidget} from '..';
 
 import props from './data/biggerProps.json'
 
@@ -25,6 +25,19 @@ export const TestPositionInput = () =>
 export const TestPositionInputWithoutModel = () =>
   <HypernetxWidgetView
     {...props}
+  />
+
+export const TestPositionInputWithFullUI = () =>
+  <HypernetxWidget
+    {...props}
+    _model={TestBackboneModel()}
+  />
+
+export const TestWithoutPositionInputWithFullUI = () =>
+  <HypernetxWidget
+    {...props}
+    pos={undefined}
+    _model={TestBackboneModel()}
   />
 
 export default {
