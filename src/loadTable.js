@@ -136,7 +136,7 @@ function EnhancedTableHead(props) {
               }
               {(paletteOpen && headCell.id === "color") ?
                 <div className="popover-menu">
-                  <div onClick={() => handleClose()}/>
+                  <div className={"cover"} onClick={() => handleClose()}/>
                   <ChromePicker color={paletteColor} onChange={(c) => handleChangeColor(c)}/>
                 </div> : null
               }

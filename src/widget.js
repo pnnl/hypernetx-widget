@@ -65,6 +65,7 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const [nodeFill, setNodeFill] = React.useState(props.nodeFill || Object.fromEntries(nodeColorMap));
   const [selectedNodes, setSelectedNodes] = React.useState(Object.fromEntries(noNodeSelectMap));
+  const [tempSelectedNodes, setTempSelectedNodes] = React.useState({});
   const [hiddenNodes, setHiddenNodes] = React.useState(props.nodeHidden || Object.fromEntries(nodeHiddenMap));
   const [removedNodes, setRemovedNodes] = React.useState(props.nodeRemoved || Object.fromEntries(nodeRemovedMap));
 
@@ -127,11 +128,13 @@ const Widget = ({ nodes, edges, ...props }) => {
   const handleSelectedChange = (datatype, uid, selected ) => {
     if(datatype === "node"){
       setSelectedNodes({...selectedNodes, [uid]:selected});
+      setTempSelectedNodes({...tempSelectedNodes, [uid]:selected});
     }
     else{
       setSelectedEdges({...selectedEdges, [uid]:selected});
     }
   }
+
 
   const handleRemovedChange = (datatype, uid, removed) => {
     if(datatype === "node"){
@@ -412,6 +415,8 @@ const Widget = ({ nodes, edges, ...props }) => {
 
 
     // console.log(transNodeData);
+  console.log(tempSelectedNodes, "try");
+
   return <div>
     <Grid container spacing={1}>
       <Grid item xs={12} sm={!navOpen ? 1 : 4} >
