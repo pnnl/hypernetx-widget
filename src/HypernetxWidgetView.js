@@ -255,7 +255,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
     });
   }}/>
 
-const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, edgeStrokeWidth, selectedEdges, hiddenEdges, removedEdges, edgeLabels={}, edgeLabelStyle, onClickEdges=Object, onChangeTooltip=Object}) =>
+const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, edgeStrokeWidth, selectedEdges, hiddenEdges, removedEdges, edgeLabels={}, edgeLabelStyle='callout', onClickEdges=Object, onChangeTooltip=Object}) =>
   <g className='edges' ref={ele => {
     const controlPoints = range(nControlPoints)
       .map(i => {
@@ -404,7 +404,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
     });
   }}/>
 
-const LineGraphLinks = ({links, simulation}) =>
+const BipartiteLinks = ({links, simulation}) =>
   <g ref={ele => {
     const lines = select(ele)
       .selectAll('line')
@@ -412,7 +412,7 @@ const LineGraphLinks = ({links, simulation}) =>
           .join('line')
             .style('stroke', 'black');
 
-    simulation.on('tick.lineGraph-lines', d => {
+    simulation.on('tick.bipartite-lines', d => {
       lines
         .attr('x1', d => d.source.x)
         .attr('y1', d => d.source.y)
@@ -422,7 +422,7 @@ const LineGraphLinks = ({links, simulation}) =>
 
   }}/>
 
-const LineGraphEdges = ({internals, edges, simulation, edgeLabels, edgeData, edgeStroke, edgeStrokeWidth, selectedNodes={}, unpinned, onClickEdges=Object, onChangeTooltip=Object}) =>
+const BipartiteEdges = ({internals, edges, simulation, edgeLabels, edgeData, edgeStroke, edgeStrokeWidth, selectedNodes={}, unpinned, onClickEdges=Object, onChangeTooltip=Object}) =>
   <g className='edges' ref={ele => {
     const selectedInternals = internals.filter(({children}) =>
       sum(children, d => selectedNodes[d.uid])
@@ -459,7 +459,7 @@ const LineGraphEdges = ({internals, edges, simulation, edgeLabels, edgeData, edg
             .call(forceMultiDragBehavior, simulation, selectedInternals, unpinned)
             .on('click', onClickEdges)
 
-    simulation.on('tick.lineGraph-edges', d => {
+    simulation.on('tick.bipartite-edges', d => {
       groups.attr('transform', d => `translate(${d.x},${d.y})`)
     });
 
@@ -646,7 +646,7 @@ const planarForce = (nodes, edges) => {
   return force;
 }
 
-export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, height=600, lineGraph, ignorePlanarForce, pos={}, collapseNodes, navOpen, ...props}) => {
+export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, height=600, bipartite, ignorePlanarForce, pos={}, collapseNodes, navOpen, ...props}) => {
   const width = navOpen ? 600 : 800;
   // const width = 600;
   const derivedProps = useMemo(
@@ -754,7 +754,7 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, h
       .force('collide', forceCollide().radius(d => 2*d.r || 0))
       .force('bound', () => simulation.nodes().forEach(boundNode));
 
-    if (!lineGraph && !ignorePlanarForce) {
+    if (!bipartite && !ignorePlanarForce) {
       simulation.force('planar', planarForce(internals, edges));
     }
 
@@ -762,7 +762,7 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, h
 
     return simulation;
 
-  }, [derivedProps, lineGraph, width, height, props.unpinned]);
+  }, [derivedProps, bipartite, width, height, props.unpinned]);
 
   const [tooltip, setTooltip] = React.useState();
 
@@ -792,12 +792,12 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, h
           </pattern>
       </defs>
 
-      { !lineGraph && <HyperEdges {...allProps}  /> }
+      { !bipartite && <HyperEdges {...allProps}  /> }
 
-      { lineGraph &&
+      { bipartite &&
         <React.Fragment>
-          <LineGraphLinks {...allProps} /> 
-          <LineGraphEdges {...allProps} />
+          <BipartiteLinks {...allProps} /> 
+          <BipartiteEdges {...allProps} />
         </React.Fragment>
       }
 

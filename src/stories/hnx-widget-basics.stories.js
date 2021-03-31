@@ -21,8 +21,8 @@ export const EulerCollapsed = () =>
 export const EulerCollapsedWithoutPlanarForce = () =>
   <HypernetxWidgetView collapseNodes {...props} ignorePlanarForce />
 
-export const LineGraph = () =>
-  <HypernetxWidgetView lineGraph {...props} />
+export const Bipartite = () =>
+  <HypernetxWidgetView bipartite {...props} />
 
-export const LineGraphCollapsed = () =>
-  <HypernetxWidgetView lineGraph collapseNodes {...props} />
+export const BipartiteCollapsed = () =>
+  <HypernetxWidgetView bipartite collapseNodes {...props} />
