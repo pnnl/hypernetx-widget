@@ -201,7 +201,9 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
         .join(
           enter => {
             const g = enter.append('g')
-            g.append('circle')
+            g.append('circle').classed('bottom', true);
+            g.append('circle').classed('top', true)
+              .attr('fill', 'url(#checkerboard)');
             g.append('text');
             return g;
           }
@@ -216,7 +218,12 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
           .call(encodeProps, d => d.data.uid, {nodeFill, nodeStroke, nodeStrokeWidth})
           .call(classedByDict, {'selected': selectedNodes, 'hiddenState': hiddenNodes})
 
-    circles.select('circle')
+    circles.select('circle.bottom')
+      .attr('cx', d => d.height === 0 ? d.x : 0)
+      .attr('cy', d => d.height === 0 ? d.y : 0)
+      .attr('r', d => d.r);
+
+    circles.select('circle.top')
       .attr('cx', d => d.height === 0 ? d.x : 0)
       .attr('cy', d => d.height === 0 ? d.y : 0)
       .attr('r', d => d.r);
@@ -761,6 +768,15 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, h
     }
 
     <svg style={{width, height}}>
+
+      <defs>
+          <pattern id="checkerboard" patternUnits="userSpaceOnUse" 
+          width="50" height="50">
+              <rect x="0" y="0" width="25" height="25"/>
+              <rect x="25" y="25" width="25" height="25" />
+          </pattern>
+      </defs>
+
       { !lineGraph && <HyperEdges {...allProps}  /> }
 
       { lineGraph &&

@@ -20,9 +20,23 @@
 	fill: white;
 }
 
-.hnx-widget-view .nodes .error {
-	fill: red !important;
+.hnx-widget-view .nodes .top {
+	visibility: hidden;
+	pointer-events: none;
 }
+
+.hnx-widget-view .nodes .error .top {
+	visibility: inherit;
+}
+
+#checkerboard rect:nth-child(3n) {
+	fill-opacity: 0;
+}
+
+#checkerboard rect {
+	fill: white;
+}
+
 .hnx-widget-view .nodes text {
 	fill: darkgray;
 	alignment-baseline: middle;
@@ -78,4 +92,3 @@
 .hnx-widget-view .hiddenState {
 	opacity: 0.1;
 }
-
