@@ -73,7 +73,7 @@ function EnhancedTableHead(props) {
   const sameColors = Array.from(new Set(data.map(d => d.color))).length === 1;
 
 
-  const [paletteColor, setColor] = React.useState("#000000ff");
+  const [paletteColor, setColor] = React.useState(sameColors ? data[0].color : "#000000ff");
 
   const [paletteOpen, setPaletteOpen] = React.useState(false);
   const handleClick = () => {
