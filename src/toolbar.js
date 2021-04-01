@@ -7,14 +7,13 @@ import VisibilityIcon from '@material-ui/icons/Visibility';
 import RemoveCircleOutlineIcon from '@material-ui/icons/RemoveCircleOutline';
 import BubbleChartIcon from '@material-ui/icons/BubbleChart';
 import SelectAllIcon from '@material-ui/icons/SelectAll';
-import BlurOnIcon from '@material-ui/icons/BlurOn';
-import BlurOffIcon from '@material-ui/icons/BlurOff';
 import ClearIcon from '@material-ui/icons/Clear';
 import LocationOffIcon from '@material-ui/icons/LocationOff';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
 import Tooltip from '@material-ui/core/Tooltip';
 import {makeStyles} from "@material-ui/core/styles";
-import {Clear} from "@material-ui/icons";
+import FlipCameraAndroidIcon from '@material-ui/icons/FlipCameraAndroid';
+import {Flip} from "@material-ui/icons";
 
 const toggleStyle = makeStyles((theme) => ({
     toggleButton: {
@@ -106,6 +105,13 @@ const Toolbar = ({ dataType, selectionState, onSelectionChange }) => {
                   <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Unselect all</div>}>
                       <ClearIcon/>
                   </Tooltip>
+              </ToggleButton>
+
+              <ToggleButton value={"reverse"} disabled={!Object.values(selectionState).includes(true)}>
+                  <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Reverse selection</div>}>
+                    <FlipCameraAndroidIcon />
+                  </Tooltip>
+
               </ToggleButton>
 
 

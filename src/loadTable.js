@@ -111,7 +111,7 @@ function EnhancedTableHead(props) {
           <Checkbox
             size="small"
             onChange={onSelectAllClick}
-            checked={!data.map(x => x.selected).includes(false) ? true : false}
+            checked={!data.map(x => x.selected === true).includes(false) }
             indeterminate={data.map(x => x.selected).includes(false) && data.map(x => x.selected).includes(true)}
           />
         </TableCell>
@@ -232,7 +232,7 @@ const LoadTable = ({ type, data, onColorChange, onVisibleChange, onSelectedChang
         {stableSort(data, getComparator(order, orderBy))
           .map((x, i) =>
               <TableRow key={i}>
-                <TableCell><CheckboxEl label={x.uid} checkState={x.selected} sendCheck={getCheck}/></TableCell>
+                <TableCell><CheckboxEl label={x.uid} checkState={x.selected === true} sendCheck={getCheck}/></TableCell>
                 <TableCell align="left">
                     <div style={{ display: "inline-block"}}>{x.uid}</div>
                 </TableCell>
