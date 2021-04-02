@@ -112,7 +112,7 @@ function EnhancedTableHead(props) {
             size="small"
             onChange={onSelectAllClick}
             checked={!data.map(x => x.selected === true).includes(false) }
-            indeterminate={data.map(x => x.selected).includes(false) && data.map(x => x.selected).includes(true)}
+            indeterminate={data.map(x => x.selected === true).includes(false) && data.map(x => x.selected === true).includes(true)}
           />
         </TableCell>
         {headCells.map((headCell) => (

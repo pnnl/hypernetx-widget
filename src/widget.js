@@ -11,7 +11,7 @@ import {HypernetxWidgetView, now} from './HypernetxWidgetView';
 import ColorPalette  from './colorPalette.js';
 import LoadTable from './loadTable.js';
 import Bars from './bars.js';
-import { getRGB, rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianStyles } from './functions.js';
+import { hexToHsv, rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianStyles } from './functions.js';
 import Toolbar from "./toolbar";
 import Switches from "./switches";
 
@@ -21,6 +21,7 @@ const createDefaultState = (data, defaultValue) => {
   return Object.fromEntries(mapObj)
 }
 
+// console.log(hexToHsv('#000000ff'));
 const Widget = ({ nodes, edges, ...props }) => {
   // console.log("props", props);
   const classes = accordianStyles();
@@ -190,17 +191,24 @@ const Widget = ({ nodes, edges, ...props }) => {
   }
 
   const getClickedNodes = (event, data) => {
+
     const newNodeSelect = new Map();
     if(event.shiftKey){
       setSelectedNodes({...selectedNodes, [data.data.uid]: !selectedNodes[data.data.uid]});
     }
     else{
-      Object.entries(createDefaultState(nodes, false)).map(d => {
-        if(d[0] === data.data.uid){
-          newNodeSelect.set(d[0], true)
-        }
-      })
-      setSelectedNodes(Object.fromEntries(newNodeSelect));
+      if(data !== undefined){
+        Object.entries(createDefaultState(nodes, false)).map(d => {
+          if(d[0] === data.data.uid){
+            newNodeSelect.set(d[0], true)
+          }
+        })
+        setSelectedNodes(Object.fromEntries(newNodeSelect));
+      }
+      else{
+        setSelectedNodes({});
+      }
+
     }
   }
 
