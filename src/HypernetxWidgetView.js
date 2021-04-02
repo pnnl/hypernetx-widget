@@ -52,15 +52,16 @@ const forceMultiDragBehavior = (selection, simulation, elements, unpinned) => {
         d.dy = d.y - y;
       });
 
+      const dr = 5; // TODO: fix dr hard coding
+
       event.subject.dxRange = [
-        min(elements, d => d.dx - d.r),
-        max(elements, d => d.dx + d.r)
+        min(elements, ({numBands=-1, dx, r}) => dx - r - dr*(1 + numBands)),
+        max(elements, ({numBands=-1, dx, r}) => dx + r + dr*(1 + numBands))
       ];
 
-
       event.subject.dyRange = [
-        min(elements, d => d.dy - d.r),
-        max(elements, d => d.dy + d.r)
+        min(elements, ({numBands=-1, dy, r}) => dy - r - dr*(1 + numBands)),
+        max(elements, ({numBands=-1, dy, r}) => dy + r + dr*(1 + numBands))
       ];
     }
 
@@ -746,10 +747,14 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, h
   const simulation = useMemo(() => {
     const {links, edges, internals} = derivedProps;
 
+    const {dr=5} = props; // TODO: fix dr hard coding
+
     function boundNode(d) {
-      const {r=0} = d;
-      d.x = Math.max(r, Math.min(width - r, d.x));
-      d.y = Math.max(r, Math.min(height - r, d.y));
+      const {r=0, numBands=-1} = d;
+      const drMax = (numBands + 1)*dr
+
+      d.x = Math.max(r + drMax, Math.min(width - r - drMax, d.x));
+      d.y = Math.max(r + drMax, Math.min(height - r - drMax, d.y));
     }
 
     let simulation = forceSimulation([...internals, ...edges])
