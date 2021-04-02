@@ -11,7 +11,7 @@ import {HypernetxWidgetView, now} from './HypernetxWidgetView';
 import ColorPalette  from './colorPalette.js';
 import LoadTable from './loadTable.js';
 import Bars from './bars.js';
-import { getRGB, rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianStyles } from './functions.js';
+import { hexToHsv, rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianStyles } from './functions.js';
 import Toolbar from "./toolbar";
 import Switches from "./switches";
 
@@ -21,6 +21,7 @@ const createDefaultState = (data, defaultValue) => {
   return Object.fromEntries(mapObj)
 }
 
+// console.log(hexToHsv('#000000ff'));
 const Widget = ({ nodes, edges, ...props }) => {
   // console.log("props", props);
   const classes = accordianStyles();
@@ -152,10 +153,10 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
-  const [navOpen, setNavOpen] = React.useState(false);
-  const toggleNav = () => {
-    setNavOpen(!navOpen);
-  }
+  // const [navOpen, setNavOpen] = React.useState(false);
+  // const toggleNav = () => {
+  //   setNavOpen(!navOpen);
+  // }
 
   const transNodeData = nodes.map(x => {
     return {
@@ -180,7 +181,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   })
 
-  const [colGroup, setColGroup] = React.useState({node: "each", edge: "each"});
+  const [colGroup, setColGroup] = React.useState({node: "degree/size", edge: "degree/size"});
   const [colPalette, setColPalette] = React.useState({node: "default", edge: "default"});
   // const [colType, setColType] = React.useState("node");
   const handleCurrData = (group, palette, dataType) => {
@@ -195,12 +196,18 @@ const Widget = ({ nodes, edges, ...props }) => {
       setSelectedNodes({...selectedNodes, [data.data.uid]: !selectedNodes[data.data.uid]});
     }
     else{
-      Object.entries(createDefaultState(nodes, false)).map(d => {
-        if(d[0] === data.data.uid){
-          newNodeSelect.set(d[0], true)
-        }
-      })
-      setSelectedNodes(Object.fromEntries(newNodeSelect));
+      if(data !== undefined){
+        Object.entries(createDefaultState(nodes, false)).map(d => {
+          if(d[0] === data.data.uid){
+            newNodeSelect.set(d[0], true)
+          }
+        })
+        setSelectedNodes(Object.fromEntries(newNodeSelect));
+      }
+      else{
+        setSelectedNodes({});
+      }
+
     }
   }
 
@@ -369,21 +376,23 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   return <div>
     <Grid container spacing={1}>
-      <Grid item xs={12} sm={!navOpen ? 1 : 4} >
-        <div className="colorSetting" style={{ justifyContent: !navOpen ? "flex-start" : "flex-end", }}>
-          <div>
-            <Button style={{justifyContent: !navOpen ? "flex-start": "flex-end"}} color="primary" onClick={() => toggleNav()}>
-              {!navOpen ? <ArrowForwardIos style={{fontSize: "20px"}} /> : <ArrowBackIos style={{fontSize: "20px"}}/>}
-            </Button>
-          </div>
-          </div>
-          {navOpen ? <div className={classes.root}>
+      <Grid item xs={12} sm={4} >
+        {/*<div className="colorSetting" style={{ justifyContent: !navOpen ? "flex-start" : "flex-end", }}>*/}
+        {/*  <div>*/}
+        {/*    <Button style={{justifyContent: !navOpen ? "flex-start": "flex-end"}} color="primary" onClick={() => toggleNav()}>*/}
+        {/*      {!navOpen ? <ArrowForwardIos style={{fontSize: "20px"}} /> : <ArrowBackIos style={{fontSize: "20px"}}/>}*/}
+        {/*    </Button>*/}
+        {/*  </div>*/}
+        {/*</div>*/}
+          <div className={classes.root}>
             <Accordion>
               <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}} />} >
                 <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Nodes" + " (" +  String(nodes.length) + ")"}</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <div style={{width: "100%"}}>
+                  <Toolbar dataType={"node"} selectionState={selectedNodes} onSelectionChange={handleToolbarSelection}/>
+
                   <LoadTable
                     type={"node"}
                     data={transNodeData}
@@ -410,6 +419,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               </AccordionSummary>
               <AccordionDetails>
                 <div style={{width: "100%"}}>
+                  <Toolbar dataType={"edge"} selectionState={selectedEdges} onSelectionChange={handleToolbarSelection}/>
                   <LoadTable
                     type={"edge"}
                     data={transEdgeData}
@@ -430,36 +440,22 @@ const Widget = ({ nodes, edges, ...props }) => {
                 </div>
               </AccordionDetails>
             </Accordion>
-
-            {/*<Accordion>*/}
-            {/*  <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}}/>} >*/}
-            {/*    <Typography style={{fontSize: "14px", fontWeight: "bold"}}>Color</Typography>*/}
-            {/*  </AccordionSummary>*/}
-            {/*  <AccordionDetails>*/}
-            {/*    <div style={{width: "100%"}}>*/}
-            {/*      <ColorPalette nodeData={nodeDegList} edgeData={edgeSizeList}*/}
-            {/*      onNodePaletteChange={palette => setNodeFill(palette)} onEdgePaletteChange={palette => setEdgeStroke(palette)}*/}
-            {/*      currGroup={colGroup} currPalette={colPalette} currType={colType} onCurrDataChange={handleCurrData}*/}
-            {/*      />*/}
-            {/*    </div>*/}
-            {/*  </AccordionDetails>*/}
-            {/*</Accordion>*/}
-          </div> : null }
+          </div>
     </Grid>
 
-    <Grid item xs={12}  sm={!navOpen ? 11 : 8}>
+    <Grid item xs={12}  sm={8}>
     {/*<Grid item xs={12} sm={navOpen && 8}>*/}
     {/*  <div>*/}
-        <div style={{ display: "flex", justifyContent: "flex-start", flexFlow: "row wrap"}}>
-            <Toolbar dataType={"node"} selectionState={selectedNodes} onSelectionChange={handleToolbarSelection}/>
-            <Toolbar dataType={"edge"} selectionState={selectedEdges} onSelectionChange={handleToolbarSelection}/>
-        </div>
+    {/*    <div style={{ display: "flex", justifyContent: "flex-start", flexFlow: "row wrap"}}>*/}
+    {/*        <Toolbar dataType={"node"} selectionState={selectedNodes} onSelectionChange={handleToolbarSelection}/>*/}
+    {/*        <Toolbar dataType={"edge"} selectionState={selectedEdges} onSelectionChange={handleToolbarSelection}/>*/}
+    {/*    </div>*/}
       {/*</div>*/}
 
       <HypernetxWidgetView
         {...props}
         {...{nodes, edges, nodeFill, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges,
-          withNodeLabels, withEdgeLabels, collapseNodes, bipartite, unpinned, navOpen}}
+          withNodeLabels, withEdgeLabels, collapseNodes, bipartite, unpinned}}
         onClickNodes={getClickedNodes} onClickEdges={getClickedEdges}
         />
     </Grid>

@@ -15,21 +15,24 @@ import {IconButton} from '@material-ui/core';
 const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
-    minWidth: 120,
+    // minWidth: 120,
+    paddingLeft: "15px"
   },
   selectEmpty: {
     marginTop: theme.spacing(2),
   },
   customSelect: {
+    // paddingLeft: "15px",
     paddingRight:"5px",
     "& .MuiSelect-root": {
-      width: 100,
+      // width: 100,
 
     },
   },
   colorItem: {
     "& .MuiSelect-root": {
-      width: 270
+      minWidth: 150,
+      width: 200,
     },
   }
 }));
@@ -43,19 +46,26 @@ const ColorPalette = ({type, data, defaultColors, onPaletteChange, currGroup, cu
   const [group, setGroup] = React.useState(currGroup);
   const [palette, setPalette] = React.useState(currPalette);
   // const [type, setType] = React.useState(currType);
-  const [openSelect, setOpenSelect] = React.useState(false);
-  const [paletteColor, setColor] = React.useState("#000000");
+  // const [paletteColor, setColor] = React.useState("#000000");
   const [paletteOpen, setPaletteOpen] = React.useState(false);
 
   const handlePalette = event => {
     setPalette(event.target.value);
 
-  }
-  const handleOpen = (event) => {
-    setOpenSelect(true);
-    if(paletteOpen){
-      event.stopPropagation();
-      event.preventDefault();
+    if(event.target.value === 'default'){
+      onPaletteChange(type, defaultColors);
+    }
+    else{
+      if(type === 'node'){
+        const nodeColorPalette = getEachColors(group, event.target.value, data);
+        onPaletteChange(type, Object.fromEntries(nodeColorPalette))
+        onCurrDataChange(group, event.target.value, type);
+      }
+      else{
+        const edgeColorPalette = getEachColors(group, event.target.value, data);
+        onPaletteChange(type, Object.fromEntries(edgeColorPalette));
+        onCurrDataChange(group, event.target.value, type);
+      }
     }
   }
 
@@ -63,51 +73,12 @@ const ColorPalette = ({type, data, defaultColors, onPaletteChange, currGroup, cu
     setGroup(event.target.value);
   }
 
-  // const handleType = event => {
-  //   setType(event.target.value);
-  // }
-
-
-  const handleClick = (event) => {
-    setPaletteOpen(!paletteOpen);
-      // event.stopPropagation();
-      // event.preventDefault();
-  }
-  const handleClose = (event) => {
-    // console.log("HERE")
-    // setOpenSelect(false);
-    if(event !== undefined){
-      if(event.currentTarget.getAttribute('data-value') === "user") {
-        if(paletteColor !== "#000000"){
-          setOpenSelect(false);
-          setPaletteOpen(false);
-        }
-      }
-      else{
-        setOpenSelect(false);
-      }
-    }
-
-
-  }
-  const handleChangeColor = (color) => {
-    // onEachColorChange(label, color.rgb);
-    setColor(color.hex);
-  }
-
   const getEachColors = (group, palette, data) => {
-
     const colorMap = new Map();
     if(group === "each"){
       const bins = Object.values(data).length;
       var scheme = range(bins).map(x => getScheme(palette)((x+1)/bins));
       scheme = scheme.map(x => rgbToHex(x));
-      // if(scheme.every(x => x.startsWith("#"))){
-      //   scheme = scheme.map(x => hexToRgb(x));
-      // }
-      // else{
-      //   scheme = scheme.map(x => x.replace('rgb', 'rgba').replace(')', ', 0.9)'));
-      // }
       Object.keys(data).map((x,i) => {
         colorMap.set(x, scheme[i]);
       });
@@ -118,13 +89,6 @@ const ColorPalette = ({type, data, defaultColors, onPaletteChange, currGroup, cu
       const bins = uniqueValues.length;
       var scheme = range(bins).map(x => getScheme(palette)((x+1)/bins));
       scheme = scheme.map(x => rgbToHex(x));
-      // if(scheme.every(x => x.startsWith("#"))){
-      //   scheme = scheme.map(x => hexToRgb(x));
-      // }
-      // else{
-      //   scheme = scheme.map(x => x.replace('rgb', 'rgba').replace(')', ', 0.9)'));
-      // }
-
       uniqueValues.map((x,i) => {
         colorPalette.push([x, scheme[i]]);
       });
@@ -134,46 +98,32 @@ const ColorPalette = ({type, data, defaultColors, onPaletteChange, currGroup, cu
         colorMap.set(x[0], colorPalette[idx][1]);
       });
     }
-    // else{
-    //   console.log(group, palette, data);
-    // }
+
     return colorMap
   }
 
-  const handleSubmit = event => {
-    if(palette === "default"){
-      // const defaultMap = new Map();
-      if(type === "node"){
-        // Object.keys(data).map(x => defaultMap.set(x, "rgba(105, 105, 105, 1)"));
-        onPaletteChange(type, defaultColors);
-        // console.log(defaultColors);
-      }
-      else{
-        // Object.keys(data).map(x => defaultMap.set(x, "rgba(0, 0, 0, 1)"));
-        onPaletteChange(type, defaultColors);
-      }
-    }
-    else if(palette === "user"){
-      const userMap = new Map();
-      if(type === "node"){
-        Object.keys(data).map(x => userMap.set(x, hexToRgb(paletteColor)));
-        onPaletteChange(type, Object.fromEntries(userMap));
-      }
-    }
-    else{
-
-      if(type === "node"){
-        const nodeColorPalette = getEachColors(group, palette, data);
-        onPaletteChange(type, Object.fromEntries(nodeColorPalette))
-        onCurrDataChange(group, palette, type);
-      }
-      else{
-        const edgeColorPalette = getEachColors(group, palette, data);
-        onPaletteChange(type, Object.fromEntries(edgeColorPalette));
-        onCurrDataChange(group, palette, type);
-      }
-    }
-  }
+  // const handleSubmit = event => {
+  //   if(palette === "default"){
+  //     if(type === "node"){
+  //       onPaletteChange(type, defaultColors);
+  //     }
+  //     else{
+  //       onPaletteChange(type, defaultColors);
+  //     }
+  //   }
+  //   else{
+  //     if(type === "node"){
+  //       const nodeColorPalette = getEachColors(group, palette, data);
+  //       onPaletteChange(type, Object.fromEntries(nodeColorPalette))
+  //       onCurrDataChange(group, palette, type);
+  //     }
+  //     else{
+  //       const edgeColorPalette = getEachColors(group, palette, data);
+  //       onPaletteChange(type, Object.fromEntries(edgeColorPalette));
+  //       onCurrDataChange(group, palette, type);
+  //     }
+  //   }
+  // }
 
   const getColorArray = (name) => {
     const colorScheme = getScheme(name);
@@ -182,11 +132,10 @@ const ColorPalette = ({type, data, defaultColors, onPaletteChange, currGroup, cu
     return result
   }
 
-
-
-  // console.log(paletteOpen);
   return <div style={{padding: "5px", width:"100%"}}>
-        {/*<FormControl classes={{root: classes.customSelect}}>*/}
+    <div style={{fontFamily: "Arial", fontSize: "15px", paddingTop: "8px", paddingBottom: "8px"}}>{"Colors"}</div>
+
+    {/*<FormControl classes={{root: classes.customSelect}}>*/}
         {/*  <InputLabel>Data</InputLabel>*/}
         {/*  <Select value={type} onChange={handleType}>*/}
         {/*    <MenuItem classes={{root: classes.menuItem}} value={"node"}>Nodes</MenuItem>*/}
@@ -197,50 +146,27 @@ const ColorPalette = ({type, data, defaultColors, onPaletteChange, currGroup, cu
         <FormControl classes={{root: classes.customSelect}}>
           <InputLabel>Group by</InputLabel>
           <Select value={group} onChange={handleGroup}>
-            <MenuItem classes={{root: classes.menuItem}} value={"each"}>Each</MenuItem>
-            <MenuItem classes={{root: classes.menuItem}} value={"degree/size"}>{type === "node" ? "Degree" : "Size"}</MenuItem>
-            {/*<MenuItem classes={{root: classes.menuItem}} value={"all"}>All</MenuItem>*/}
+            <MenuItem value={"each"}>Each</MenuItem>
+            <MenuItem value={"degree/size"}>{type === "node" ? "Degree" : "Size"}</MenuItem>
           </Select>
         </FormControl>
 
         <FormControl classes={{root: classes.colorItem}}>
           <InputLabel>Color palette</InputLabel>
-          <Select
-            value={palette}
-            onChange={handlePalette}
-            // open={openSelect}
-            // onOpen={handleOpen}
-            // onClose={handleClose}
-          >
-
-                <MenuItem classes={{root: classes.menuItem}} value={"default"}>Default</MenuItem>
-
-            {/*  <MenuItem value={"user"}>*/}
-            {/*    <IconButton style={{padding:'2px'}} onClick={handleClick}>*/}
-            {/*      <Palette fontSize="small" style={{  fill:paletteColor}}/>*/}
-            {/*    </IconButton>*/}
-            {/*    {paletteColor === "#000000" ? "Choose" : paletteColor}*/}
-            {/*    {paletteOpen ?*/}
-            {/*      <div className="popover-menu">*/}
-            {/*        <div className="cover" />*/}
-            {/*        <ChromePicker color={paletteColor} onChange={(c) => handleChangeColor(c)}/>*/}
-            {/*      </div> : null*/}
-            {/*    }*/}
-
-            {/*</MenuItem>*/}
-            {allPalettes.map(c => <MenuItem classes={{root: classes.menuItem}} key={c} value={c}>
+          <Select value={palette} onChange={handlePalette}>
+            <MenuItem value={"default"}>Default</MenuItem>
+            {allPalettes.map(c => <MenuItem key={c} value={c}>
                 <Colorscale onClick={() => {}}
                   colorscale={getColorArray(c)} maxWidth={80} label={c}
                 />
-
               </MenuItem>)}
           </Select>
         </FormControl>
 
-      <div className="colorButtonCont">
-        <Button onClick={handleSubmit} type="button" variant="outlined" color="primary">Update</Button>
-        {/*<Button onClick={handleReset} type="button" variant="outlined" color="primary">Reset</Button>*/}
-      </div>
+      {/*<div className="colorButtonCont">*/}
+      {/*  <Button onClick={handleSubmit} type="button" variant="outlined" color="primary">Update</Button>*/}
+      {/*  /!*<Button onClick={handleReset} type="button" variant="outlined" color="primary">Reset</Button>*!/*/}
+      {/*</div>*/}
     </div>
 
 

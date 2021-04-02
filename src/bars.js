@@ -31,7 +31,7 @@ const Bars = ({ type, freqData, onValueChange }) => {
   }
 
   return <div>
-    <div style={{fontFamily: "Arial", fontSize: "13px", paddingLeft: "15px", paddingTop: "8px"}}>{type === "node" ? "Node degree distribution" : "Edge Size Distribution"}</div>
+    <div style={{fontFamily: "Arial", fontSize: "15px", paddingLeft: "5px", paddingTop: "8px"}}>{type === "node" ? "Node degree distribution" : "Edge Size Distribution"}</div>
     <div style={{display: "flex", justifyContent: 'flex-end',}}>
       <Button style={{textTransform: 'none', fontSize: "11px", minWidth: '40px', maxWidth: "50px", minHeight: '15px', maxHeight: "25px"}} variant={"outlined"} size={"small"} onClick={handleClearSelect}>Clear</Button>
     </div>
