@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react'
+import React, {useState, useMemo} from 'react'
 
 import {debounce, throttle} from 'lodash'
 
@@ -748,7 +748,10 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, w
     [nodes, edges, removedNodes, removedEdges, collapseNodes]
   );
 
-  const simulation = useMemo(() => {
+  const [simulation] = useState(forceSimulation());
+
+  // re-initialize the simulation if certain variables have changed
+  useMemo(() => {
     const {links, edges, internals} = derivedProps;
 
     const {dr=5} = props; // TODO: fix dr hard coding
@@ -761,12 +764,14 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, w
       d.y = Math.max(r + drMax, Math.min(height - r - drMax, d.y));
     }
 
-    let simulation = forceSimulation([...internals, ...edges])
+    simulation.nodes([...internals, ...edges])
       .force('charge', forceManyBody().strength(-150).distanceMax(300))
       .force('link', forceLink(links).distance(30))
       .force('center', forceCenter(width/2, height/2))
       .force('collide', forceCollide().radius(d => 2*d.r || 0))
-      .force('bound', () => simulation.nodes().forEach(boundNode));
+      .force('bound', () => simulation.nodes().forEach(boundNode))
+      .alpha(1)
+      .restart();
 
     if (!bipartite && !ignorePlanarForce) {
       simulation.force('planar', planarForce(internals, edges));
