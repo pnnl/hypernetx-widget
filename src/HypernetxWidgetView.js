@@ -298,7 +298,6 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
       .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth});
 
     groups.select('text')
-      .attr('x', dx)
       .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
       .style('visibility', withEdgeLabels ? undefined : 'hidden');
 
