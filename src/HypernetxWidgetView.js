@@ -311,7 +311,12 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
 
     groups.select('text')
       .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
-      .style('visibility', withEdgeLabels ? undefined : 'hidden');
+
+    const edgeVisibility = withEdgeLabels ? undefined : 'hidden';
+    for (let v of ['rect', 'text', 'circle']) {
+      groups.select(v)
+        .style('visibility', edgeVisibility);
+    }
 
     const xValue = d => d[0];
     const yValue = d => d[1];
