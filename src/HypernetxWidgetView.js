@@ -298,7 +298,10 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
               onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
             )
             .on('mouseout', () => onChangeTooltip())
-            .on('click', onClickEdges)
+            .on('click', (ev, data) => {
+              ev.stopPropagation();
+              onClickEdges(ev, data);
+            })
             .call(forceEdgeDragBehavior, simulation)
             .call(classedByDict, {'selected': selectedEdges, 'hiddenState': hiddenEdges});
 
