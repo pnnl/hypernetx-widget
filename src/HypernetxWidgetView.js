@@ -226,7 +226,6 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
             onChangeTooltip(createTooltipData(ev, d.data.uid, {xOffset: d.r + 3, labels: nodeLabels, data: nodeData}))
           )
           .on('mouseout', (ev, d) => d.height === 0 && onChangeTooltip())
-          // .classed('internal', d => d.height > 0)
           .call(encodeProps, d => d.data.uid, {nodeFill, nodeStroke, nodeStrokeWidth})
           .call(classedByDict, {'selected': selectedNodes, 'hiddenState': hiddenNodes})
 
