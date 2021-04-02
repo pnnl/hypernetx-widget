@@ -5,7 +5,7 @@
 }
 
 .hnx-widget-view .nodes .internal {
-	fill-opacity: 0;
+	fill: white;
 }
 
 .hnx-widget-view .nodes circle:hover {

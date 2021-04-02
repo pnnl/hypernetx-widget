@@ -90,6 +90,10 @@ const forceMultiDragBehavior = (selection, simulation, elements, unpinned) => {
     }
 
     function unfix(event, d) {
+      if (event) {
+        event.stopPropagation();
+      }
+
       d.fx = undefined;
       d.fy = undefined;
     }
@@ -192,12 +196,19 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
     const groups = select(ele)
       .selectAll('g.group')
         .data(internals)
-          .join('g')
+          .join(enter => {
+            const g = enter.append('g');
+            g.append('circle').classed('internal', true);
+            return g;
+          })
             .classed('group', true)
             .call(forceMultiDragBehavior, simulation, selectedInternals, unpinned);
 
+    groups.select('circle.internal')
+      .attr('r', d => d.r);
+
     const circles = groups.selectAll('g')
-      .data(d => d.descendants())
+      .data(d => d.children)
         .join(
           enter => {
             const g = enter.append('g')
@@ -208,30 +219,24 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
             return g;
           }
         )
+          .attr('transform', d => `translate(${d.x}, ${d.y})`)
           .on('click', (ev, d) => ev.stopPropagation() || onClickNodes(ev, d))
           .on('mouseover', (ev, d) => 
             d.height === 0 &&
             onChangeTooltip(createTooltipData(ev, d.data.uid, {xOffset: d.r + 3, labels: nodeLabels, data: nodeData}))
           )
           .on('mouseout', (ev, d) => d.height === 0 && onChangeTooltip())
-          .classed('internal', d => d.height > 0)
+          // .classed('internal', d => d.height > 0)
           .call(encodeProps, d => d.data.uid, {nodeFill, nodeStroke, nodeStrokeWidth})
           .call(classedByDict, {'selected': selectedNodes, 'hiddenState': hiddenNodes})
 
     circles.select('circle.bottom')
-      .attr('cx', d => d.height === 0 ? d.x : 0)
-      .attr('cy', d => d.height === 0 ? d.y : 0)
       .attr('r', d => d.r);
 
     circles.select('circle.top')
-      .attr('cx', d => d.height === 0 ? d.x : 0)
-      .attr('cy', d => d.height === 0 ? d.y : 0)
       .attr('r', d => d.r);
 
     circles.select('text')
-      .attr('x', d => d.x)
-      .attr('y', d => d.y)
-      // .attr('dx', d => d.r + 7)
       .text(d => d.data.uid in nodeLabels ? nodeLabels[d.data.uid] : d.data.uid)
       .style('visibility', withNodeLabels ? undefined : 'hidden');
 
@@ -710,6 +715,7 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, h
           if (children.length > 0) {
             d.fx = mean(children, c => pos[c.data.uid][0]);
             d.fy = mean(children, c => pos[c.data.uid][1]);
+
             d.pinned = now();
           }
         }
