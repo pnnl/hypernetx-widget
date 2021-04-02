@@ -95,8 +95,6 @@ const forceMultiDragBehavior = (selection, simulation, elements, unpinned) => {
         event.stopPropagation();
       }
 
-      simulation.alphaTarget(0.3).restart();
-
       d.fx = undefined;
       d.fy = undefined;
     }
@@ -107,7 +105,10 @@ const forceMultiDragBehavior = (selection, simulation, elements, unpinned) => {
         unfix(undefined, d)
       }
     })
-    .on('dblclick', unfix)
+    .on('dblclick', (ev, d) => {
+      unfix(ev, d);
+      simulation.alphaTarget(0.3).restart();
+    })
     .call(drag()
       .on('start', dragstarted)
       .on('drag', dragged)
