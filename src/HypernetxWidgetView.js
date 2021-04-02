@@ -189,7 +189,7 @@ const classedByDict = (selection, props) =>
       selection.classed(className, d => dict[d.uid])
     )
 
-const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes={}, hiddenNodes, removedNodes, nodeLabels={}, unpinned, _model}) =>
+const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes={}, hiddenNodes, removedNodes, nodeLabels={}, unpinned, bipartite, _model}) =>
   <g className='nodes' ref={ele => {
     
     const selectedInternals = internals.filter(({children}) =>
@@ -205,6 +205,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
             return g;
           })
             .classed('group', true)
+            .classed('error', d => !bipartite && d.violations > 0)
             .call(forceMultiDragBehavior, simulation, selectedInternals, unpinned);
 
     groups.select('circle.internal')
@@ -258,7 +259,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
       groups
         .attr('transform', d => `translate(${d.x},${d.y})`)
         .classed('fixed', d => d.fx !== undefined)
-        .classed('error', d => d.violations > 0);
+        .classed('error', d => !bipartite && d.violations > 0);
 
       updateModel();
     });
@@ -656,7 +657,7 @@ const planarForce = (nodes, edges) => {
   return force;
 }
 
-export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, width=600, height=600, bipartite, ignorePlanarForce, pos={}, collapseNodes, ...props}) => {
+export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, width=600, height=600, ignorePlanarForce, pos={}, collapseNodes, ...props}) => {
   // const width = navOpen ? 600 : 800;
   const derivedProps = useMemo(
     () => {
@@ -748,6 +749,8 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, w
     [nodes, edges, removedNodes, removedEdges, collapseNodes]
   );
 
+  const {bipartite, unpinned} = props;
+
   const [simulation] = useState(forceSimulation());
 
   // re-initialize the simulation if certain variables have changed
@@ -781,7 +784,7 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, w
 
     return simulation;
 
-  }, [derivedProps, bipartite, width, height, props.unpinned]);
+  }, [derivedProps, bipartite, width, height, unpinned]);
 
   const [tooltip, setTooltip] = React.useState();
 
