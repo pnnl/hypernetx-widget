@@ -6,7 +6,6 @@ import './css/hnxStyle.css';
 import {rgbToHex} from "./functions";
 
 const ColorButton = ({ label, color, onEachColorChange }) => {
-  // console.log('color', color);
   const [paletteColor, setColor] = React.useState("#000000ff");
   const [palette, setPalette] = React.useState(false);
 
@@ -19,11 +18,8 @@ const ColorButton = ({ label, color, onEachColorChange }) => {
 
   const handleChangeColor = (label, color) => {
     const RGB = color.rgb;
-    // console.log("RGB", RGB);
     const rgbaStr = "rgba(" + RGB.r + ", " + RGB.g + ", " + RGB.b + ", " + RGB.a + ")";
-    // console.log("rgbaStr", rgbaStr);
     onEachColorChange(label, rgbaStr);
-    // console.log(rgbToHex(rgbaStr));
     setColor(rgbToHex(rgbaStr));
   }
 
