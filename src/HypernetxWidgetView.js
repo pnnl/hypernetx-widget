@@ -311,7 +311,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
     groups.select('path')
       .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth});
 
-    groups.select('text')
+    groups.select('.label text')
       .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
 
     groups.select('g.label')
@@ -390,24 +390,18 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
 
       if (edgeLabelStyle === 'callout') {
 
-        const mx = d => d.markerLocation[0];
-        const my = d => d.markerLocation[1];
+        groups.select('g.label')
+          .attr('transform', d => `translate(${d.markerLocation[0]},${d.markerLocation[1]})`);
 
-
-        groups.select('circle')
-          .attr('cx', mx)
-          .attr('cy', my)
+        groups.select('.label circle')
           .attr('r', 3);
 
-        groups.select('rect')
-          .attr('x', mx)
-          .attr('y', d => my(d) - .75)
+        groups.select('.label rect')
+          .attr('y', d => -1)
           .attr('width', dx)
-          .attr('height', 1.5);
+          .attr('height', 2);
 
-        groups.select('text')
-          .attr('x', mx)
-          .attr('y', my)
+        groups.select('.label text')
           .attr('dx', dx + 2)
           .style('text-anchor', 'start');
 
