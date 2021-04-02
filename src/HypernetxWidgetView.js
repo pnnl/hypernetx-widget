@@ -95,6 +95,8 @@ const forceMultiDragBehavior = (selection, simulation, elements, unpinned) => {
         event.stopPropagation();
       }
 
+      simulation.alphaTarget(0.3).restart();
+
       d.fx = undefined;
       d.fy = undefined;
     }
