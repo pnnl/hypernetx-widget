@@ -777,12 +777,19 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, h
     onChangeTooltip: handleTooltip
   };
 
+  const {onClickNodes=Object, onClickEdges=Object} = props;
+
+  const handleClearSelection = ev => {
+    onClickNodes(ev);
+    onClickEdges(ev);
+  }
+
   return <div className='hnx-widget-view'>
     { tooltip &&
       <Tooltip {...tooltip} />
     }
 
-    <svg style={{width, height}}>
+    <svg style={{width, height}} onClick={handleClearSelection}>
 
       <defs>
           <pattern id="checkerboard" patternUnits="userSpaceOnUse" 
