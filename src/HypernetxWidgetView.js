@@ -266,27 +266,25 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
     const groups = select(ele)
       .selectAll('g')
         .data(edges)
-          .join(enter => {
-            const g = enter.append('g')
-              .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
+          .join(
+            enter => {
+              const g = enter.append('g');
 
-            g.append('path')
-              .attr('stroke', 'black');
+              g.append('path')
+                .attr('stroke', 'black');
 
-            if (edgeLabelStyle === 'callout') {
-              g.append('rect')
+              if (edgeLabelStyle === 'callout') {
+                g.append('rect')
+              }
+
+              g.append('circle');
+
+              g.append('text');
+
+              return g;
             }
-
-            g.append('circle');
-
-            g.append('text')
-              .attr('x', dx)
-              .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid);
-
-
-
-            return g;
-          })
+          )
+            .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black')
             .on('mouseover', (ev, d) => 
               onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
             )
@@ -295,10 +293,13 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
             .call(forceEdgeDragBehavior, simulation)
             .call(classedByDict, {'selected': selectedEdges, 'hiddenState': hiddenEdges});
 
+
     groups.select('path')
       .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth});
 
     groups.select('text')
+      .attr('x', dx)
+      .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
       .style('visibility', withEdgeLabels ? undefined : 'hidden');
 
     const xValue = d => d[0];
