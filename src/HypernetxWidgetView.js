@@ -273,22 +273,24 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
       });
 
     const groups = select(ele)
-      .selectAll('g')
+      .selectAll('g.edge')
         .data(edges)
           .join(
             enter => {
-              const g = enter.append('g');
+              const g = enter.append('g').classed('edge', true);
 
               g.append('path')
                 .attr('stroke', 'black');
 
+              const gLabel = g.append('g').classed('label', true);
+
               if (edgeLabelStyle === 'callout') {
-                g.append('rect')
+                gLabel.append('rect')
               }
 
-              g.append('circle');
+              gLabel.append('circle');
 
-              g.append('text');
+              gLabel.append('text');
 
               return g;
             }
@@ -312,11 +314,8 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
     groups.select('text')
       .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
 
-    const edgeVisibility = withEdgeLabels ? undefined : 'hidden';
-    for (let v of ['rect', 'text', 'circle']) {
-      groups.select(v)
-        .style('visibility', edgeVisibility);
-    }
+    groups.select('g.label')
+      .style('visibility', withEdgeLabels ? undefined : 'hidden');
 
     const xValue = d => d[0];
     const yValue = d => d[1];
