@@ -4,20 +4,19 @@
 	stroke-dasharray: 6,3;
 }
 
+.hnx-widget-view .nodes {
+	cursor: pointer;
+}
+
 .hnx-widget-view .nodes .internal {
 	fill: white;
 }
 
-.hnx-widget-view .nodes circle:hover {
-	stroke: black;
-	stroke-width: 2;
-	fill: white;
-}
-
-.hnx-widget-view .nodes .selected circle {
+.hnx-widget-view .nodes g:hover circle.bottom,
+.hnx-widget-view .nodes .selected circle.bottom {
 	stroke: black;
 	stroke-width: 4;
-	fill: white;
+	fill-opacity: .125;
 }
 
 .hnx-widget-view .nodes .top {
