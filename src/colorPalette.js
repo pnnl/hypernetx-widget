@@ -16,24 +16,43 @@ const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
     // minWidth: 120,
-    paddingLeft: "15px"
+    paddingLeft: "15px",
+
   },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
+  // selectEmpty: {
+  //   marginTop: theme.spacing(2),
+  // },
   customSelect: {
     // paddingLeft: "15px",
     paddingRight:"5px",
     "& .MuiSelect-root": {
-      // width: 100,
-
+      width: 100,
     },
+    "& .MuiFormLabel-root":{
+      fontSize: "15px"
+    }
   },
   colorItem: {
+    // height: '5px',
     "& .MuiSelect-root": {
-      minWidth: 150,
       width: 200,
     },
+
+    "& .MuiSelect-selectMenu": {
+
+    },
+
+    "& .MuiFormLabel-root":{
+      fontSize: "15px"
+    }
+  },
+  menuItem: {
+    // "& .MuiMenuItem-root": {
+    //   padding: "0px",
+    paddingLeft: "2px",
+    paddingRight: "2px",
+    whiteSpace: "normal",
+    // },
   }
 }));
 
@@ -47,7 +66,7 @@ const ColorPalette = ({type, data, defaultColors, onPaletteChange, currGroup, cu
   const [palette, setPalette] = React.useState(currPalette);
   // const [type, setType] = React.useState(currType);
   // const [paletteColor, setColor] = React.useState("#000000");
-  const [paletteOpen, setPaletteOpen] = React.useState(false);
+  // const [paletteOpen, setPaletteOpen] = React.useState(false);
 
   const handlePalette = event => {
     setPalette(event.target.value);
@@ -154,8 +173,8 @@ const ColorPalette = ({type, data, defaultColors, onPaletteChange, currGroup, cu
         <FormControl classes={{root: classes.colorItem}}>
           <InputLabel>Color palette</InputLabel>
           <Select value={palette} onChange={handlePalette}>
-            <MenuItem value={"default"}>Default</MenuItem>
-            {allPalettes.map(c => <MenuItem key={c} value={c}>
+            <MenuItem classes={{root: classes.menuItem}} value={"default"}>Default</MenuItem>
+            {allPalettes.map(c => <MenuItem key={c} classes={{root: classes.menuItem}} value={c}>
                 <Colorscale onClick={() => {}}
                   colorscale={getColorArray(c)} maxWidth={80} label={c}
                 />

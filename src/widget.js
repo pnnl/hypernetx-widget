@@ -207,7 +207,6 @@ const Widget = ({ nodes, edges, ...props }) => {
       else{
         setSelectedNodes({});
       }
-
     }
   }
 
@@ -217,12 +216,17 @@ const Widget = ({ nodes, edges, ...props }) => {
       setSelectedEdges({...selectedEdges, [data.uid]: !selectedEdges[data.uid]});
     }
     else{
-      Object.entries(createDefaultState(edges, false)).map(d => {
-        if(d[0] === data.uid){
-          newEdgeSelect.set(d[0], true)
-        }
-      })
-      setSelectedEdges(Object.fromEntries(newEdgeSelect));
+      if(data !== undefined){
+        Object.entries(createDefaultState(edges, false)).map(d => {
+          if(d[0] === data.uid){
+            newEdgeSelect.set(d[0], true)
+          }
+        })
+        setSelectedEdges(Object.fromEntries(newEdgeSelect));
+      }
+      else{
+        setSelectedEdges({});
+      }
     }
   }
 
