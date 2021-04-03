@@ -4,12 +4,9 @@ import { VictoryBar, VictoryChart, VictoryAxis, VictorySelectionContainer } from
 import {Button} from "@material-ui/core";
 
 const Bars = ({ type, freqData, onValueChange }) => {
-    const [filterVal, setFilterVal] = React.useState([]);
-
-
+  const [filterVal, setFilterVal] = React.useState([]);
   const maxVal = max(freqData.map(d => d.x));
   const handleBrush = points => {
-      // console.log(points);
       onValueChange(points.data.map(d => d.x), type);
       setFilterVal(points.data.map(d => d.x));
   }

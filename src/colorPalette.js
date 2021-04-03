@@ -26,21 +26,25 @@ const useStyles = makeStyles((theme) => ({
     // paddingLeft: "15px",
     paddingRight:"5px",
     "& .MuiSelect-root": {
-      width: 100,
+      width: 55,
+    },
+    "& .MuiSelect-selectMenu": {
+      overflow: 'visible',
     },
     "& .MuiFormLabel-root":{
       fontSize: "15px"
     }
   },
   colorItem: {
-    // height: '5px',
     "& .MuiSelect-root": {
-      width: 200,
+      width: 230,
     },
 
-    "& .MuiSelect-selectMenu": {
-
-    },
+    // "& .MuiSelect-selectMenu": {
+    //   // whiteSpace: "normal",
+    //   height: 'fit-content'
+    //
+    // },
 
     "& .MuiFormLabel-root":{
       fontSize: "15px"
@@ -176,7 +180,7 @@ const ColorPalette = ({type, data, defaultColors, onPaletteChange, currGroup, cu
             <MenuItem classes={{root: classes.menuItem}} value={"default"}>Default</MenuItem>
             {allPalettes.map(c => <MenuItem key={c} classes={{root: classes.menuItem}} value={c}>
                 <Colorscale onClick={() => {}}
-                  colorscale={getColorArray(c)} maxWidth={80} label={c}
+                  colorscale={getColorArray(c)} label={c}
                 />
               </MenuItem>)}
           </Select>

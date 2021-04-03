@@ -53,9 +53,9 @@ const Toolbar = ({ dataType, selectionState, onSelectionChange }) => {
 
     return(
       <div style={{ paddingRight: "7px",}}>
-          {/*<div style={{fontFamily: "Arial", fontSize: "14px", paddingBottom: "5px"}}>*/}
-          {/*    {dataType === "node" ? "Nodes" : "Edges "}*/}
-          {/*</div>*/}
+          <div style={{fontFamily: "Arial", fontSize: "14px", paddingBottom: "5px"}}>
+              {dataType === "node" ? "Nodes" : "Edges "}
+          </div>
           <ToggleButtonGroup
             size={"small"}
             classes={{root: classes.toggleButton}}
@@ -86,6 +86,14 @@ const Toolbar = ({ dataType, selectionState, onSelectionChange }) => {
                       <BubbleChartIcon />
                   </Tooltip>
               </ToggleButton>
+
+              {dataType === "node" &&
+                  <ToggleButton value={"pin"}>
+                      <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Pin all</div>}>
+                          <LocationOnIcon/>
+                      </Tooltip>
+                  </ToggleButton>
+              }
 
               {dataType === "node" &&
                 <ToggleButton value={"unpin"}>
