@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react'
+import React, {useState, useMemo} from 'react'
 
 import {debounce, throttle} from 'lodash'
 
@@ -38,6 +38,7 @@ const forceMultiDragBehavior = (selection, simulation, elements, unpinned) => {
     const [width, height] = simulation.size;
 
     function dragstarted(event) {
+      simulation.alphaTarget(0.3).restart();
 
       // subject.x, subject.y is the location of node
       const {x, y, uid} = event.subject;
@@ -52,21 +53,20 @@ const forceMultiDragBehavior = (selection, simulation, elements, unpinned) => {
         d.dy = d.y - y;
       });
 
+      const dr = 5; // TODO: fix dr hard coding
+
       event.subject.dxRange = [
-        min(elements, d => d.dx - d.r),
-        max(elements, d => d.dx + d.r)
+        min(elements, ({numBands=-1, dx, r}) => dx - r - dr*(1 + numBands)),
+        max(elements, ({numBands=-1, dx, r}) => dx + r + dr*(1 + numBands))
       ];
 
-
       event.subject.dyRange = [
-        min(elements, d => d.dy - d.r),
-        max(elements, d => d.dy + d.r)
+        min(elements, ({numBands=-1, dy, r}) => dy - r - dr*(1 + numBands)),
+        max(elements, ({numBands=-1, dy, r}) => dy + r + dr*(1 + numBands))
       ];
     }
 
     function dragged(event) {
-
-      simulation.alphaTarget(0.3).restart();
 
       // event.x, event.y is the location of the drag
       const {dx, dy, dxRange, dyRange} = event.subject;
@@ -86,10 +86,14 @@ const forceMultiDragBehavior = (selection, simulation, elements, unpinned) => {
     }
 
     function dragended(event) {
-      if (!event.active) simulation.alphaTarget(0);
+      simulation.alphaTarget(0);
     }
 
     function unfix(event, d) {
+      if (event) {
+        event.stopPropagation();
+      }
+
       d.fx = undefined;
       d.fy = undefined;
     }
@@ -100,7 +104,10 @@ const forceMultiDragBehavior = (selection, simulation, elements, unpinned) => {
         unfix(undefined, d)
       }
     })
-    .on('dblclick', unfix)
+    .on('dblclick', (ev, d) => {
+      unfix(ev, d);
+      simulation.alpha(0.3).restart();
+    })
     .call(drag()
       .on('start', dragstarted)
       .on('drag', dragged)
@@ -112,6 +119,7 @@ const forceEdgeDragBehavior = (selection, simulation) => {
     const [width, height] = simulation.size;
 
     function dragstarted(event) {
+      simulation.alphaTarget(0.3).restart();
 
       // subject.x, subject.y is the location of node
       const {x, y, elements} = event.subject;
@@ -135,7 +143,6 @@ const forceEdgeDragBehavior = (selection, simulation) => {
     }
 
     function dragged(event) {
-      simulation.alphaTarget(0.3).restart();
 
       // event.x, event.y is the location of the drag
       const {dx, dy, elements, dxRange, dyRange} = event.subject;
@@ -155,7 +162,7 @@ const forceEdgeDragBehavior = (selection, simulation) => {
     }
 
     function dragended(event) {
-      if (!event.active) simulation.alphaTarget(0);
+      simulation.alphaTarget(0);
     }
 
   selection
@@ -182,7 +189,7 @@ const classedByDict = (selection, props) =>
       selection.classed(className, d => dict[d.uid])
     )
 
-const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes={}, hiddenNodes, removedNodes, nodeLabels={}, unpinned, _model}) =>
+const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes={}, hiddenNodes, removedNodes, nodeLabels={}, unpinned, bipartite, _model}) =>
   <g className='nodes' ref={ele => {
     
     const selectedInternals = internals.filter(({children}) =>
@@ -192,12 +199,20 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
     const groups = select(ele)
       .selectAll('g.group')
         .data(internals)
-          .join('g')
+          .join(enter => {
+            const g = enter.append('g');
+            g.append('circle').classed('internal', true);
+            return g;
+          })
             .classed('group', true)
+            .classed('error', d => !bipartite && d.violations > 0)
             .call(forceMultiDragBehavior, simulation, selectedInternals, unpinned);
 
+    groups.select('circle.internal')
+      .attr('r', d => d.r);
+
     const circles = groups.selectAll('g')
-      .data(d => d.descendants())
+      .data(d => d.children)
         .join(
           enter => {
             const g = enter.append('g')
@@ -208,30 +223,23 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
             return g;
           }
         )
+          .attr('transform', d => `translate(${d.x}, ${d.y})`)
           .on('click', (ev, d) => ev.stopPropagation() || onClickNodes(ev, d))
           .on('mouseover', (ev, d) => 
             d.height === 0 &&
             onChangeTooltip(createTooltipData(ev, d.data.uid, {xOffset: d.r + 3, labels: nodeLabels, data: nodeData}))
           )
           .on('mouseout', (ev, d) => d.height === 0 && onChangeTooltip())
-          .classed('internal', d => d.height > 0)
           .call(encodeProps, d => d.data.uid, {nodeFill, nodeStroke, nodeStrokeWidth})
           .call(classedByDict, {'selected': selectedNodes, 'hiddenState': hiddenNodes})
 
     circles.select('circle.bottom')
-      .attr('cx', d => d.height === 0 ? d.x : 0)
-      .attr('cy', d => d.height === 0 ? d.y : 0)
       .attr('r', d => d.r);
 
     circles.select('circle.top')
-      .attr('cx', d => d.height === 0 ? d.x : 0)
-      .attr('cy', d => d.height === 0 ? d.y : 0)
       .attr('r', d => d.r);
 
     circles.select('text')
-      .attr('x', d => d.x)
-      .attr('y', d => d.y)
-      // .attr('dx', d => d.r + 7)
       .text(d => d.data.uid in nodeLabels ? nodeLabels[d.data.uid] : d.data.uid)
       .style('visibility', withNodeLabels ? undefined : 'hidden');
 
@@ -246,10 +254,12 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
     }, 1000);
 
     simulation.on('tick.nodes', d => {
+      // throttledConsole('ticking', simulation.alpha(), simulation.alphaTarget());
+
       groups
         .attr('transform', d => `translate(${d.x},${d.y})`)
         .classed('fixed', d => d.fx !== undefined)
-        .classed('error', d => d.violations > 0);
+        .classed('error', d => !bipartite && d.violations > 0);
 
       updateModel();
     });
@@ -264,41 +274,48 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
       });
 
     const groups = select(ele)
-      .selectAll('g')
+      .selectAll('g.edge')
         .data(edges)
-          .join(enter => {
-            const g = enter.append('g')
-              .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black');
+          .join(
+            enter => {
+              const g = enter.append('g').classed('edge', true);
 
-            g.append('path')
-              .attr('stroke', 'black');
+              g.append('path')
+                .attr('stroke', 'black');
 
-            if (edgeLabelStyle === 'callout') {
-              g.append('rect')
+              const gLabel = g.append('g').classed('label', true);
+
+              if (edgeLabelStyle === 'callout') {
+                gLabel.append('rect')
+              }
+
+              gLabel.append('circle');
+
+              gLabel.append('text');
+
+              return g;
             }
-
-            g.append('circle');
-
-            g.append('text')
-              .attr('x', dx)
-              .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid);
-
-
-
-            return g;
-          })
+          )
+            .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black')
             .on('mouseover', (ev, d) => 
               onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
             )
             .on('mouseout', () => onChangeTooltip())
-            .on('click', onClickEdges)
+            .on('click', (ev, data) => {
+              ev.stopPropagation();
+              onClickEdges(ev, data);
+            })
             .call(forceEdgeDragBehavior, simulation)
             .call(classedByDict, {'selected': selectedEdges, 'hiddenState': hiddenEdges});
+
 
     groups.select('path')
       .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth});
 
-    groups.select('text')
+    groups.select('.label text')
+      .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
+
+    groups.select('g.label')
       .style('visibility', withEdgeLabels ? undefined : 'hidden');
 
     const xValue = d => d[0];
@@ -374,24 +391,18 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
 
       if (edgeLabelStyle === 'callout') {
 
-        const mx = d => d.markerLocation[0];
-        const my = d => d.markerLocation[1];
+        groups.select('g.label')
+          .attr('transform', d => `translate(${d.markerLocation[0]},${d.markerLocation[1]})`);
 
-
-        groups.select('circle')
-          .attr('cx', mx)
-          .attr('cy', my)
+        groups.select('.label circle')
           .attr('r', 3);
 
-        groups.select('rect')
-          .attr('x', mx)
-          .attr('y', d => my(d) - .75)
+        groups.select('.label rect')
+          .attr('y', d => -1)
           .attr('width', dx)
-          .attr('height', 1.5);
+          .attr('height', 2);
 
-        groups.select('text')
-          .attr('x', mx)
-          .attr('y', my)
+        groups.select('.label text')
           .attr('dx', dx + 2)
           .style('text-anchor', 'start');
 
@@ -646,7 +657,7 @@ const planarForce = (nodes, edges) => {
   return force;
 }
 
-export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, width=600, height=600, bipartite, ignorePlanarForce, pos={}, collapseNodes, ...props}) => {
+export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, width=600, height=600, ignorePlanarForce, pos={}, collapseNodes, ...props}) => {
   // const width = navOpen ? 600 : 800;
   const derivedProps = useMemo(
     () => {
@@ -709,6 +720,7 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, w
           if (children.length > 0) {
             d.fx = mean(children, c => pos[c.data.uid][0]);
             d.fy = mean(children, c => pos[c.data.uid][1]);
+
             d.pinned = now();
           }
         }
@@ -737,21 +749,32 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, w
     [nodes, edges, removedNodes, removedEdges, collapseNodes]
   );
 
-  const simulation = useMemo(() => {
+  const {bipartite, unpinned} = props;
+
+  const [simulation] = useState(forceSimulation());
+
+  // re-initialize the simulation if certain variables have changed
+  useMemo(() => {
     const {links, edges, internals} = derivedProps;
 
+    const {dr=5} = props; // TODO: fix dr hard coding
+
     function boundNode(d) {
-      const {r=0} = d;
-      d.x = Math.max(r, Math.min(width - r, d.x));
-      d.y = Math.max(r, Math.min(height - r, d.y));
+      const {r=0, numBands=-1} = d;
+      const drMax = (numBands + 1)*dr
+
+      d.x = Math.max(r + drMax, Math.min(width - r - drMax, d.x));
+      d.y = Math.max(r + drMax, Math.min(height - r - drMax, d.y));
     }
 
-    let simulation = forceSimulation([...internals, ...edges])
+    simulation.nodes([...internals, ...edges])
       .force('charge', forceManyBody().strength(-150).distanceMax(300))
       .force('link', forceLink(links).distance(30))
       .force('center', forceCenter(width/2, height/2))
       .force('collide', forceCollide().radius(d => 2*d.r || 0))
-      .force('bound', () => simulation.nodes().forEach(boundNode));
+      .force('bound', () => simulation.nodes().forEach(boundNode))
+      .alpha(1)
+      .restart();
 
     if (!bipartite && !ignorePlanarForce) {
       simulation.force('planar', planarForce(internals, edges));
@@ -761,7 +784,7 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, w
 
     return simulation;
 
-  }, [derivedProps, bipartite, width, height, props.unpinned]);
+  }, [derivedProps, bipartite, width, height, unpinned]);
 
   const [tooltip, setTooltip] = React.useState();
 
@@ -776,12 +799,19 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, w
     onChangeTooltip: handleTooltip
   };
 
+  const {onClickNodes=Object, onClickEdges=Object} = props;
+
+  const handleClearSelection = ev => {
+    onClickNodes(ev);
+    onClickEdges(ev);
+  }
+
   return <div className='hnx-widget-view'>
     { tooltip &&
       <Tooltip {...tooltip} />
     }
 
-    <svg style={{width, height}}>
+    <svg style={{width, height}} onClick={handleClearSelection}>
 
       <defs>
           <pattern id="checkerboard" patternUnits="userSpaceOnUse" 
