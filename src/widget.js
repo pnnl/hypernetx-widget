@@ -14,6 +14,8 @@ import Bars from './bars.js';
 import { hexToHsv, rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianStyles } from './functions.js';
 import Toolbar from "./toolbar";
 import Switches from "./switches";
+import FontSizeMenu from "./fontSizeMenu";
+import {create, selection} from "d3-selection";
 
 const createDefaultState = (data, defaultValue) => {
   const mapObj = new Map();
@@ -21,7 +23,6 @@ const createDefaultState = (data, defaultValue) => {
   return Object.fromEntries(mapObj)
 }
 
-// console.log(hexToHsv('#000000ff'));
 const Widget = ({ nodes, edges, ...props }) => {
   // console.log("props", props);
   const classes = accordianStyles();
@@ -49,6 +50,10 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [hiddenEdges, setHiddenEdges] = React.useState(props.edgeHidden || {});
   const [removedEdges, setRemovedEdges] = React.useState(props.edgeRemoved || {});
 
+  const [nodeFontSize, setNodeFontSize] = React.useState(createDefaultState(nodes, 16));
+  const [edgeFontSize, setEdgeFontSize] = React.useState(createDefaultState(edges, 16));
+
+  const [pinned, setPinned] = React.useState(false);
   const [unpinned, setUnpinned] = React.useState(now());
 
   // update the python model with state
@@ -183,6 +188,7 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const [colGroup, setColGroup] = React.useState({node: "degree/size", edge: "degree/size"});
   const [colPalette, setColPalette] = React.useState({node: "default", edge: "default"});
+  const [fontSize, setFontSize] = React.useState({node: 16, edge: 16});
   // const [colType, setColType] = React.useState("node");
   const handleCurrData = (group, palette, dataType) => {
     setColGroup({...colGroup, [dataType]:group});
@@ -291,11 +297,14 @@ const Widget = ({ nodes, edges, ...props }) => {
   const handleToolbarSelection = (dataType, selectionType) => {
     if(selectionType === "hidden"){
       handleHideSelected(dataType);
+      setPinned(false);
     }
     else if(selectionType === "removed"){
       handleRemoveSelected(dataType);
+      setPinned(false);
     }
     else if(selectionType === "other"){
+      setPinned(false);
       if(dataType === "node"){
         handleOtherSelect("edges in nodes");
       }
@@ -304,6 +313,7 @@ const Widget = ({ nodes, edges, ...props }) => {
       }
     }
     else if(selectionType === "all"){
+      setPinned(false);
       if(dataType === "node"){
         setSelectedNodes(createDefaultState(nodes, true));
       }
@@ -313,6 +323,7 @@ const Widget = ({ nodes, edges, ...props }) => {
       }
     }
     else if(selectionType === "none"){
+      setPinned(false);
       if(dataType === "node"){
         setSelectedNodes({});
       }
@@ -321,9 +332,14 @@ const Widget = ({ nodes, edges, ...props }) => {
       }
     }
     else if(selectionType === "unpin"){
+      setPinned(false);
       setUnpinned(now());
     }
+    else if(selectionType === "pin"){
+      setPinned(true);
+    }
     else if(selectionType === "reverse"){
+      setPinned(false);
       if(dataType === "node"){
         const currSelectedNodes = {...selectedNodes};
         const uids = nodes.map(d => d.uid);
@@ -342,6 +358,7 @@ const Widget = ({ nodes, edges, ...props }) => {
       }
     }
     else{
+      setPinned(false);
       handleOriginal(dataType);
     }
   }
@@ -378,6 +395,17 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   }
 
+  const handleFontSize = (type, size) => {
+    if(type === 'node'){
+      setNodeFontSize(createDefaultState(nodes, size));
+      setFontSize({...fontSize, [type]:size})
+    }
+    else{
+      setEdgeFontSize(createDefaultState(edges, size));
+      setFontSize({...fontSize, [type]: size})
+    }
+  }
+
   return <div>
     <Grid container spacing={1}>
       <Grid item xs={12} sm={4} >
@@ -395,7 +423,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               </AccordionSummary>
               <AccordionDetails>
                 <div style={{width: "100%"}}>
-                  <Toolbar dataType={"node"} selectionState={selectedNodes} onSelectionChange={handleToolbarSelection}/>
+                  {/*<Toolbar dataType={"node"} selectionState={selectedNodes} onSelectionChange={handleToolbarSelection}/>*/}
 
                   <LoadTable
                     type={"node"}
@@ -412,6 +440,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                                 onPaletteChange={handlePaletteChange}
                                 currGroup={colGroup.node} currPalette={colPalette.node} onCurrDataChange={handleCurrData}
                   />
+                  <FontSizeMenu type={"node"} currSize={fontSize} onSizeChange={handleFontSize}/>
                   <Switches dataType={"node"} onSwitchChange={handleSwitch}/>
                 </div>
 
@@ -423,7 +452,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               </AccordionSummary>
               <AccordionDetails>
                 <div style={{width: "100%"}}>
-                  <Toolbar dataType={"edge"} selectionState={selectedEdges} onSelectionChange={handleToolbarSelection}/>
+                  {/*<Toolbar dataType={"edge"} selectionState={selectedEdges} onSelectionChange={handleToolbarSelection}/>*/}
                   <LoadTable
                     type={"edge"}
                     data={transEdgeData}
@@ -440,6 +469,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                                 onPaletteChange={handlePaletteChange}
                                 currGroup={colGroup.edge} currPalette={colPalette.edge} onCurrDataChange={handleCurrData}
                   />
+                  <FontSizeMenu type={"edge"} currSize={fontSize} onSizeChange={handleFontSize}/>
                   <Switches dataType={"edge"} onSwitchChange={handleSwitch}/>
                 </div>
               </AccordionDetails>
@@ -449,17 +479,17 @@ const Widget = ({ nodes, edges, ...props }) => {
 
     <Grid item xs={12}  sm={8}>
     {/*<Grid item xs={12} sm={navOpen && 8}>*/}
-    {/*  <div>*/}
-    {/*    <div style={{ display: "flex", justifyContent: "flex-start", flexFlow: "row wrap"}}>*/}
-    {/*        <Toolbar dataType={"node"} selectionState={selectedNodes} onSelectionChange={handleToolbarSelection}/>*/}
-    {/*        <Toolbar dataType={"edge"} selectionState={selectedEdges} onSelectionChange={handleToolbarSelection}/>*/}
-    {/*    </div>*/}
-      {/*</div>*/}
+      <div>
+        <div style={{ display: "flex", justifyContent: "flex-start", flexFlow: "row wrap"}}>
+            <Toolbar dataType={"node"} selectionState={selectedNodes} onSelectionChange={handleToolbarSelection}/>
+            <Toolbar dataType={"edge"} selectionState={selectedEdges} onSelectionChange={handleToolbarSelection}/>
+        </div>
+      </div>
 
       <HypernetxWidgetView
         {...props}
         {...{nodes, edges, nodeFill, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges,
-          withNodeLabels, withEdgeLabels, collapseNodes, bipartite, unpinned}}
+          withNodeLabels, withEdgeLabels, collapseNodes, bipartite, unpinned, nodeFontSize, edgeFontSize, pinned}}
         onClickNodes={getClickedNodes} onClickEdges={getClickedEdges}
         />
     </Grid>
