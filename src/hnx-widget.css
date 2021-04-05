@@ -21,7 +21,7 @@
 .hnx-widget-view .nodes .selected circle.bottom {
 	stroke: black;
 	stroke-width: 4;
-	fill-opacity: 2;
+	fill-opacity: .2;
 }
 
 .hnx-widget-view .nodes .selected {
