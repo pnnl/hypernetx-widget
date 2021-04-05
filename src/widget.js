@@ -50,8 +50,8 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [hiddenEdges, setHiddenEdges] = React.useState(props.edgeHidden || {});
   const [removedEdges, setRemovedEdges] = React.useState(props.edgeRemoved || {});
 
-  const [nodeFontSize, setNodeFontSize] = React.useState(createDefaultState(nodes, 16));
-  const [edgeFontSize, setEdgeFontSize] = React.useState(createDefaultState(edges, 16));
+  const [nodeFontSize, setNodeFontSize] = React.useState(createDefaultState(nodes, 12));
+  const [edgeFontSize, setEdgeFontSize] = React.useState(createDefaultState(edges, 12));
 
   const [pinned, setPinned] = React.useState(false);
   const [unpinned, setUnpinned] = React.useState(now());
@@ -188,7 +188,7 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const [colGroup, setColGroup] = React.useState({node: "degree/size", edge: "degree/size"});
   const [colPalette, setColPalette] = React.useState({node: "default", edge: "default"});
-  const [fontSize, setFontSize] = React.useState({node: 16, edge: 16});
+  const [fontSize, setFontSize] = React.useState({node: 12, edge: 12});
   // const [colType, setColType] = React.useState("node");
   const handleCurrData = (group, palette, dataType) => {
     setColGroup({...colGroup, [dataType]:group});
@@ -405,6 +405,18 @@ const Widget = ({ nodes, edges, ...props }) => {
       setFontSize({...fontSize, [type]: size})
     }
   }
+  const [openAccordian, setOpenAccordian] = React.useState({node: true, edge: false});
+  const handleAccordian = (e, expanded, type) => {
+    const currAccordian = {...openAccordian};
+    currAccordian[type] = expanded;
+    if(type === 'node'){
+      currAccordian['edge'] = !currAccordian['edge']
+    }
+    else{
+      currAccordian['node'] = !currAccordian['node']
+    }
+    setOpenAccordian(currAccordian);
+  }
 
   return <div>
     <Grid container spacing={1}>
@@ -417,7 +429,7 @@ const Widget = ({ nodes, edges, ...props }) => {
         {/*  </div>*/}
         {/*</div>*/}
           <div className={classes.root}>
-            <Accordion>
+            <Accordion expanded={openAccordian['node']} onChange={(e, expanded) => handleAccordian(e, expanded, "node")}>
               <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}} />} >
                 <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Nodes" + " (" +  String(nodes.length) + ")"}</Typography>
               </AccordionSummary>
@@ -446,7 +458,7 @@ const Widget = ({ nodes, edges, ...props }) => {
 
               </AccordionDetails>
             </Accordion>
-            <Accordion>
+            <Accordion expanded={openAccordian['edge']} onChange={(e, expanded) => handleAccordian(e, expanded, "edge")}>
               <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}} />} >
                 <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Edges" + " (" +  String(edges.length) + ")"}</Typography>
               </AccordionSummary>
