@@ -405,7 +405,18 @@ const Widget = ({ nodes, edges, ...props }) => {
       setFontSize({...fontSize, [type]: size})
     }
   }
-
+  const [openAccordian, setOpenAccordian] = React.useState({node: true, edge: false});
+  const handleAccordian = (e, expanded, type) => {
+    const currAccordian = {...openAccordian};
+    currAccordian[type] = expanded;
+    if(type === 'node'){
+      currAccordian['edge'] = !currAccordian['edge']
+    }
+    else{
+      currAccordian['node'] = !currAccordian['node']
+    }
+    setOpenAccordian(currAccordian);
+  }
   return <div>
     <Grid container spacing={1}>
       <Grid item xs={12} sm={4} >
@@ -417,7 +428,7 @@ const Widget = ({ nodes, edges, ...props }) => {
         {/*  </div>*/}
         {/*</div>*/}
           <div className={classes.root}>
-            <Accordion>
+            <Accordion expanded={openAccordian['node']} onChange={(e, expanded) => handleAccordian(e, expanded, "node")}>
               <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}} />} >
                 <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Nodes" + " (" +  String(nodes.length) + ")"}</Typography>
               </AccordionSummary>
@@ -446,7 +457,7 @@ const Widget = ({ nodes, edges, ...props }) => {
 
               </AccordionDetails>
             </Accordion>
-            <Accordion>
+            <Accordion expanded={openAccordian['edge']} onChange={(e, expanded) => handleAccordian(e, expanded, "edge")}>
               <AccordionSummary expandIcon={<ExpandMoreIcon style={{fontSize: "20px"}} />} >
                 <Typography style={{fontSize: "14px", fontWeight: "bold"}}>{"Edges" + " (" +  String(edges.length) + ")"}</Typography>
               </AccordionSummary>
