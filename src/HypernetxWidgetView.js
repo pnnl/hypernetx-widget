@@ -34,6 +34,13 @@ const encodeProps = (selection, key, props) => {
   })
 }
 
+const createHandleSelection = callback => (ev, data) => {
+  if (!(ev.ctrlKey || ev.metaKey)) {
+    ev.stopPropagation();
+    callback(ev, data);
+  }
+}
+
 const forceMultiDragBehavior = (selection, simulation, elements, unpinned) => {
     const [width, height] = simulation.size;
 
@@ -91,7 +98,8 @@ const forceMultiDragBehavior = (selection, simulation, elements, unpinned) => {
 
     function unfix(event, d) {
       if (event) {
-        event.stopPropagation();
+        // event.stopPropagation();
+        event.preventDefault();
       }
 
       d.fx = undefined;
@@ -104,9 +112,12 @@ const forceMultiDragBehavior = (selection, simulation, elements, unpinned) => {
         unfix(undefined, d)
       }
     })
-    .on('dblclick', (ev, d) => {
-      unfix(ev, d);
-      simulation.alpha(0.3).restart();
+    .on('click.force', (ev, d) => {
+      if ((ev.ctrlKey || ev.metaKey) && d.fx !== undefined) {
+        ev.stopPropagation();
+        unfix(ev, d);
+        simulation.alpha(0.3).restart();
+      }
     })
     .call(drag()
       .on('start', dragstarted)
@@ -189,7 +200,7 @@ const classedByDict = (selection, props) =>
       selection.classed(className, d => dict[d.uid])
     )
 
-const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes={}, hiddenNodes, removedNodes, nodeLabels={}, unpinned, bipartite, _model}) =>
+const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes={}, hiddenNodes, removedNodes, nodeLabels={}, unpinned, bipartite, nodeFontSize={}, _model}) =>
   <g className='nodes' ref={ele => {
     
     const selectedInternals = internals.filter(({children}) =>
@@ -224,7 +235,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
           }
         )
           .attr('transform', d => `translate(${d.x}, ${d.y})`)
-          .on('click', (ev, d) => ev.stopPropagation() || onClickNodes(ev, d))
+          .on('click.selection', createHandleSelection(onClickNodes))
           .on('mouseover', (ev, d) => 
             d.height === 0 &&
             onChangeTooltip(createTooltipData(ev, d.data.uid, {xOffset: d.r + 3, labels: nodeLabels, data: nodeData}))
@@ -241,6 +252,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
 
     circles.select('text')
       .text(d => d.data.uid in nodeLabels ? nodeLabels[d.data.uid] : d.data.uid)
+      .style('font-size', d => nodeFontSize[d.uid] ? String(nodeFontSize[d.uid]) + 'pt' : undefined)
       .style('visibility', withNodeLabels ? undefined : 'hidden');
 
     const updateModel = throttle(() => {
@@ -265,7 +277,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
     });
   }}/>
 
-const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, edgeStrokeWidth, selectedEdges, hiddenEdges, removedEdges, edgeLabels={}, edgeLabelStyle='callout', onClickEdges=Object, onChangeTooltip=Object}) =>
+const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, edgeStrokeWidth, selectedEdges, hiddenEdges, removedEdges, edgeLabels={}, edgeLabelStyle='callout', edgeFontSize={}, onClickEdges=Object, onChangeTooltip=Object}) =>
   <g className='edges' ref={ele => {
     const controlPoints = range(nControlPoints)
       .map(i => {
@@ -301,10 +313,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
               onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
             )
             .on('mouseout', () => onChangeTooltip())
-            .on('click', (ev, data) => {
-              ev.stopPropagation();
-              onClickEdges(ev, data);
-            })
+            .on('click.selection', createHandleSelection(onClickEdges))
             .call(forceEdgeDragBehavior, simulation)
             .call(classedByDict, {'selected': selectedEdges, 'hiddenState': hiddenEdges});
 
@@ -313,6 +322,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
       .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth});
 
     groups.select('.label text')
+      .style('font-size', d => edgeFontSize[d.uid] ? String(edgeFontSize[d.uid]) + 'pt' : undefined)
       .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
 
     groups.select('g.label')
@@ -433,7 +443,7 @@ const BipartiteLinks = ({links, simulation}) =>
 
   }}/>
 
-const BipartiteEdges = ({internals, edges, simulation, edgeLabels, edgeData, edgeStroke, edgeStrokeWidth, selectedNodes={}, unpinned, onClickEdges=Object, onChangeTooltip=Object}) =>
+const BipartiteEdges = ({internals, edges, simulation, edgeLabels, edgeData, edgeStroke, edgeStrokeWidth, selectedNodes={}, selectedEdges={}, hiddenEdges={}, unpinned, withEdgeLabels, onClickEdges=Object, onChangeTooltip=Object}) =>
   <g className='bipartite edges' ref={ele => {
     const selectedInternals = internals.filter(({children}) =>
       sum(children, d => selectedNodes[d.uid])
@@ -463,15 +473,21 @@ const BipartiteEdges = ({internals, edges, simulation, edgeLabels, edgeData, edg
 
             return g;
           })
+            .call(classedByDict, {'selected': selectedEdges, 'hiddenState': hiddenEdges})
             .on('mouseover', (ev, d) => 
               onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
             )
             .on('mouseout', () => onChangeTooltip())
             .call(forceMultiDragBehavior, simulation, selectedInternals, unpinned)
-            .on('click', onClickEdges)
+            .on('click.selection', createHandleSelection(onClickEdges))
+
+    groups.select('text')
+      .style('visibility', withEdgeLabels ? undefined : 'hidden');
 
     simulation.on('tick.bipartite-edges', d => {
-      groups.attr('transform', d => `translate(${d.x},${d.y})`)
+      groups
+        .attr('transform', d => `translate(${d.x},${d.y})`)
+        .classed('fixed', d => d.fx !== undefined);
     });
 
   }}/>

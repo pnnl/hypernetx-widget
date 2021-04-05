@@ -4,6 +4,11 @@
 	stroke-dasharray: 6,3;
 }
 
+.hnx-widget-view .edges .fixed rect {
+	stroke-width: 3;
+	stroke-dasharray: 6,3;
+}
+
 .hnx-widget-view .nodes {
 	cursor: pointer;
 }
@@ -16,7 +21,11 @@
 .hnx-widget-view .nodes .selected circle.bottom {
 	stroke: black;
 	stroke-width: 4;
-	fill-opacity: .125;
+	fill-opacity: .2;
+}
+
+.hnx-widget-view .nodes .selected {
+	cursor: move;
 }
 
 .hnx-widget-view .nodes .top {
@@ -49,11 +58,8 @@
 	font-style: italic;
 }
 
-.hnx-widget-view .edges path{
-	pointer-events: visibleStroke;
-}
-
 .hnx-widget-view .edges path {
+	pointer-events: visibleStroke;
 	stroke-width: 1.5;
 	fill-opacity: 0;
 }
@@ -61,22 +67,23 @@
 .hnx-widget-view .bipartite.edges rect {
 	fill-opacity: 1;
 	fill: white;
-}
-
-.hnx-widget-view .edges :hover path{
-	fill-opacity: .5;
+	stroke-width: 1.5;
 }
 
 .hnx-widget-view .edges :hover path,
 .hnx-widget-view .edges :hover rect {
+	fill-opacity: .5;
+	fill: inherit;
 	/*stroke-dasharray: 6,3;*/
 	stroke-width: 3;
 	cursor: pointer;
 }
 
-.hnx-widget-view .edges .selected path {
+.hnx-widget-view .edges .selected path,
+.hnx-widget-view .edges .selected rect {
+	fill: inherit;
 	stroke-width: 5;
-	fill-opacity: .125;
+	fill-opacity: .2;
 }
 
 .hnx-widget-view table.hnx-tooltip {
