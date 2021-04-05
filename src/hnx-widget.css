@@ -19,6 +19,10 @@
 	fill-opacity: .125;
 }
 
+.hnx-widget-view .nodes .selected {
+	cursor: move;
+}
+
 .hnx-widget-view .nodes .top {
 	visibility: hidden;
 	pointer-events: none;
