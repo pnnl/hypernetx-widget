@@ -435,7 +435,7 @@ const BipartiteLinks = ({links, simulation}) =>
 
   }}/>
 
-const BipartiteEdges = ({internals, edges, simulation, edgeLabels, edgeData, edgeStroke, edgeStrokeWidth, selectedNodes={}, unpinned, onClickEdges=Object, onChangeTooltip=Object}) =>
+const BipartiteEdges = ({internals, edges, simulation, edgeLabels, edgeData, edgeStroke, edgeStrokeWidth, selectedNodes={}, selectedEdges={}, hiddenEdges={}, unpinned, onClickEdges=Object, onChangeTooltip=Object}) =>
   <g className='bipartite edges' ref={ele => {
     const selectedInternals = internals.filter(({children}) =>
       sum(children, d => selectedNodes[d.uid])
@@ -465,12 +465,16 @@ const BipartiteEdges = ({internals, edges, simulation, edgeLabels, edgeData, edg
 
             return g;
           })
+            .call(classedByDict, {'selected': selectedEdges, 'hiddenState': hiddenEdges})
             .on('mouseover', (ev, d) => 
               onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
             )
             .on('mouseout', () => onChangeTooltip())
             .call(forceMultiDragBehavior, simulation, selectedInternals, unpinned)
-            .on('click', onClickEdges)
+            .on('click', (ev, data) => {
+              ev.stopPropagation();
+              onClickEdges(ev, data);
+            })
 
     simulation.on('tick.bipartite-edges', d => {
       groups.attr('transform', d => `translate(${d.x},${d.y})`)
