@@ -435,7 +435,7 @@ const BipartiteLinks = ({links, simulation}) =>
 
   }}/>
 
-const BipartiteEdges = ({internals, edges, simulation, edgeLabels, edgeData, edgeStroke, edgeStrokeWidth, selectedNodes={}, selectedEdges={}, hiddenEdges={}, unpinned, onClickEdges=Object, onChangeTooltip=Object}) =>
+const BipartiteEdges = ({internals, edges, simulation, edgeLabels, edgeData, edgeStroke, edgeStrokeWidth, selectedNodes={}, selectedEdges={}, hiddenEdges={}, unpinned, withEdgeLabels, onClickEdges=Object, onChangeTooltip=Object}) =>
   <g className='bipartite edges' ref={ele => {
     const selectedInternals = internals.filter(({children}) =>
       sum(children, d => selectedNodes[d.uid])
@@ -475,6 +475,9 @@ const BipartiteEdges = ({internals, edges, simulation, edgeLabels, edgeData, edg
               ev.stopPropagation();
               onClickEdges(ev, data);
             })
+
+    groups.select('text')
+      .style('visibility', withEdgeLabels ? undefined : 'hidden');
 
     simulation.on('tick.bipartite-edges', d => {
       groups
