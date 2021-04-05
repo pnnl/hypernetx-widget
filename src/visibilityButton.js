@@ -3,10 +3,10 @@ import {IconButton} from '@material-ui/core';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 
 const VisibilityButton = ({ label, visibility, sendVisibility }) => {
-  const [show, setShow] = React.useState(true);
+  // const [show, setShow] = React.useState(visibility);
   const handleShow = () => {
-    setShow(!show);
-    sendVisibility(label, !show);
+    // setShow(!show);
+    sendVisibility(label, !visibility);
   }
 
   return(

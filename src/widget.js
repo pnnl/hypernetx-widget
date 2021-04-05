@@ -5,17 +5,14 @@ import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Typography from '@material-ui/core/Typography';
-import { ArrowForwardIos, ArrowBackIos } from '@material-ui/icons';
-import Button from '@material-ui/core/Button';
 import {HypernetxWidgetView, now} from './HypernetxWidgetView';
 import ColorPalette  from './colorPalette.js';
 import LoadTable from './loadTable.js';
 import Bars from './bars.js';
-import { hexToHsv, rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianStyles } from './functions.js';
+import { rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianStyles } from './functions.js';
 import Toolbar from "./toolbar";
 import Switches from "./switches";
 import FontSizeMenu from "./fontSizeMenu";
-import {create, selection} from "d3-selection";
 
 const createDefaultState = (data, defaultValue) => {
   const mapObj = new Map();
@@ -418,6 +415,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     setOpenAccordian(currAccordian);
   }
 
+  // console.log(transNodeData);
   return <div>
     <Grid container spacing={1}>
       <Grid item xs={12} sm={4} >
