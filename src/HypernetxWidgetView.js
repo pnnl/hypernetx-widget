@@ -34,6 +34,13 @@ const encodeProps = (selection, key, props) => {
   })
 }
 
+const createHandleSelection = callback => (ev, data) => {
+  if (!(ev.ctrlKey || ev.metaKey)) {
+    ev.stopPropagation();
+    callback(ev, data);
+  }
+}
+
 const forceMultiDragBehavior = (selection, simulation, elements, unpinned) => {
     const [width, height] = simulation.size;
 
@@ -91,7 +98,8 @@ const forceMultiDragBehavior = (selection, simulation, elements, unpinned) => {
 
     function unfix(event, d) {
       if (event) {
-        event.stopPropagation();
+        // event.stopPropagation();
+        event.preventDefault();
       }
 
       d.fx = undefined;
@@ -104,9 +112,12 @@ const forceMultiDragBehavior = (selection, simulation, elements, unpinned) => {
         unfix(undefined, d)
       }
     })
-    .on('dblclick', (ev, d) => {
-      unfix(ev, d);
-      simulation.alpha(0.3).restart();
+    .on('click.force', (ev, d) => {
+      if ((ev.ctrlKey || ev.metaKey) && d.fx !== undefined) {
+        ev.stopPropagation();
+        unfix(ev, d);
+        simulation.alpha(0.3).restart();
+      }
     })
     .call(drag()
       .on('start', dragstarted)
@@ -224,7 +235,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
           }
         )
           .attr('transform', d => `translate(${d.x}, ${d.y})`)
-          .on('click', (ev, d) => ev.stopPropagation() || onClickNodes(ev, d))
+          .on('click.selection', createHandleSelection(onClickNodes))
           .on('mouseover', (ev, d) => 
             d.height === 0 &&
             onChangeTooltip(createTooltipData(ev, d.data.uid, {xOffset: d.r + 3, labels: nodeLabels, data: nodeData}))
@@ -302,10 +313,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
               onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
             )
             .on('mouseout', () => onChangeTooltip())
-            .on('click', (ev, data) => {
-              ev.stopPropagation();
-              onClickEdges(ev, data);
-            })
+            .on('click.selection', createHandleSelection(onClickEdges))
             .call(forceEdgeDragBehavior, simulation)
             .call(classedByDict, {'selected': selectedEdges, 'hiddenState': hiddenEdges});
 
@@ -471,10 +479,7 @@ const BipartiteEdges = ({internals, edges, simulation, edgeLabels, edgeData, edg
             )
             .on('mouseout', () => onChangeTooltip())
             .call(forceMultiDragBehavior, simulation, selectedInternals, unpinned)
-            .on('click', (ev, data) => {
-              ev.stopPropagation();
-              onClickEdges(ev, data);
-            })
+            .on('click.selection', createHandleSelection(onClickEdges))
 
     groups.select('text')
       .style('visibility', withEdgeLabels ? undefined : 'hidden');
