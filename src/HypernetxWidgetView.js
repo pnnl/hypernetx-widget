@@ -818,8 +818,10 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, w
   const {onClickNodes=Object, onClickEdges=Object} = props;
 
   const handleClearSelection = ev => {
-    onClickNodes(ev);
-    onClickEdges(ev);
+    if (!(ev.shiftKey || ev.ctrlKey || ev.metaKey)) {
+      onClickNodes(ev);
+      onClickEdges(ev);
+    }
   }
 
   return <div className='hnx-widget-view'>
