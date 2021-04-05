@@ -189,7 +189,7 @@ const classedByDict = (selection, props) =>
       selection.classed(className, d => dict[d.uid])
     )
 
-const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes={}, hiddenNodes, removedNodes, nodeLabels={}, unpinned, bipartite, _model}) =>
+const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTooltip=Object, withNodeLabels=true, nodeFill, nodeStroke, nodeStrokeWidth, selectedNodes={}, hiddenNodes, removedNodes, nodeLabels={}, unpinned, bipartite, nodeFontSize={}, _model}) =>
   <g className='nodes' ref={ele => {
     
     const selectedInternals = internals.filter(({children}) =>
@@ -241,6 +241,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
 
     circles.select('text')
       .text(d => d.data.uid in nodeLabels ? nodeLabels[d.data.uid] : d.data.uid)
+      .style('font-size', d => nodeFontSize[d.uid] ? String(nodeFontSize[d.uid]) + 'pt' : undefined)
       .style('visibility', withNodeLabels ? undefined : 'hidden');
 
     const updateModel = throttle(() => {
@@ -265,7 +266,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
     });
   }}/>
 
-const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, edgeStrokeWidth, selectedEdges, hiddenEdges, removedEdges, edgeLabels={}, edgeLabelStyle='callout', onClickEdges=Object, onChangeTooltip=Object}) =>
+const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, edgeStrokeWidth, selectedEdges, hiddenEdges, removedEdges, edgeLabels={}, edgeLabelStyle='callout', edgeFontSize={}, onClickEdges=Object, onChangeTooltip=Object}) =>
   <g className='edges' ref={ele => {
     const controlPoints = range(nControlPoints)
       .map(i => {
@@ -313,6 +314,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
       .call(encodeProps, d => d.uid, {edgeStroke, edgeStrokeWidth});
 
     groups.select('.label text')
+      .style('font-size', d => edgeFontSize[d.uid] ? String(edgeFontSize[d.uid]) + 'pt' : undefined)
       .text(d => d.uid in edgeLabels ? edgeLabels[d.uid] : d.uid)
 
     groups.select('g.label')
