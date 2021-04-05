@@ -9,7 +9,7 @@ const useStyles = makeStyles((theme) => ({
 		}
 	}
 }))
-const sizeArr = [12, 14, 16, 18, 20, 24, 28];
+const sizeArr = [8, 10, 12, 14, 16, 18];
 
 const FontSizeMenu = ({ type, currSize, onSizeChange }) => {
 	const classes = useStyles();
