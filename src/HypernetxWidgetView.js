@@ -477,7 +477,9 @@ const BipartiteEdges = ({internals, edges, simulation, edgeLabels, edgeData, edg
             })
 
     simulation.on('tick.bipartite-edges', d => {
-      groups.attr('transform', d => `translate(${d.x},${d.y})`)
+      groups
+        .attr('transform', d => `translate(${d.x},${d.y})`)
+        .classed('fixed', d => d.fx !== undefined);
     });
 
   }}/>
