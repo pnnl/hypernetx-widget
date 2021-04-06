@@ -3,11 +3,12 @@ import RemoveCircleOutlineOutlinedIcon from '@material-ui/icons/RemoveCircleOutl
 import {IconButton} from "@material-ui/core";
 
 const RemoveButton = ({label, remove, onRemoveChange}) => {
-    const [removal, setRemoval] = React.useState(false);
+    // const [removal, setRemoval] = React.useState(remove);
 
     const handleRemove = () => {
-        setRemoval(!removal);
-        onRemoveChange(label, !removal);
+        // setRemoval(!removal);
+        // console.log(!removal, 'removal');
+        onRemoveChange(label, !remove);
     }
 
     return(

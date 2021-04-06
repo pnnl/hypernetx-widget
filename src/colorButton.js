@@ -3,10 +3,9 @@ import { ChromePicker } from 'react-color';
 import { Palette } from '@material-ui/icons';
 import {IconButton} from '@material-ui/core';
 import './css/hnxStyle.css';
-import {rgbToHex} from "./functions";
 
 const ColorButton = ({ label, color, onEachColorChange }) => {
-  const [paletteColor, setColor] = React.useState("#000000ff");
+  // const [paletteColor, setColor] = React.useState("#000000ff");
   const [palette, setPalette] = React.useState(false);
 
   const handleClick = () => {
@@ -20,7 +19,7 @@ const ColorButton = ({ label, color, onEachColorChange }) => {
     const RGB = color.rgb;
     const rgbaStr = "rgba(" + RGB.r + ", " + RGB.g + ", " + RGB.b + ", " + RGB.a + ")";
     onEachColorChange(label, rgbaStr);
-    setColor(rgbToHex(rgbaStr));
+    // setColor(rgbToHex(rgbaStr));
   }
 
   return <div className="hoverShowButton">
@@ -32,7 +31,7 @@ const ColorButton = ({ label, color, onEachColorChange }) => {
         {palette ?
             <div className="palettePopUp">
               <div className="cover" onClick={() => handleClose()}/>
-              <ChromePicker color={paletteColor} onChange={(c) => handleChangeColor(label, c)}/>
+              <ChromePicker color={color} onChange={(c) => handleChangeColor(label, c)}/>
             </div> : null
         }
       </div>

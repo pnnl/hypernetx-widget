@@ -177,7 +177,7 @@ const LoadTable = ({ type, data, onColorChange, onVisibleChange, onSelectedChang
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('label');
 
-  const handleRequestSort = (event, property, paletteState) => {
+  const handleRequestSort = (event, property) => {
 
     const isAsc = orderBy === property && order === 'asc';
 
