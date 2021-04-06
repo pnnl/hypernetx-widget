@@ -164,7 +164,6 @@ const Widget = ({ nodes, edges, ...props }) => {
     return {
       uid: x.uid,
       value: nodeDegList[x.uid],
-      // color:  {"r": getRGB(nodeFill[x.uid])[0], "g":getRGB(nodeFill[x.uid])[1], "b":getRGB(nodeFill[x.uid])[2], "a":getRGB(nodeFill[x.uid])[3]},
       color: nodeFill[x.uid],
       selected: selectedNodes[x.uid],
       hidden: hiddenNodes[x.uid],
@@ -194,18 +193,20 @@ const Widget = ({ nodes, edges, ...props }) => {
   }
 
   const getClickedNodes = (event, data) => {
-    const newNodeSelect = new Map();
+    // const newNodeSelect = new Map();
     if(event.shiftKey){
       setSelectedNodes({...selectedNodes, [data.data.uid]: !selectedNodes[data.data.uid]});
     }
     else{
+
       if(data !== undefined){
-        Object.entries(createDefaultState(nodes, false)).map(d => {
-          if(d[0] === data.data.uid){
-            newNodeSelect.set(d[0], true)
-          }
-        })
-        setSelectedNodes(Object.fromEntries(newNodeSelect));
+        // Object.entries(createDefaultState(nodes, false)).map(d => {
+        //   if(d[0] === data.data.uid){
+        //     newNodeSelect.set(d[0], true)
+        //   }
+        // })
+        // setSelectedNodes(Object.fromEntries(newNodeSelect));
+        setSelectedNodes({...selectedNodes, [data.data.uid]: true})
       }
       else{
         setSelectedNodes({});
@@ -214,18 +215,19 @@ const Widget = ({ nodes, edges, ...props }) => {
   }
 
   const getClickedEdges = (event, data) => {
-    const newEdgeSelect = new Map();
+    // const newEdgeSelect = new Map();
     if(event.shiftKey){
       setSelectedEdges({...selectedEdges, [data.uid]: !selectedEdges[data.uid]});
     }
     else{
       if(data !== undefined){
-        Object.entries(createDefaultState(edges, false)).map(d => {
-          if(d[0] === data.uid){
-            newEdgeSelect.set(d[0], true)
-          }
-        })
-        setSelectedEdges(Object.fromEntries(newEdgeSelect));
+        // Object.entries(createDefaultState(edges, false)).map(d => {
+        //   if(d[0] === data.uid){
+        //     newEdgeSelect.set(d[0], true)
+        //   }
+        // })
+        // setSelectedEdges(Object.fromEntries(newEdgeSelect));
+        setSelectedEdges({...selectedEdges, [data.uid]: true})
       }
       else{
         setSelectedEdges({});
@@ -257,6 +259,7 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const handleRemoveSelected = (type) => {
     if(type === 'node'){
+      console.log(selectedNodes);
       setRemovedNodes(selectedNodes);
       // setSelectedNodes(Object.fromEntries(noNodeSelectMap));
     }
