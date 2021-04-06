@@ -36,7 +36,7 @@ const tableStyles = makeStyles((theme) => ({
     },
     "& .MuiTableCell-paddingNone": {
       // padding: "0px 0px 5px 15px",
-      fontSize: "13px",
+      fontSize: "12px",
       fontWeight: 500,
       align: "center",
     },
@@ -52,7 +52,7 @@ const tableStyles = makeStyles((theme) => ({
       margin: "0px"
     },
     "& .MuiTableSortLabel-root": {
-      fontSize: "13px"
+      fontSize: "12px"
     }
   },
   visuallyHidden: {
@@ -122,6 +122,7 @@ function EnhancedTableHead(props) {
             sortDirection={orderBy === headCell.id ? order : false}
           >
             <TableSortLabel
+              style={{paddingRight: '7px'}}
               active={orderBy === headCell.id}
               direction={orderBy === headCell.id ? order : 'asc'}
               onClick={!paletteOpen ? createSortHandler(headCell.id) : null}

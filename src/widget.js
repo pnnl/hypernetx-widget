@@ -48,7 +48,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [removedEdges, setRemovedEdges] = React.useState(props.edgeRemoved || {});
 
   const [nodeFontSize, setNodeFontSize] = React.useState(createDefaultState(nodes, 12));
-  const [edgeFontSize, setEdgeFontSize] = React.useState(createDefaultState(edges, 12));
+  const [edgeFontSize, setEdgeFontSize] = React.useState(createDefaultState(edges, 10));
 
   const [pinned, setPinned] = React.useState(false);
   const [unpinned, setUnpinned] = React.useState(now());
@@ -184,7 +184,7 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const [colGroup, setColGroup] = React.useState({node: "degree/size", edge: "degree/size"});
   const [colPalette, setColPalette] = React.useState({node: "default", edge: "default"});
-  const [fontSize, setFontSize] = React.useState({node: 12, edge: 12});
+  const [fontSize, setFontSize] = React.useState({node: 12, edge: 10});
   // const [colType, setColType] = React.useState("node");
   const handleCurrData = (group, palette, dataType) => {
     setColGroup({...colGroup, [dataType]:group});
