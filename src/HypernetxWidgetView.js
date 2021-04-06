@@ -790,31 +790,36 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, w
     const nodeSimulationValues = new Map();
     const edgeSimulationValues = new Map();
 
-    simulation.nodes().forEach(({children, x, y, vx, vy, uid}) => {
+    simulation.nodes().forEach(({children, x, y, vx, vy, fx, fy, pinned, uid}) => {
       if (children === undefined) {
-        edgeSimulationValues.set(uid, ({x, y, vx, vy}));
+        edgeSimulationValues.set(uid, ({x, y, vx, vy, pinned}));
       } else {
         children.forEach(c =>
           nodeSimulationValues.set(c.uid, ({
             x: x + c.x,
             y: y + c.y,
-            vx, vy
-          }))        
+            fx: fx + c.x,
+            fy: fy + c.y,
+            vx, vy, pinned
+          }))
         )
       }
     });
 
     // restore the old values if available
 
-    const recallSimulationValues = (d, key) => {
-      d[key] = mean(d.children, c => (nodeSimulationValues.get(c.uid) || {})[key]);
+    const recallSimulationValues = (d, key, agg=mean) => {
+      d[key] = agg(d.children, c => (nodeSimulationValues.get(c.uid) || {})[key]);
     }
 
     internals.forEach(d => {
-      recallSimulationValues(d, 'x')
-      recallSimulationValues(d, 'y')
-      recallSimulationValues(d, 'vx')
-      recallSimulationValues(d, 'vy')
+      recallSimulationValues(d, 'pinned', min);
+      recallSimulationValues(d, 'fx');
+      recallSimulationValues(d, 'fy');
+      recallSimulationValues(d, 'x');
+      recallSimulationValues(d, 'y');
+      recallSimulationValues(d, 'vx');
+      recallSimulationValues(d, 'vy');
     });
 
     edges.forEach(d => {
@@ -824,6 +829,7 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, w
       d.y = values.y;
       d.vx = values.vx;
       d.vy = values.vy;
+      d.pinned = values.pinned;
     });
 
     const nodes = [...internals, ...edges];
