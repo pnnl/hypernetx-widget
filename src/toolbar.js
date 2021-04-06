@@ -13,7 +13,6 @@ import LocationOnIcon from '@material-ui/icons/LocationOn';
 import Tooltip from '@material-ui/core/Tooltip';
 import {makeStyles} from "@material-ui/core/styles";
 import FlipCameraAndroidIcon from '@material-ui/icons/FlipCameraAndroid';
-import {Flip} from "@material-ui/icons";
 
 const toggleStyle = makeStyles((theme) => ({
     toggleButton: {
@@ -87,21 +86,6 @@ const Toolbar = ({ dataType, selectionState, onSelectionChange }) => {
                   </Tooltip>
               </ToggleButton>
 
-              {dataType === "node" &&
-                  <ToggleButton value={"pin"}>
-                      <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Pin all</div>}>
-                          <LocationOnIcon/>
-                      </Tooltip>
-                  </ToggleButton>
-              }
-
-              {dataType === "node" &&
-                <ToggleButton value={"unpin"}>
-                    <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Unpin all</div>}>
-                        <LocationOffIcon />
-                    </Tooltip>
-                </ToggleButton>
-              }
 
               <ToggleButton value={"all"}>
                   <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Select all</div>}>
@@ -121,6 +105,23 @@ const Toolbar = ({ dataType, selectionState, onSelectionChange }) => {
                   </Tooltip>
 
               </ToggleButton>
+
+              {dataType === "node" &&
+              <ToggleButton value={"pin"}>
+                  <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Pin all</div>}>
+                      <LocationOnIcon/>
+                  </Tooltip>
+              </ToggleButton>
+              }
+
+              {dataType === "node" &&
+              <ToggleButton value={"unpin"}>
+                  <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Unpin all</div>}>
+                      <LocationOffIcon />
+                  </Tooltip>
+              </ToggleButton>
+              }
+
 
 
           </ToggleButtonGroup>

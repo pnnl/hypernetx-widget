@@ -1,8 +1,9 @@
 import * as scale from 'd3-scale-chromatic';
 import { makeStyles } from '@material-ui/core/styles';
-import {descending} from "d3-array";
 
 export const descendingComparator = (a, b, orderBy) => {
+  a[orderBy] = a[orderBy] || false;
+  b[orderBy] = b[orderBy] || false;
   if (b[orderBy] < a[orderBy]) {
     return -1;
   }
@@ -29,20 +30,6 @@ export const stableSort = (array, comparator) => {
   return stabilizedThis.map((el) => el[0]);
 }
 
-
-export const hexToRgb = hex => {
-  // var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  // const r = parseInt(result[1], 16);
-  // const g = parseInt(result[2], 16);
-  // const b = parseInt(result[3], 16);
-  // const a = 0.9;
-  // return result ? `rgba(${r}, ${g}, ${b}, ${a})`: null;
-  var r = parseInt(hex.slice(1, 3), 16),
-    g = parseInt(hex.slice(3, 5), 16),
-    b = parseInt(hex.slice(5, 7), 16),
-    a = parseInt(hex.slice(7, 9), 8)
-}
-
 export const rgbToHex = (rgbString) => {
   var a,
     rgb = rgbString.replace(/\s/g, '').match(/^rgba?\((\d+),(\d+),(\d+),?([^,\s)]+)?/i),
@@ -60,15 +47,7 @@ export const rgbToHex = (rgbString) => {
 
   a = ((a * 255) | 1 << 8).toString(16).slice(1);
   hex = hex + a;
-  // console.log(hex);
 
-  const tmp = rgbString.substr(5, 12).replace(/ /g, '').split(',');
-
-  const [r, g, b] = tmp.map(x => parseInt(x));
-  // console.log(r, g, b, a);
-  // console.log(r, g, b, "RGB");
-  // console.log(R, G, B);f
-  // return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
   return '#' + hex
 }
 
@@ -259,37 +238,4 @@ export const getScheme = color => {
   else if(color === "Sinebow"){
     return scale.interpolateSinebow
   }
-}
-
-export const hexToHsv = hex => {
-  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-
-  var r = parseInt(hex.slice(1, 3), 16),
-    g = parseInt(hex.slice(3, 5), 16),
-    b = parseInt(hex.slice(5, 7), 16);
-
-  r /= 255, g /= 255, b /= 255;
-  var max = Math.max(r, g, b), min = Math.min(r, g, b);
-  var h, s, l = (max + min) / 2;
-
-  if(max == min){
-    h = s = 0; // achromatic
-  }
-  else {
-    var d = max - min;
-    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-    switch(max) {
-      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-      case g: h = (b - r) / d + 2; break;
-      case b: h = (r - g) / d + 4; break;
-    }
-    h /= 6;
-  }
-
-  // s = s*100;
-  // s = Math.round(s);
-  // l = l*100;
-  // l = Math.round(l);
-  return {'h': h, 's': s, 'l': l}
-
 }
