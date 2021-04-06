@@ -37,6 +37,7 @@ const encodeProps = (selection, key, props) => {
 const createHandleSelection = callback => (ev, data) => {
   if (!(ev.ctrlKey || ev.metaKey)) {
     ev.stopPropagation();
+    ev.preventDefault();
     callback(ev, data);
   }
 }
@@ -45,8 +46,6 @@ const forceMultiDragBehavior = (selection, simulation, elements, unpinned) => {
     const [width, height] = simulation.size;
 
     function dragstarted(event) {
-      simulation.alphaTarget(0.3).restart();
-
       // subject.x, subject.y is the location of node
       const {x, y, uid} = event.subject;
 
@@ -74,6 +73,8 @@ const forceMultiDragBehavior = (selection, simulation, elements, unpinned) => {
     }
 
     function dragged(event) {
+      simulation.alphaTarget(0.3).restart();
+
 
       // event.x, event.y is the location of the drag
       const {dx, dy, dxRange, dyRange} = event.subject;
@@ -130,8 +131,6 @@ const forceEdgeDragBehavior = (selection, simulation) => {
     const [width, height] = simulation.size;
 
     function dragstarted(event) {
-      simulation.alphaTarget(0.3).restart();
-
       // subject.x, subject.y is the location of node
       const {x, y, elements} = event.subject;
 
@@ -154,6 +153,7 @@ const forceEdgeDragBehavior = (selection, simulation) => {
     }
 
     function dragged(event) {
+      simulation.alphaTarget(0.3).restart();
 
       // event.x, event.y is the location of the drag
       const {dx, dy, elements, dxRange, dyRange} = event.subject;
@@ -797,8 +797,6 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, w
     }
 
     simulation.size = [width, height];
-
-    return simulation;
 
   }, [derivedProps, bipartite, width, height, unpinned]);
 
