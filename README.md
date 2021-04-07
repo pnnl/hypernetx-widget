@@ -69,6 +69,7 @@ The toolbar also contains buttons to select all nodes (or edges), un-select all 
 
 * **Select all nodes not in an edge by:** select an edge, select all nodes in that edge, then reverse the selected nodes to select every node not in that edge.
 * **Traverse the graph by:** selecting a start node, then alternating select all edges containing selected nodes and selecting all nodes within selected edges
+* **Pin Everything by:** hitting the button to select all nodes, then drag any node slightly to activate the pinning for all nodes.
 
 ## Side Panel
 Details on nodes and edges are visible in the side panel. For both nodes and edges, a table shows the node name, degree (or size for edges), its selection state, removed state, and color. These properties can also be controlled directly from this panel. The color of nodes and edges can be set in bulk here as well, for example, coloring by degree.
