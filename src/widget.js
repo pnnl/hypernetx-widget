@@ -194,47 +194,69 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const getClickedNodes = (event, data) => {
     // const newNodeSelect = new Map();
-    if(event.shiftKey){
+    if (event.shiftKey) {
       setSelectedNodes({...selectedNodes, [data.data.uid]: !selectedNodes[data.data.uid]});
     }
-    else{
-
-      if(data !== undefined){
-        // Object.entries(createDefaultState(nodes, false)).map(d => {
-        //   if(d[0] === data.data.uid){
-        //     newNodeSelect.set(d[0], true)
-        //   }
-        // })
-        // setSelectedNodes(Object.fromEntries(newNodeSelect));
-        setSelectedNodes({...selectedNodes, [data.data.uid]: true})
-      }
-      else{
-        setSelectedNodes({});
-      }
+    else if(data === undefined){
+      setSelectedNodes({});
     }
+    else {
+      setSelectedNodes({[data.data.uid]: true})
+    }
+
+    // setSelectedNodes({...(event.shiftKey ? selectedNodes : undefined), ...newSelection})
+    // if(event.shiftKey){
+    //   setSelectedNodes({...selectedNodes, [data.data.uid]: !selectedNodes[data.data.uid]});
+    // }
+    // else{
+    //
+    //   if(data !== undefined){
+    //     Object.entries(createDefaultState(nodes, false)).map(d => {
+    //       if(d[0] === data.data.uid){
+    //         newNodeSelect.set(d[0], true)
+    //       }
+    //     })
+    //     // setSelectedNodes(Object.fromEntries(newNodeSelect));
+    //
+    //
+    //     setSelectedNodes({...selectedNodes, [data.data.uid]: true})
+    //   }
+    //   else{
+    //     setSelectedNodes({});
+    //   }
+    // }
   }
 
   const getClickedEdges = (event, data) => {
     // const newEdgeSelect = new Map();
-    if(event.shiftKey){
+    if (event.shiftKey) {
       setSelectedEdges({...selectedEdges, [data.uid]: !selectedEdges[data.uid]});
     }
-    else{
-      if(data !== undefined){
-        const newEdgeSelect = new Map();
-        Object.entries(createDefaultState(edges, false)).map(d => {
-          if(d[0] === data.uid){
-            newEdgeSelect.set(d[0], true)
-          }
-        })
-        // setSelectedEdges(Object.fromEntries(newEdgeSelect));
-        // console.log(newEdgeSelect);
-        setSelectedEdges({...selectedEdges, [data.uid]: true})
-      }
-      else{
-        setSelectedEdges({});
-      }
+    else if(data === undefined){
+      setSelectedEdges({});
     }
+    else {
+      setSelectedEdges({[data.uid]: true})
+    }
+    // if(event.shiftKey){
+    //   setSelectedEdges({...selectedEdges, [data.uid]: !selectedEdges[data.uid]});
+    // }
+    // else{
+      // if(data !== undefined){
+      //   const newEdgeSelect = new Map();
+      //   Object.entries(createDefaultState(edges, false)).map(d => {
+      //     if(d[0] === data.uid){
+      //       newEdgeSelect.set(d[0], true)
+      //     }
+      //   })
+      //   // setSelectedEdges(Object.fromEntries(newEdgeSelect));
+      //   // console.log(newEdgeSelect);
+      //   setSelectedEdges({...selectedEdges, [data.uid]: true})
+      // }
+      // else{
+      //   setSelectedEdges({});
+      // }
+    // }
   }
 
   const handleOriginal = (type) => {
@@ -252,22 +274,27 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const handleHideSelected = (type) => {
     if(type === 'node'){
-      setHiddenNodes(selectedNodes);
+      const selectedNodesTrue = Object.fromEntries(Object.entries(selectedNodes).filter(([k, v]) => v));
+      setHiddenNodes({...hiddenNodes, ...selectedNodesTrue})
+      // setHiddenNodes(selectedNodes);
     }
     else{
-      setHiddenEdges(selectedEdges);
+      const selectedEdgesTrue = Object.fromEntries(Object.entries(selectedEdges).filter(([k, v]) => v));
+      setHiddenEdges({...hiddenEdges, ...selectedEdgesTrue})
+      // setHiddenEdges(selectedEdges);
     }
   }
 
   const handleRemoveSelected = (type) => {
     if(type === 'node'){
       // console.log(selectedNodes);
-      setRemovedNodes(selectedNodes);
+      const selectedNodesTrue = Object.fromEntries(Object.entries(selectedNodes).filter(([k, v]) => v));
+      setRemovedNodes({...removedNodes, ...selectedNodesTrue});
       // setSelectedNodes(Object.fromEntries(noNodeSelectMap));
     }
     else{
-      setRemovedEdges(selectedEdges);
-      // setSelectedEdges(Object.fromEntries(noEdgeSelectMap));
+      const selectedEdgesTrue = Object.fromEntries(Object.entries(selectedEdges).filter(([k, v]) => v));
+      setRemovedEdges({...removedEdges, ...selectedEdgesTrue})
     }
   }
 
