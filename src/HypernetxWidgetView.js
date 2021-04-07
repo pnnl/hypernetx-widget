@@ -659,8 +659,8 @@ const planarForce = (nodes, edges) => {
               const dy = y - cy;
               const r = Math.sqrt(dx*dx + dy*dy);
 
-              v.vx += dx/(r*r)*alpha;
-              v.vy += dy/(r*r)*alpha;
+              v.vx += dx/r*alpha;
+              v.vy += dy/r*alpha;
             }
           });
       }
@@ -673,7 +673,7 @@ const planarForce = (nodes, edges) => {
   return force;
 }
 
-export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, width=600, height=600, ignorePlanarForce, pos={}, collapseNodes, ...props}) => {
+export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, pinned, width=600, height=600, ignorePlanarForce, pos={}, collapseNodes, ...props}) => {
   // const width = navOpen ? 600 : 800;
   const derivedProps = useMemo(
     () => {
@@ -853,6 +853,17 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, w
 
 
   }, [derivedProps, bipartite, width, height, unpinned]);
+
+  // if (pinned) {
+  //   // pinning all nodes
+  //   console.log('pinning all');
+    
+  //   simulation.nodes().forEach(d => {
+  //     d.pinned = now();
+  //     d.fx = d.x;
+  //     d.fy = d.y;
+  //   })
+  // }  
 
   const [tooltip, setTooltip] = React.useState();
 
