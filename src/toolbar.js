@@ -114,13 +114,13 @@ const Toolbar = ({ dataType, selectionState, onSelectionChange }) => {
               {/*</ToggleButton>*/}
               {/*}*/}
 
-              {/*{dataType === "node" &&*/}
-              {/*<ToggleButton value={"unpin"}>*/}
-              {/*    <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Unpin all</div>}>*/}
-              {/*        <LocationOffIcon />*/}
-              {/*    </Tooltip>*/}
-              {/*</ToggleButton>*/}
-              {/*}*/}
+              {dataType === "node" &&
+              <ToggleButton value={"unpin"}>
+                  <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Unpin all</div>}>
+                      <LocationOffIcon />
+                  </Tooltip>
+              </ToggleButton>
+              }
 
 
 
