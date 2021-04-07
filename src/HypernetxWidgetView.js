@@ -729,6 +729,8 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, w
         (tree);
 
       // pre-specified children
+      // set internal node position to the mean of
+      // its children contained in pos
       tree.each(d => {
         if (d.depth === 1) {
           const children = d.children.filter(c => c.data.uid in pos);
@@ -783,20 +785,72 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, w
       d.y = Math.max(r + drMax, Math.min(height - r - drMax, d.y));
     }
 
-    simulation.nodes([...internals, ...edges])
+    // save the old values in the simulation 
+
+    const nodeSimulationValues = new Map();
+    const edgeSimulationValues = new Map();
+
+    simulation.nodes().forEach(({children, x, y, vx, vy, fx, fy, pinned, uid}) => {
+      if (children === undefined) {
+        edgeSimulationValues.set(uid, ({x, y, vx, vy, pinned}));
+      } else {
+        children.forEach(c =>
+          nodeSimulationValues.set(c.uid, ({
+            x: x + c.x,
+            y: y + c.y,
+            fx: fx + c.x,
+            fy: fy + c.y,
+            vx, vy, pinned
+          }))
+        )
+      }
+    });
+
+    // restore the old values if available
+
+    const recallSimulationValues = (d, key, agg=mean) => {
+      d[key] = agg(d.children, c => (nodeSimulationValues.get(c.uid) || {})[key]);
+    }
+
+    internals.forEach(d => {
+      recallSimulationValues(d, 'pinned', min);
+      recallSimulationValues(d, 'fx');
+      recallSimulationValues(d, 'fy');
+      recallSimulationValues(d, 'x');
+      recallSimulationValues(d, 'y');
+      recallSimulationValues(d, 'vx');
+      recallSimulationValues(d, 'vy');
+    });
+
+    edges.forEach(d => {
+      const values = edgeSimulationValues.get(d.uid) || {};
+
+      d.x = values.x;
+      d.y = values.y;
+      d.vx = values.vx;
+      d.vy = values.vy;
+      d.pinned = values.pinned;
+    });
+
+    const nodes = [...internals, ...edges];
+
+    simulation.nodes(nodes)
       .force('charge', forceManyBody().strength(-150).distanceMax(300))
       .force('link', forceLink(links).distance(30))
       .force('center', forceCenter(width/2, height/2))
       .force('collide', forceCollide().radius(d => 2*d.r || 0))
-      .force('bound', () => simulation.nodes().forEach(boundNode))
-      .alpha(1)
-      .restart();
+      .force('bound', () => simulation.nodes().forEach(boundNode));
+
+    simulation.size = [width, height];
 
     if (!bipartite && !ignorePlanarForce) {
       simulation.force('planar', planarForce(internals, edges));
     }
 
-    simulation.size = [width, height];
+    if (simulation.alpha() < .3) {
+      simulation.alpha(.3).restart();
+    }    
+
 
   }, [derivedProps, bipartite, width, height, unpinned]);
 
