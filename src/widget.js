@@ -38,14 +38,14 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [bipartite, setBipartite] = React.useState(false);
 
   const [nodeFill, setNodeFill] = React.useState(props.nodeFill || createDefaultState(nodes, "#000000ff"));
-  const [selectedNodes, setSelectedNodes] = React.useState({});
-  const [hiddenNodes, setHiddenNodes] = React.useState(props.nodeHidden || {});
-  const [removedNodes, setRemovedNodes] = React.useState(props.nodeRemoved || {});
+  const [selectedNodes, setSelectedNodes] = React.useState(props.selectedNodes || {});
+  const [hiddenNodes, setHiddenNodes] = React.useState(props.hiddenNodes || {});
+  const [removedNodes, setRemovedNodes] = React.useState(props.removedNodes || {});
 
   const [edgeStroke, setEdgeStroke] = React.useState(props.edgeStroke || createDefaultState(edges, "#000000ff"));
-  const [selectedEdges, setSelectedEdges] = React.useState({});
-  const [hiddenEdges, setHiddenEdges] = React.useState(props.edgeHidden || {});
-  const [removedEdges, setRemovedEdges] = React.useState(props.edgeRemoved || {});
+  const [selectedEdges, setSelectedEdges] = React.useState(props.selectedEdges || {});
+  const [hiddenEdges, setHiddenEdges] = React.useState(props.hiddenEdges || {});
+  const [removedEdges, setRemovedEdges] = React.useState(props.removedEdges || {});
 
   const [nodeFontSize, setNodeFontSize] = React.useState(createDefaultState(nodes, 12));
   const [edgeFontSize, setEdgeFontSize] = React.useState(createDefaultState(edges, 10));
