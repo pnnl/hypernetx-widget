@@ -10,7 +10,7 @@ jupyter nbextension enable hnxwidget
 # Getting Started
 After a successful installation, you can copy/paste the fragment below into a jupyter notebook cell. Executing the cell will produce an interactive hypergraph visualization. It is required that the last line of the cell returns the widget.
 ```py
-from hnxwidget import HypernetxWidgetView
+from hnxwidget import HypernetxWidget
 import hypernetx as hnx
 
 scenes = {
@@ -25,7 +25,7 @@ scenes = {
 }
 
 H = hnx.Hypergraph(scenes)
-HypernetxWidgetView(H)
+HypernetxWidget(H)
 ```
 ![Screenshot of HNX Widget](hnx-widget-screenshot.png)
 
