@@ -221,12 +221,14 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
     else{
       if(data !== undefined){
-        // Object.entries(createDefaultState(edges, false)).map(d => {
-        //   if(d[0] === data.uid){
-        //     newEdgeSelect.set(d[0], true)
-        //   }
-        // })
+        const newEdgeSelect = new Map();
+        Object.entries(createDefaultState(edges, false)).map(d => {
+          if(d[0] === data.uid){
+            newEdgeSelect.set(d[0], true)
+          }
+        })
         // setSelectedEdges(Object.fromEntries(newEdgeSelect));
+        // console.log(newEdgeSelect);
         setSelectedEdges({...selectedEdges, [data.uid]: true})
       }
       else{
@@ -259,7 +261,7 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const handleRemoveSelected = (type) => {
     if(type === 'node'){
-      console.log(selectedNodes);
+      // console.log(selectedNodes);
       setRemovedNodes(selectedNodes);
       // setSelectedNodes(Object.fromEntries(noNodeSelectMap));
     }
