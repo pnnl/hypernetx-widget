@@ -9,6 +9,8 @@ import numpy as np
 
 from .util import get_set_layering, inflate_kwargs
 
+from itertools import chain
+
 converters = {
     'edgecolor': 'Stroke',
     'edgecolors': 'Stroke',
@@ -45,7 +47,7 @@ def hex_array(values):
         for c in to_rgba_array(values)
     ]
 
-def hnx_kwargs_to_props(H,
+def hnx_kwargs_to_props(V, E,
     nodes_kwargs={},
     edges_kwargs={},
     node_labels_kwargs={},
@@ -54,27 +56,21 @@ def hnx_kwargs_to_props(H,
 ):
     # reproduce default hnx coloring behaviors
     edges_kwargs = edges_kwargs.copy()
-    edges_kwargs.setdefault('edgecolors', plt.cm.tab10(np.arange(len(H.edges))%10))
+    edges_kwargs.setdefault('edgecolors', plt.cm.tab10(np.arange(len(E))%10))
     edges_kwargs.setdefault('linewidths', 2)
     
     # props = kwargs.copy()
     props = {}
-    props.update(prepare_kwargs(H.nodes, nodes_kwargs, prefix='node'))
-    props.update(prepare_kwargs(H.nodes, node_labels_kwargs, prefix='nodeLabel'))
-    props.update(prepare_kwargs(H.edges, edges_kwargs, prefix='edge'))
-    props.update(prepare_kwargs(H.edges, edge_labels_kwargs, prefix='edgeLabel'))
+    props.update(prepare_kwargs(V, nodes_kwargs, prefix='node'))
+    props.update(prepare_kwargs(V, node_labels_kwargs, prefix='nodeLabel'))
+    props.update(prepare_kwargs(E, edges_kwargs, prefix='edge'))
+    props.update(prepare_kwargs(E, edge_labels_kwargs, prefix='edgeLabel'))
     
     # if not otherwise specified, set the edge label color
     # to be the same as the edge color
     props.setdefault('edgeLabelColor', props['edgeStroke'])
 
     return {**props, **rename_kwargs(**kwargs)}
-
-def _forwards_compatible_collapse(H):
-    return [
-        frozenset([uid]) if type(uid) is not frozenset else uid
-        for uid in H.nodes
-    ]
 
 @widgets.register
 class HypernetxWidgetView(ReactJupyterWidget):
@@ -109,7 +105,9 @@ class HypernetxWidgetView(ReactJupyterWidget):
         with_color=True,
         **kwargs
     ):
-        self.H = H
+        incidence_dict = H.edges.incidence_dict\
+            if H.__class__.__name__ == 'Hypergraph'\
+            else H
 
         def get_property(id, value, default):
             if value is None:
@@ -118,28 +116,31 @@ class HypernetxWidgetView(ReactJupyterWidget):
                 return value.get(id, default)
             else:
                 return value
-                
+            
+        V = set(chain.from_iterable(incidence_dict.values()))
+        E = list(incidence_dict)
+
         nodes = [
             {
                 'uid': uid,
                 'value': get_property(uid, node_size, 1)
             }
-            for uid in self.H
+            for uid in V
         ]
-
+        
         # js friendly representation of the hypergraph
         edges = [
             {
                 'uid': str(uid),
-                'elements': list(entity.elements),
+                'elements': elements
             }
-            for uid, entity in self.H.edges.elements.items()
+            for uid, elements in incidence_dict.items()
         ]
 
         super().__init__(
             nodes=nodes,
             edges=edges,
-            **hnx_kwargs_to_props(H, **kwargs)
+            **hnx_kwargs_to_props(V, E, **kwargs)
         )
 
 @widgets.register
