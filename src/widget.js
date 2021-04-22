@@ -58,6 +58,8 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [pinned, setPinned] = React.useState(false);
   const [unpinned, setUnpinned] = React.useState(now());
 
+  // const [fullscreen, setFullscreen] = React.useState(false);
+
   // update the python model with state
   const {_model} = props;
 
@@ -208,28 +210,6 @@ const Widget = ({ nodes, edges, ...props }) => {
     else {
       setSelectedNodes({[data.data.uid]: true})
     }
-
-    // setSelectedNodes({...(event.shiftKey ? selectedNodes : undefined), ...newSelection})
-    // if(event.shiftKey){
-    //   setSelectedNodes({...selectedNodes, [data.data.uid]: !selectedNodes[data.data.uid]});
-    // }
-    // else{
-    //
-    //   if(data !== undefined){
-    //     Object.entries(createDefaultState(nodes, false)).map(d => {
-    //       if(d[0] === data.data.uid){
-    //         newNodeSelect.set(d[0], true)
-    //       }
-    //     })
-    //     // setSelectedNodes(Object.fromEntries(newNodeSelect));
-    //
-    //
-    //     setSelectedNodes({...selectedNodes, [data.data.uid]: true})
-    //   }
-    //   else{
-    //     setSelectedNodes({});
-    //   }
-    // }
   }
 
   const getClickedEdges = (event, data) => {
@@ -243,37 +223,23 @@ const Widget = ({ nodes, edges, ...props }) => {
     else {
       setSelectedEdges({[data.uid]: true})
     }
-    // if(event.shiftKey){
-    //   setSelectedEdges({...selectedEdges, [data.uid]: !selectedEdges[data.uid]});
-    // }
-    // else{
-      // if(data !== undefined){
-      //   const newEdgeSelect = new Map();
-      //   Object.entries(createDefaultState(edges, false)).map(d => {
-      //     if(d[0] === data.uid){
-      //       newEdgeSelect.set(d[0], true)
-      //     }
-      //   })
-      //   // setSelectedEdges(Object.fromEntries(newEdgeSelect));
-      //   // console.log(newEdgeSelect);
-      //   setSelectedEdges({...selectedEdges, [data.uid]: true})
-      // }
-      // else{
-      //   setSelectedEdges({});
-      // }
-    // }
+
   }
 
   const handleOriginal = (type) => {
-    if(type === 'node'){
+    if(type === 'node' || type === 'graph'){
       setSelectedNodes({});
       setHiddenNodes({});
       setRemovedNodes({});
     }
-    else{
+    if(type === 'edge' || type === 'graph'){
       setSelectedEdges({});
       setHiddenEdges({});
       setRemovedEdges({});
+    }
+    if(type === 'graph'){
+      setBipartite(false);
+      setCollapseNodes(false);
     }
   }
 
@@ -390,6 +356,15 @@ const Widget = ({ nodes, edges, ...props }) => {
         })
         setSelectedEdges(currSelectedEdges);
       }
+    }
+    else if(selectionType === "fullscreen"){
+      setOpen(true);
+    }
+    else if(selectionType === "bipartite"){
+      setBipartite(true);
+    }
+    else if(selectionType === "collapse"){
+      setCollapseNodes(true);
     }
     else{
       setPinned(false);
@@ -532,14 +507,18 @@ const Widget = ({ nodes, edges, ...props }) => {
         <div style={{ display: "flex", justifyContent: "flex-start", flexFlow: "row wrap"}}>
             <Toolbar dataType={"node"} selectionState={selectedNodes} onSelectionChange={handleToolbarSelection}/>
             <Toolbar dataType={"edge"} selectionState={selectedEdges} onSelectionChange={handleToolbarSelection}/>
+            <Toolbar dataType={"graph"} onSelectionChange={handleToolbarSelection}/>
         </div>
-        <div style={{display: 'flex', justifyContent: "flex-end", paddingRight: "40px", paddingTop: '7px'}}>
-          <Button  size={'small'} style={{maxWidth: "30px", minWidth: "30px"}} onClick={() => setOpen(true)}>
-            <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>View fullscreen</div>}>
-              <ZoomOutMapIcon />
-            </Tooltip>
-          </Button>
-        </div>
+        {/*<div style={{display: 'flex', justifyContent: "flex-end", paddingRight: "40px", paddingTop: '7px'}}>*/}
+        {/*  <div style={{fontFamily: "Arial", fontSize: "14px", paddingBottom: "5px"}}>*/}
+        {/*    {"Graph"}*/}
+        {/*  </div>*/}
+        {/*  <Button  size={'small'} style={{maxWidth: "30px", minWidth: "30px"}} onClick={() => setOpen(true)}>*/}
+        {/*    <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>View fullscreen</div>}>*/}
+        {/*      <ZoomOutMapIcon />*/}
+        {/*    </Tooltip>*/}
+        {/*  </Button>*/}
+        {/*</div>*/}
 
 
       </div>
@@ -557,9 +536,17 @@ const Widget = ({ nodes, edges, ...props }) => {
      // onClose={() => setOpen(false)}
    >
      <Paper>
-       <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-         <IconButton onClick={() => setOpen(false)}><CloseIcon /></IconButton>
+       <div style={{display: 'flex', justifyContent: 'space-between', paddingLeft: "10px", paddingTop: '5px'}}>
+         <div style={{ display: "flex", justifyContent: "flex-start", flexFlow: "row wrap"}}>
+           <Toolbar dataType={"node"} selectionState={selectedNodes} onSelectionChange={handleToolbarSelection}/>
+           <Toolbar dataType={"edge"} selectionState={selectedEdges} onSelectionChange={handleToolbarSelection}/>
+           <Toolbar dataType={"graph"} onSelectionChange={handleToolbarSelection}/>
+         </div>
+         <div>
+           <IconButton onClick={() => setOpen(false)}><CloseIcon /></IconButton>
+         </div>
        </div>
+
 
        <HypernetxWidgetView
          {...props}

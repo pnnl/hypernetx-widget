@@ -13,6 +13,7 @@ import LocationOnIcon from '@material-ui/icons/LocationOn';
 import Tooltip from '@material-ui/core/Tooltip';
 import {makeStyles} from "@material-ui/core/styles";
 import FlipCameraAndroidIcon from '@material-ui/icons/FlipCameraAndroid';
+import ZoomOutMapIcon from "@material-ui/icons/ZoomOutMap";
 
 const toggleStyle = makeStyles((theme) => ({
     toggleButton: {
@@ -51,9 +52,9 @@ const Toolbar = ({ dataType, selectionState, onSelectionChange }) => {
     }
 
     return(
-      <div style={{ paddingRight: "7px",}}>
+      <div style={{  paddingTop: "5px", paddingRight: "7px",}}>
           <div style={{fontFamily: "Arial", fontSize: "14px", paddingBottom: "5px"}}>
-              {dataType === "node" ? "Nodes" : "Edges "}
+              {dataType === "node" ? "Nodes" : dataType === "edge" ? "Edges " : "Graph"}
           </div>
           <ToggleButtonGroup
             size={"small"}
@@ -62,49 +63,83 @@ const Toolbar = ({ dataType, selectionState, onSelectionChange }) => {
             exclusive
             onChange={handleSelection}
           >
+
               <ToggleButton value={"original"}>
                   <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Return to original</div>}>
                       <SettingsBackupRestoreIcon />
                   </Tooltip>
               </ToggleButton>
 
-              <ToggleButton value={"hidden"} disabled={!Object.values(selectionState).includes(true)} >
-                  <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Hide selected</div>}>
-                      {Object.values(selectionState).includes(true) ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                  </Tooltip>
-              </ToggleButton>
+              {dataType !== 'graph' &&
+                  <ToggleButton value={"hidden"} disabled={!Object.values(selectionState).includes(true)}>
+                      <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Hide selected</div>}>
+                          {Object.values(selectionState).includes(true) ? <VisibilityOffIcon/> : <VisibilityIcon/>}
+                      </Tooltip>
+                  </ToggleButton>
+              }
 
-              <ToggleButton value={"removed"} disabled={!Object.values(selectionState).includes(true)}>
-                  <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Remove selected</div>}>
-                      <RemoveCircleOutlineIcon />
-                  </Tooltip>
-              </ToggleButton>
+              {dataType !== 'graph' &&
+                  <ToggleButton value={"removed"} disabled={!Object.values(selectionState).includes(true)}>
+                      <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Remove selected</div>}>
+                          <RemoveCircleOutlineIcon/>
+                      </Tooltip>
+                  </ToggleButton>
+              }
 
-              <ToggleButton value={"other"} disabled={!Object.values(selectionState).includes(true)}>
-                  <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>{dataType === "node" ? "Select all edges containing selected nodes " : "Select all nodes in selected edges"}</div>}>
-                      <BubbleChartIcon />
-                  </Tooltip>
-              </ToggleButton>
+              {dataType !== 'graph' &&
+                  <ToggleButton value={"other"} disabled={!Object.values(selectionState).includes(true)}>
+                      <Tooltip title={<div style={{
+                          fontSize: "14px",
+                          padding: "3px"
+                      }}>{dataType === "node" ? "Select all edges containing selected nodes " : "Select all nodes in selected edges"}</div>}>
+                          <BubbleChartIcon/>
+                      </Tooltip>
+                  </ToggleButton>
+              }
 
+              {dataType !== 'graph' &&
+                  <ToggleButton value={"all"}>
+                      <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Select all</div>}>
+                          <SelectAllIcon/>
+                      </Tooltip>
+                  </ToggleButton>
+              }
 
-              <ToggleButton value={"all"}>
-                  <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Select all</div>}>
-                      <SelectAllIcon/>
-                  </Tooltip>
-              </ToggleButton>
+              {dataType !== 'graph' &&
+                  <ToggleButton value={"none"} disabled={!Object.values(selectionState).includes(true)}>
+                      <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Unselect all</div>}>
+                          <ClearIcon/>
+                      </Tooltip>
+                  </ToggleButton>
+              }
 
-              <ToggleButton value={"none"} disabled={!Object.values(selectionState).includes(true)}>
-                  <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Unselect all</div>}>
-                      <ClearIcon/>
-                  </Tooltip>
-              </ToggleButton>
+              {dataType !== 'graph' &&
+                  <ToggleButton value={"reverse"} disabled={!Object.values(selectionState).includes(true)}>
+                      <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Reverse selection</div>}>
+                          <FlipCameraAndroidIcon/>
+                      </Tooltip>
+                  </ToggleButton>
+              }
 
-              <ToggleButton value={"reverse"} disabled={!Object.values(selectionState).includes(true)}>
-                  <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Reverse selection</div>}>
-                    <FlipCameraAndroidIcon />
-                  </Tooltip>
+              {dataType === "graph" &&
+                <ToggleButton value={"fullscreen"}>
+                    <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>View fullscreen</div>}>
+                        <ZoomOutMapIcon />
+                    </Tooltip>
+                </ToggleButton>
+              }
 
-              </ToggleButton>
+              {dataType === "graph" &&
+                <ToggleButton value={"collapse"}>
+                    Collapse
+                </ToggleButton>
+              }
+
+              {dataType === "graph" &&
+                <ToggleButton value={"bipartite"}>
+                    Bipartite
+                </ToggleButton>
+              }
 
               {/*{dataType === "node" &&*/}
               {/*<ToggleButton value={"pin"}>*/}
