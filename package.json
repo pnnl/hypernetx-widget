@@ -64,6 +64,7 @@
     "lodash": "^4.17.21",
     "react-color": "^2.19.3",
     "react-colorscales": "^0.7.3",
+    "react-sizeme": "^3.0.1",
     "react-window": "^1.8.6",
     "victory": "^35.4.3"
   }

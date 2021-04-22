@@ -1,5 +1,7 @@
 import React, {useState, useMemo} from 'react'
 
+import { withSize } from 'react-sizeme'
+
 import {debounce, throttle} from 'lodash'
 
 import {drag} from 'd3-drag'
@@ -673,8 +675,15 @@ const planarForce = (nodes, edges) => {
   return force;
 }
 
-export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, pinned, width=600, height=600, ignorePlanarForce, pos={}, collapseNodes, ...props}) => {
-  // const width = navOpen ? 600 : 800;
+export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, pinned, size, aspect=4/3, ignorePlanarForce, pos={}, collapseNodes, ...props}) => {
+  let {width, height} = size;
+
+  if (height === null) {
+    height = width/aspect;
+  } else if (width === null) {
+    width = height*aspect;
+  }
+
   const derivedProps = useMemo(
     () => {
       removedNodes = removedNodes || {};
@@ -917,7 +926,7 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, p
   </div>
 }
 
-export default HypernetxWidgetView
+export default withSize()(HypernetxWidgetView)
 
 // todo:
 //   labels, tooltips (data)
