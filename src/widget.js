@@ -13,6 +13,11 @@ import { rgbToHex, getNodeDegree, getEdgeSize, getValueFreq, accordianStyles } f
 import Toolbar from "./toolbar";
 import Switches from "./switches";
 import FontSizeMenu from "./fontSizeMenu";
+import ZoomOutMapIcon from '@material-ui/icons/ZoomOutMap';
+import {IconButton, Modal, Paper} from "@material-ui/core";
+import Button from "@material-ui/core/Button";
+import CloseIcon from '@material-ui/icons/Close';
+import Tooltip from "@material-ui/core/Tooltip";
 
 const createDefaultState = (data, defaultValue) => {
   const mapObj = new Map();
@@ -447,6 +452,8 @@ const Widget = ({ nodes, edges, ...props }) => {
     setOpenAccordian(currAccordian);
   }
 
+  const [open, setOpen] = React.useState(false);
+
   // console.log(transNodeData);
   return <div>
     <Grid container spacing={1}>
@@ -526,6 +533,15 @@ const Widget = ({ nodes, edges, ...props }) => {
             <Toolbar dataType={"node"} selectionState={selectedNodes} onSelectionChange={handleToolbarSelection}/>
             <Toolbar dataType={"edge"} selectionState={selectedEdges} onSelectionChange={handleToolbarSelection}/>
         </div>
+        <div style={{display: 'flex', justifyContent: "flex-end", paddingRight: "40px", paddingTop: '7px'}}>
+          <Button  size={'small'} style={{maxWidth: "30px", minWidth: "30px"}} onClick={() => setOpen(true)}>
+            <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>View fullscreen</div>}>
+              <ZoomOutMapIcon />
+            </Tooltip>
+          </Button>
+        </div>
+
+
       </div>
 
       <HypernetxWidgetView
@@ -536,6 +552,25 @@ const Widget = ({ nodes, edges, ...props }) => {
         />
     </Grid>
   </Grid>
+   <Modal
+     open={open}
+     // onClose={() => setOpen(false)}
+   >
+     <Paper>
+       <div style={{display: 'flex', justifyContent: 'flex-end'}}>
+         <IconButton onClick={() => setOpen(false)}><CloseIcon /></IconButton>
+       </div>
+
+       <HypernetxWidgetView
+         {...props}
+         {...{nodes, edges, nodeFill, selectedNodes, hiddenNodes, removedNodes, edgeStroke, selectedEdges, hiddenEdges, removedEdges,
+            withNodeLabels, withEdgeLabels, collapseNodes, bipartite, unpinned, nodeFontSize, edgeFontSize, pinned}}
+          onClickNodes={getClickedNodes} onClickEdges={getClickedEdges}
+       />
+
+
+     </Paper>
+   </Modal>
 
 </div>
 
