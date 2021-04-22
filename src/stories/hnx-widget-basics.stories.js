@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {HypernetxWidgetView} from '../HypernetxWidgetView';
+import HypernetxWidgetView from '../HypernetxWidgetView';
 
 import props from './data/props.json'
 

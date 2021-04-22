@@ -1,7 +1,7 @@
 import React from 'react';
 
 // import {HypernetxWidget} from '..'
-import {HypernetxWidgetView, HypernetxWidget} from '..';
+import HypernetxWidgetView, {HypernetxWidget} from '..';
 
 import props from './data/biggerProps.json'
 

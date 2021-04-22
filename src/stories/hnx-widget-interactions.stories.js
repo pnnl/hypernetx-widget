@@ -4,7 +4,7 @@ import IconButton from '@material-ui/core/IconButton'
 import LockOpen from '@material-ui/icons/LockOpen'
 
 // import {HypernetxWidget} from '..'
-import {HypernetxWidgetView, now} from '../HypernetxWidgetView';
+import HypernetxWidgetView, {now} from '../HypernetxWidgetView';
 
 import props from './data/props.json'
 
