@@ -98,6 +98,21 @@ class HypernetxWidgetView(ReactJupyterWidget):
             'removed_edges': self.removed_edges
         }
 
+    def get_index(self, selection={}):
+        return [
+            k
+            for k, v in selection.items()
+            if v
+        ]
+
+    @property
+    def selected_node_data(self):
+        return self.node_data.loc[self.get_index(self.selected_nodes)]
+
+    @property
+    def selected_edge_data(self):
+        return self.edge_data.loc[self.get_index(self.selected_edges)]
+
     def __init__(self, H,
         collapse=True,
         node_size=None,
@@ -136,6 +151,14 @@ class HypernetxWidgetView(ReactJupyterWidget):
             }
             for uid, elements in incidence_dict.items()
         ]
+
+        if 'node_data' in kwargs:
+            self.node_data = kwargs['node_data']
+            kwargs['node_data'] = self.node_data.T.to_dict()
+
+        if 'edge_data' in kwargs:
+            self.edge_data = kwargs['edge_data']
+            kwargs['edge_data'] = self.edge_data.T.to_dict()
 
         super().__init__(
             nodes=nodes,
