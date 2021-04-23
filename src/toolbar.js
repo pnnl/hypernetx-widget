@@ -9,7 +9,8 @@ import BubbleChartIcon from '@material-ui/icons/BubbleChart';
 import SelectAllIcon from '@material-ui/icons/SelectAll';
 import ClearIcon from '@material-ui/icons/Clear';
 import LocationOffIcon from '@material-ui/icons/LocationOff';
-import LocationOnIcon from '@material-ui/icons/LocationOn';
+import PictureInPictureIcon from '@material-ui/icons/PictureInPicture';
+import LinearScaleIcon from '@material-ui/icons/LinearScale';
 import Tooltip from '@material-ui/core/Tooltip';
 import {makeStyles} from "@material-ui/core/styles";
 import FlipCameraAndroidIcon from '@material-ui/icons/FlipCameraAndroid';
@@ -92,7 +93,7 @@ const Toolbar = ({ dataType, selectionState, onSelectionChange }) => {
                           fontSize: "14px",
                           padding: "3px"
                       }}>{dataType === "node" ? "Select all edges containing selected nodes " : "Select all nodes in selected edges"}</div>}>
-                          <BubbleChartIcon/>
+                          <PictureInPictureIcon/>
                       </Tooltip>
                   </ToggleButton>
               }
@@ -131,13 +132,17 @@ const Toolbar = ({ dataType, selectionState, onSelectionChange }) => {
 
               {dataType === "graph" &&
                 <ToggleButton value={"collapse"}>
-                    Collapse
+                    <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Collapse nodes</div>}>
+                        <BubbleChartIcon />
+                    </Tooltip>
                 </ToggleButton>
               }
 
               {dataType === "graph" &&
                 <ToggleButton value={"bipartite"}>
-                    Bipartite
+                    <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Convert to bipartite</div>}>
+                        <LinearScaleIcon />
+                    </Tooltip>
                 </ToggleButton>
               }
 
