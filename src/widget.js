@@ -366,6 +366,10 @@ const Widget = ({ nodes, edges, ...props }) => {
     else if(selectionType === "collapse"){
       setCollapseNodes(true);
     }
+    else if(selectionType === "undo"){
+      setBipartite(false);
+      setCollapseNodes(false);
+    }
     else{
       setPinned(false);
       handleOriginal(dataType);
@@ -461,6 +465,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                   />
                   <Bars type={"node"} freqData={getValueFreq(nodeDegList)} onValueChange={handleBarSelect} />
                   <ColorPalette type={"node"} data={nodeDegList} defaultColors={props.nodeFill || createDefaultState(nodes, "#000000ff")}
+                                // isDiscrete={true}
                                 onPaletteChange={handlePaletteChange}
                                 currGroup={colGroup.node} currPalette={colPalette.node} onCurrDataChange={handleCurrData}
                   />
