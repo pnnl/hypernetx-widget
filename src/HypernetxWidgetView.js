@@ -675,7 +675,7 @@ const planarForce = (nodes, edges) => {
   return force;
 }
 
-export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, pinned, size, aspect=4/3, ignorePlanarForce, pos={}, collapseNodes, ...props}) => {
+export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, pinned, size, aspect=1, ignorePlanarForce, pos={}, collapseNodes, ...props}) => {
   let {width, height} = size;
 
   if (height === null) {
