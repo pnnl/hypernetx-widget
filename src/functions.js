@@ -129,6 +129,12 @@ export const allPalettes = ["Blues", "Greens", "Greys", "Oranges", "Purples", "R
 "Bn-BuGn", "PuRd-Gn", "Pink-YlGn", "Pu-Or", "Rd-Bu", "Rd-Grey", "Rd-Yl-Bu", "Spectral",
 "Turbo", "Viridis", "Inferno", "Plasma", "Cividis", "Warm", "Cool", "Rainbow", "Sinebow"];
 
+export const discretePalettes = ["Bn-BuGn", "PuRd-Gn", "Pink-YlGn", "Pu-Or", "Rd-Bu", "Rd-Grey", "Rd-Yl-Bu", "Spectral",
+  "Turbo", "Viridis", "Inferno", "Plasma", "Cividis", "Warm", "Cool", "Rainbow", "Sinebow"]
+
+export const contPalettes = ["Blues", "Greens", "Greys", "Oranges", "Purples", "Reds", "Bu-Gn", "Bu-Pu", "Gn-Bu",
+  "Or-Rd", "Pu-Bu-Gn", "Pu-Bu", "Pu-Rd", "Rd-Pu", "Yl-Gn-Bu", "Yl-Gn", "Yl-Or-Bn", "Yl-Or-Rd"]
+
 export const getScheme = color => {
   if(color === "Blues"){
     return scale.interpolateBlues

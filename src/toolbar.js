@@ -40,7 +40,7 @@ const toggleStyle = makeStyles((theme) => ({
 const Toolbar = ({ dataType, selectionState, onSelectionChange }) => {
 
     const classes = toggleStyle();
-    const [selectionType, setSelectionType] = React.useState("original");
+    const [selectionType, setSelectionType] = React.useState(dataType !== 'graph' ? "original" : "undo");
 
     const handleSelection = (event, newSelection) => {
         if(newSelection === null){
@@ -64,12 +64,21 @@ const Toolbar = ({ dataType, selectionState, onSelectionChange }) => {
             exclusive
             onChange={handleSelection}
           >
-
+              {dataType !== 'graph' &&
               <ToggleButton value={"original"}>
                   <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Return to original</div>}>
                       <SettingsBackupRestoreIcon />
                   </Tooltip>
               </ToggleButton>
+              }
+
+              {dataType === 'graph' &&
+              <ToggleButton value={"undo"}>
+                  <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>Return to original</div>}>
+                      <SettingsBackupRestoreIcon />
+                  </Tooltip>
+              </ToggleButton>
+              }
 
               {dataType !== 'graph' &&
                   <ToggleButton value={"hidden"} disabled={!Object.values(selectionState).includes(true)}>
