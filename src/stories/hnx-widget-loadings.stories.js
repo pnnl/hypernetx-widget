@@ -1,6 +1,7 @@
 import React from 'react';
 import Widget from '../widget.js';
 import props from './data/props.json';
+import metaprops from './data/props-with-metadata.json';
 import '../css/hnxStyle.css';
 
 export default {
@@ -49,15 +50,17 @@ const edgeColorDict = {
 }
 
 // console.log({...props});
-export const MainComponent = () => <div>
-  <Widget {...props} withEdgeLabels={true} withNodeLabels={true}
-          // nodeFill={nodeColorDict}
+// export const MainComponent = () => <div>
+//   <Widget {...props} withEdgeLabels={true} withNodeLabels={true}
+//           // nodeFill={nodeColorDict}
+//
+//     // edgeStroke={{}}
+//           // nodeRemoved={nodeRemovedDict}
+//           // edgeHidden={edgeHiddenDict}
+//     // edgeRemoved={edgeRemovedDict}
+//   />
+// </div>
 
-    // edgeStroke={{}}
-          // nodeRemoved={nodeRemovedDict}
-          // edgeHidden={edgeHiddenDict}
-    // edgeRemoved={edgeRemovedDict}
-  />
+export const WithMetaData = () => <div>
+  <Widget {...metaprops} withEdgeLabels={true} withNodeLabels={true} />
 </div>
-
-// export const Button = () => <ShowButton type={"node"} />
