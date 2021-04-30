@@ -4,7 +4,7 @@ import React from 'react';
 import HypernetxWidgetView from '../HypernetxWidgetView';
 
 import props from './data/props.json'
-
+import propsWithRadius from './data/props-with-radius.json'
 
 export default {
   title: 'HNX Widget SVG/Encodings',
@@ -32,4 +32,10 @@ export const RemovedNodes = () =>
 
 export const RemovedEdges = () =>
   <HypernetxWidgetView {...props} removedEdges={edges}  />
+
+export const WithRadius = () =>
+  <HypernetxWidgetView {...propsWithRadius} />
+
+export const WithRadiusCollapsed = () =>
+  <HypernetxWidgetView {...propsWithRadius} collapseNodes />
 
