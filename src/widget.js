@@ -539,7 +539,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                   <ColorPalette
                     type={"edge"}
                     data={edgeSizeList}
-                    // metadata={props.edgeData}
+                    metadata={props.edgeData}
                     defaultColors={
                       props.edgeStroke || createDefaultState(edges, "#000000ff")
                     }
