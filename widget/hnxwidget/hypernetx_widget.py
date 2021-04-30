@@ -115,7 +115,6 @@ class HypernetxWidgetView(ReactJupyterWidget):
 
     def __init__(self, H,
         collapse=True,
-        node_size=None,
         node_styles={},
         with_color=True,
         **kwargs
@@ -135,13 +134,7 @@ class HypernetxWidgetView(ReactJupyterWidget):
         V = set(chain.from_iterable(incidence_dict.values()))
         E = list(incidence_dict)
 
-        nodes = [
-            {
-                'uid': uid,
-                'value': get_property(uid, node_size, 1)
-            }
-            for uid in V
-        ]
+        nodes = [{'uid': uid} for uid in V]
         
         # js friendly representation of the hypergraph
         edges = [
