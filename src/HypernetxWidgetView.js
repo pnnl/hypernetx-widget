@@ -522,7 +522,7 @@ const Tooltip = ({x, y, xOffset=20, title, content={}}) =>
     </table>
   </div>
 
-const performCollapseNodes = ({nodes, edges, collapseNodes}) => {
+const performCollapseNodes = ({nodes, edges, collapseNodes, nodeRadius={}}) => {
 
   const edgesOfNodes = new Map(
     nodes.map(d => ([d.uid, []]))
@@ -546,7 +546,7 @@ const performCollapseNodes = ({nodes, edges, collapseNodes}) => {
 
   // construct a simple hierarchy out of the nodes
   return hierarchy({elements: tree}, d => d.elements)
-    .sum(d => d.value);
+    .sum(({uid}) => nodeRadius[uid] || 1);
 }
 
 const sortHyperEdges = edges => {
@@ -675,7 +675,7 @@ const planarForce = (nodes, edges) => {
   return force;
 }
 
-export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, pinned, size, aspect=1, ignorePlanarForce, pos={}, collapseNodes, ...props}) => {
+export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, pinned, size, aspect=1, ignorePlanarForce, pos={}, collapseNodes, nodeRadius, ...props}) => {
   let {width, height} = size;
 
   if (height === null) {
@@ -696,7 +696,7 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, p
           ...rest
         }));
 
-      const tree = performCollapseNodes({nodes, edges, collapseNodes})
+      const tree = performCollapseNodes({nodes, edges, collapseNodes, nodeRadius})
         .each((d, i) => d.uid = 'uid' in d.data ? d.data.uid : i);
 
       const nodesMap = new Map(
