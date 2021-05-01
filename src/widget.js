@@ -24,6 +24,7 @@ import { IconButton, Modal, Paper } from "@material-ui/core";
 import Button from "@material-ui/core/Button";
 import CloseIcon from "@material-ui/icons/Close";
 import Tooltip from "@material-ui/core/Tooltip";
+import NodeSizeMenu from "./nodeSizeMenu";
 
 const createDefaultState = (data, defaultValue) => {
   const mapObj = new Map();
@@ -175,11 +176,6 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   };
 
-  // const [navOpen, setNavOpen] = React.useState(false);
-  // const toggleNav = () => {
-  //   setNavOpen(!navOpen);
-  // }
-
   const transNodeData = nodes.map((x) => {
     return {
       uid: x.uid,
@@ -211,7 +207,9 @@ const Widget = ({ nodes, edges, ...props }) => {
     edge: "default",
   });
   const [fontSize, setFontSize] = React.useState({ node: 12, edge: 10 });
-  // const [colType, setColType] = React.useState("node");
+  const [nodeSize, setNodeSize] = React.useState(createDefaultState(nodes, 5));
+  const [nodeSizeValue, setNodeSizeValue] = React.useState(5);
+
   const handleCurrData = (group, palette, dataType) => {
     setColGroup({ ...colGroup, [dataType]: group });
     setColPalette({ ...colPalette, [dataType]: palette });
@@ -426,6 +424,11 @@ const Widget = ({ nodes, edges, ...props }) => {
       setFontSize({ ...fontSize, [type]: size });
     }
   };
+
+  const handleNodeSize = (size) => {
+    setNodeSize(createDefaultState(nodes, size));
+    setNodeSizeValue(size);
+  };
   const [openAccordian, setOpenAccordian] = React.useState({
     node: true,
     edge: false,
@@ -502,6 +505,10 @@ const Widget = ({ nodes, edges, ...props }) => {
                     type={"node"}
                     currSize={fontSize}
                     onSizeChange={handleFontSize}
+                  />
+                  <NodeSizeMenu
+                    currSize={nodeSizeValue}
+                    onSizeChange={handleNodeSize}
                   />
                   <Switches dataType={"node"} onSwitchChange={handleSwitch} />
                 </div>
@@ -617,6 +624,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               unpinned,
               nodeFontSize,
               edgeFontSize,
+              nodeSize,
               pinned,
             }}
             onClickNodes={getClickedNodes}
@@ -686,6 +694,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               unpinned,
               nodeFontSize,
               edgeFontSize,
+              nodeSize,
               pinned,
             }}
             onClickNodes={getClickedNodes}
