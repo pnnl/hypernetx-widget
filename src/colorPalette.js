@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     // paddingLeft: "15px",
     paddingRight: "5px",
     "& .MuiSelect-root": {
-      // width: 55,
+      minWidth: 50,
     },
     "& .MuiSelect-selectMenu": {
       overflow: "visible",
