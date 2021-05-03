@@ -8,16 +8,11 @@ import { makeStyles } from "@material-ui/core/styles";
 import { range } from "d3-array";
 import {
   getScheme,
-  hexToRgb,
-  allPalettes,
   rgbToHex,
   discretePalettes,
   contPalettes,
 } from "./functions.js";
 import { Colorscale } from "react-colorscales";
-import { ChromePicker } from "react-color";
-import { Palette } from "@material-ui/icons";
-import { IconButton } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -32,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     // paddingLeft: "15px",
     paddingRight: "5px",
     "& .MuiSelect-root": {
-      width: 55,
+      // width: 55,
     },
     "& .MuiSelect-selectMenu": {
       overflow: "visible",
@@ -225,7 +220,9 @@ const ColorPalette = ({
           {/*</MenuItem>*/}
           {/*)}*/}
           {columns.map((c) => (
-            <MenuItem value={c}>{c}</MenuItem>
+            <MenuItem key={c} value={c}>
+              {c}
+            </MenuItem>
           ))}
         </Select>
       </FormControl>

@@ -19,11 +19,8 @@ import {
 import Toolbar from "./toolbar";
 import Switches from "./switches";
 import FontSizeMenu from "./fontSizeMenu";
-import ZoomOutMapIcon from "@material-ui/icons/ZoomOutMap";
 import { IconButton, Modal, Paper } from "@material-ui/core";
-import Button from "@material-ui/core/Button";
 import CloseIcon from "@material-ui/icons/Close";
-import Tooltip from "@material-ui/core/Tooltip";
 import NodeSizeMenu from "./nodeSizeMenu";
 
 const createDefaultState = (data, defaultValue) => {
@@ -84,7 +81,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [pinned, setPinned] = React.useState(false);
   const [unpinned, setUnpinned] = React.useState(now());
 
-  // const [fullscreen, setFullscreen] = React.useState(false);
+  const [aspect, setAspect] = React.useState(1);
 
   // update the python model with state
   const { _model } = props;
@@ -373,6 +370,7 @@ const Widget = ({ nodes, edges, ...props }) => {
       }
     } else if (selectionType === "fullscreen") {
       setOpen(true);
+      setAspect(1.5);
     } else if (selectionType === "bipartite") {
       setBipartite(true);
     } else if (selectionType === "collapse") {
@@ -445,7 +443,10 @@ const Widget = ({ nodes, edges, ...props }) => {
   };
 
   const [open, setOpen] = React.useState(false);
-
+  const handleClose = () => {
+    setOpen(false);
+    setAspect(1);
+  };
   // console.log(transNodeData);
   return (
     <div>
@@ -626,6 +627,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               edgeFontSize,
               nodeSize,
               pinned,
+              aspect,
             }}
             onClickNodes={getClickedNodes}
             onClickEdges={getClickedEdges}
@@ -668,7 +670,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               />
             </div>
             <div>
-              <IconButton onClick={() => setOpen(false)}>
+              <IconButton onClick={handleClose}>
                 <CloseIcon />
               </IconButton>
             </div>
@@ -696,6 +698,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               edgeFontSize,
               nodeSize,
               pinned,
+              aspect,
             }}
             onClickNodes={getClickedNodes}
             onClickEdges={getClickedEdges}
