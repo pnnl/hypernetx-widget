@@ -773,7 +773,7 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, p
 
       return {links, edges, internals};
     },
-    [nodes, edges, removedNodes, removedEdges, collapseNodes]
+    [nodes, edges, removedNodes, removedEdges, collapseNodes, nodeSize]
   );
 
   const {bipartite, unpinned} = props;
