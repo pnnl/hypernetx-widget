@@ -22,6 +22,7 @@ import FontSizeMenu from "./fontSizeMenu";
 import { IconButton, Modal, Paper } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import NodeSizeMenu from "./nodeSizeMenu";
+import { range } from "d3-array";
 
 const createDefaultState = (data, defaultValue) => {
   const mapObj = new Map();
@@ -30,8 +31,6 @@ const createDefaultState = (data, defaultValue) => {
 };
 
 const Widget = ({ nodes, edges, ...props }) => {
-  // console.log(props.nodeData['BM'])
-  // console.log("props", props);
   const classes = accordianStyles();
 
   const nodeDegMap = new Map();
@@ -82,6 +81,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [unpinned, setUnpinned] = React.useState(now());
 
   const [aspect, setAspect] = React.useState(1);
+  const [mode, setMode] = React.useState("");
 
   // update the python model with state
   const { _model } = props;
@@ -204,17 +204,15 @@ const Widget = ({ nodes, edges, ...props }) => {
     edge: "default",
   });
   const [fontSize, setFontSize] = React.useState({ node: 12, edge: 10 });
-  const [nodeSize, setNodeSize] = React.useState(createDefaultState(nodes, 5));
-  const [nodeSizeValue, setNodeSizeValue] = React.useState(5);
+  const [nodeSize, setNodeSize] = React.useState(createDefaultState(nodes, 2));
+  const [nodeSizeGroup, setNodeSizeGroup] = React.useState("None");
 
   const handleCurrData = (group, palette, dataType) => {
     setColGroup({ ...colGroup, [dataType]: group });
     setColPalette({ ...colPalette, [dataType]: palette });
-    // setColType(type);
   };
 
   const getClickedNodes = (event, data) => {
-    // const newNodeSelect = new Map();
     if (event.shiftKey) {
       setSelectedNodes({
         ...selectedNodes,
@@ -228,7 +226,6 @@ const Widget = ({ nodes, edges, ...props }) => {
   };
 
   const getClickedEdges = (event, data) => {
-    // const newEdgeSelect = new Map();
     if (event.shiftKey) {
       setSelectedEdges({
         ...selectedEdges,
@@ -264,24 +261,20 @@ const Widget = ({ nodes, edges, ...props }) => {
         Object.entries(selectedNodes).filter(([k, v]) => v)
       );
       setHiddenNodes({ ...hiddenNodes, ...selectedNodesTrue });
-      // setHiddenNodes(selectedNodes);
     } else {
       const selectedEdgesTrue = Object.fromEntries(
         Object.entries(selectedEdges).filter(([k, v]) => v)
       );
       setHiddenEdges({ ...hiddenEdges, ...selectedEdgesTrue });
-      // setHiddenEdges(selectedEdges);
     }
   };
 
   const handleRemoveSelected = (type) => {
     if (type === "node") {
-      // console.log(selectedNodes);
       const selectedNodesTrue = Object.fromEntries(
         Object.entries(selectedNodes).filter(([k, v]) => v)
       );
       setRemovedNodes({ ...removedNodes, ...selectedNodesTrue });
-      // setSelectedNodes(Object.fromEntries(noNodeSelectMap));
     } else {
       const selectedEdgesTrue = Object.fromEntries(
         Object.entries(selectedEdges).filter(([k, v]) => v)
@@ -378,9 +371,11 @@ const Widget = ({ nodes, edges, ...props }) => {
     } else if (selectionType === "undo") {
       setBipartite(false);
       setCollapseNodes(false);
-    } else {
+    } else if (selectionType === "original") {
       setPinned(false);
       handleOriginal(dataType);
+    } else {
+      setMode(selectionType);
     }
   };
 
@@ -423,9 +418,39 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   };
 
-  const handleNodeSize = (size) => {
-    setNodeSize(createDefaultState(nodes, size));
-    setNodeSizeValue(size);
+  const assignSizeWMeta = (group, metadata) => {
+    const groupObj = {};
+    Object.entries(metadata).map((d) => {
+      groupObj[d[0]] = d[1][group];
+    });
+
+    const sizeDict = {};
+    const values = Object.values(groupObj);
+    const unique = Array.from(new Set(values)).sort();
+    range(unique.length).map((d, i) => {
+      sizeDict[unique[i]] = i + 1;
+    });
+
+    const dataDict = {};
+    Object.entries(groupObj).map((d) => {
+      dataDict[d[0]] = sizeDict[d[1]];
+    });
+    return dataDict;
+  };
+
+  const handleNodeSize = (group, metadata) => {
+    var obj = {};
+    if (group === "None") {
+      obj = createDefaultState(nodes, 2);
+    } else {
+      if (metadata === undefined) {
+        obj = nodeDegList;
+      } else {
+        obj = assignSizeWMeta(group, metadata);
+      }
+    }
+    setNodeSize(obj);
+    setNodeSizeGroup(group);
   };
   const [openAccordian, setOpenAccordian] = React.useState({
     node: true,
@@ -447,18 +472,11 @@ const Widget = ({ nodes, edges, ...props }) => {
     setOpen(false);
     setAspect(1);
   };
-  // console.log(transNodeData);
+
   return (
     <div>
       <Grid container spacing={1}>
         <Grid item xs={12} sm={4}>
-          {/*<div className="colorSetting" style={{ justifyContent: !navOpen ? "flex-start" : "flex-end", }}>*/}
-          {/*  <div>*/}
-          {/*    <Button style={{justifyContent: !navOpen ? "flex-start": "flex-end"}} color="primary" onClick={() => toggleNav()}>*/}
-          {/*      {!navOpen ? <ArrowForwardIos style={{fontSize: "20px"}} /> : <ArrowBackIos style={{fontSize: "20px"}}/>}*/}
-          {/*    </Button>*/}
-          {/*  </div>*/}
-          {/*</div>*/}
           <div className={classes.root}>
             <Accordion
               expanded={openAccordian["node"]}
@@ -508,8 +526,9 @@ const Widget = ({ nodes, edges, ...props }) => {
                     onSizeChange={handleFontSize}
                   />
                   <NodeSizeMenu
-                    currSize={nodeSizeValue}
-                    onSizeChange={handleNodeSize}
+                    currGroup={nodeSizeGroup}
+                    metadata={props.nodeData}
+                    onGroupChange={handleNodeSize}
                   />
                   <Switches dataType={"node"} onSwitchChange={handleSwitch} />
                 </div>
@@ -628,6 +647,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               nodeSize,
               pinned,
               aspect,
+              mode,
             }}
             onClickNodes={getClickedNodes}
             onClickEdges={getClickedEdges}
@@ -699,6 +719,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               nodeSize,
               pinned,
               aspect,
+              mode,
             }}
             onClickNodes={getClickedNodes}
             onClickEdges={getClickedEdges}
