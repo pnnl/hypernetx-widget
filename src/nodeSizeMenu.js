@@ -12,14 +12,18 @@ const useStyles = makeStyles((theme) => ({
 
 const sizeArr = [1, 3, 5, 7, 9];
 
-const NodeSizeMenu = ({ currSize, onSizeChange }) => {
+const NodeSizeMenu = ({ currGroup, metadata, onGroupChange }) => {
   const classes = useStyles();
-  const [size, setSize] = React.useState(currSize);
-
+  const [group, setGroup] = React.useState(currGroup);
   const handleSize = (event) => {
-    setSize(event.target.value);
-    onSizeChange(event.target.value);
+    setGroup(event.target.value);
+    onGroupChange(event.target.value, metadata);
   };
+
+  const columns =
+    metadata !== undefined
+      ? Object.keys(Object.values(metadata)[0]).concat("None")
+      : ["None", "Degree"];
 
   return (
     <div style={{ padding: "5px", width: "100%" }}>
@@ -34,11 +38,11 @@ const NodeSizeMenu = ({ currSize, onSizeChange }) => {
         {"Node size"}
       </div>
       <FormControl classes={{ root: classes.customSelect }}>
-        <InputLabel> Size </InputLabel>
-        <Select value={size} onChange={handleSize}>
-          {sizeArr.map((x) => (
-            <MenuItem key={x} value={x}>
-              {x}
+        <InputLabel> Group by </InputLabel>
+        <Select value={group} onChange={handleSize}>
+          {columns.map((c) => (
+            <MenuItem key={c} value={c}>
+              {c}
             </MenuItem>
           ))}
         </Select>

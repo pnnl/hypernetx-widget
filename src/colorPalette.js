@@ -213,12 +213,6 @@ const ColorPalette = ({
       <FormControl classes={{ root: classes.customSelect }}>
         <InputLabel>Group by</InputLabel>
         <Select value={group} onChange={handleGroup}>
-          {/*{metadata !== undefined && (*/}
-          {/*<MenuItem value={"each"}>Each</MenuItem>*/}
-          {/*<MenuItem value={"Degree"}>*/}
-          {/*  {type === "node" ? "Degree" : "Size"}*/}
-          {/*</MenuItem>*/}
-          {/*)}*/}
           {columns.map((c) => (
             <MenuItem key={c} value={c}>
               {c}
