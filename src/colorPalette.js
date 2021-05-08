@@ -9,8 +9,9 @@ import { range } from "d3-array";
 import {
   getScheme,
   rgbToHex,
-  discretePalettes,
   contPalettes,
+  getCategoricalScheme,
+  categoricalPalettes,
 } from "./functions.js";
 import { Colorscale } from "react-colorscales";
 
@@ -38,14 +39,8 @@ const useStyles = makeStyles((theme) => ({
   },
   colorItem: {
     "& .MuiSelect-root": {
-      width: 230,
+      width: 250,
     },
-
-    // "& .MuiSelect-selectMenu": {
-    //   // whiteSpace: "normal",
-    //   height: 'fit-content'
-    //
-    // },
 
     "& .MuiFormLabel-root": {
       fontSize: "15px",
@@ -114,7 +109,7 @@ const ColorPalette = ({
       return true;
     }
   };
-  const myPalette = isDiscrete(dataObj) ? discretePalettes : contPalettes;
+  const myPalette = isDiscrete(dataObj) ? categoricalPalettes : contPalettes;
 
   const [palette, setPalette] = React.useState(currPalette);
   // console.log(palette);
@@ -142,20 +137,29 @@ const ColorPalette = ({
 
   const assignColors = (group, palette) => {
     const schemeObj = {};
-    const colorObj = {};
+    var colorObj = {};
     const values = Object.values(dataObj);
     const unique = Array.from(new Set(values)).sort();
 
     const bins = unique.length;
+    if (!isDiscrete(dataObj)) {
+      range(bins).map((x, i) => {
+        schemeObj[unique[i]] = rgbToHex(getScheme(palette)((x + 1) / bins));
+      });
 
-    range(bins).map((x, i) => {
-      schemeObj[unique[i]] = rgbToHex(getScheme(palette)((x + 1) / bins));
-    });
-
-    Object.entries(dataObj).map((d) => {
-      colorObj[d[0]] = schemeObj[d[1]];
-    });
-
+      Object.entries(dataObj).map((d) => {
+        colorObj[d[0]] = schemeObj[d[1]];
+      });
+    } else {
+      const modifiedScheme = [];
+      range(bins).map((x, i) => {
+        let idx = x % getCategoricalScheme(palette).length;
+        modifiedScheme.push(getCategoricalScheme(palette)[idx]);
+      });
+      Object.entries(dataObj).map((d, i) => {
+        colorObj[d[0]] = modifiedScheme[i];
+      });
+    }
     return colorObj;
   };
 
@@ -191,10 +195,14 @@ const ColorPalette = ({
   // };
 
   const getColorArray = (name) => {
-    const colorScheme = getScheme(name);
-    const k = [0.2, 0.4, 0.6, 0.8, 1];
-    const result = k.map((x) => colorScheme(x));
-    return result;
+    if (isDiscrete(dataObj)) {
+      return getCategoricalScheme(name);
+    } else {
+      const colorScheme = getScheme(name);
+      const k = [0.2, 0.4, 0.6, 0.8, 1];
+      const result = k.map((x) => colorScheme(x));
+      return result;
+    }
   };
 
   return (
