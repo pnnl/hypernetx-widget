@@ -18,6 +18,7 @@ import ZoomOutMapIcon from "@material-ui/icons/ZoomOutMap";
 import ZoomInIcon from "@material-ui/icons/ZoomIn";
 import ZoomOutIcon from "@material-ui/icons/ZoomOut";
 import OpenWithIcon from "@material-ui/icons/OpenWith";
+import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
 
 const toggleStyle = makeStyles((theme) => ({
   toggleButton: {
@@ -283,6 +284,20 @@ const Toolbar = ({ dataType, selectionState, onSelectionChange }) => {
               }
             >
               <ZoomOutMapIcon />
+            </Tooltip>
+          </ToggleButton>
+        )}
+
+        {dataType === "graph" && (
+          <ToggleButton value={"help"}>
+            <Tooltip
+              title={
+                <div style={{ fontSize: "14px", padding: "3px" }}>
+                  View help menu
+                </div>
+              }
+            >
+              <HelpOutlineIcon />
             </Tooltip>
           </ToggleButton>
         )}

@@ -23,6 +23,7 @@ import { IconButton, Modal, Paper } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import NodeSizeMenu from "./nodeSizeMenu";
 import { range } from "d3-array";
+import HelpMenu from "./helpMenu";
 
 const createDefaultState = (data, defaultValue) => {
   const mapObj = new Map();
@@ -206,6 +207,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [fontSize, setFontSize] = React.useState({ node: 12, edge: 10 });
   const [nodeSize, setNodeSize] = React.useState(createDefaultState(nodes, 2));
   const [nodeSizeGroup, setNodeSizeGroup] = React.useState("None");
+  const [openHelp, setOpenHelp] = React.useState(false);
 
   const handleCurrData = (group, palette, dataType) => {
     setColGroup({ ...colGroup, [dataType]: group });
@@ -362,7 +364,7 @@ const Widget = ({ nodes, edges, ...props }) => {
         setSelectedEdges(currSelectedEdges);
       }
     } else if (selectionType === "fullscreen") {
-      setOpen(true);
+      setOpenFullscreen(true);
       setAspect(1.5);
     } else if (selectionType === "bipartite") {
       setBipartite(true);
@@ -374,6 +376,8 @@ const Widget = ({ nodes, edges, ...props }) => {
     } else if (selectionType === "original") {
       setPinned(false);
       handleOriginal(dataType);
+    } else if (selectionType === "help") {
+      setOpenHelp(true);
     } else {
       setMode(selectionType);
     }
@@ -467,9 +471,9 @@ const Widget = ({ nodes, edges, ...props }) => {
     setOpenAccordian(currAccordian);
   };
 
-  const [open, setOpen] = React.useState(false);
+  const [openFullscreen, setOpenFullscreen] = React.useState(false);
   const handleClose = () => {
-    setOpen(false);
+    setOpenFullscreen(false);
     setAspect(1);
   };
 
@@ -547,7 +551,6 @@ const Widget = ({ nodes, edges, ...props }) => {
               </AccordionSummary>
               <AccordionDetails>
                 <div style={{ width: "100%" }}>
-                  {/*<Toolbar dataType={"edge"} selectionState={selectedEdges} onSelectionChange={handleToolbarSelection}/>*/}
                   <LoadTable
                     type={"edge"}
                     data={transEdgeData}
@@ -588,7 +591,6 @@ const Widget = ({ nodes, edges, ...props }) => {
         </Grid>
 
         <Grid item xs={12} sm={8}>
-          {/*<Grid item xs={12} sm={navOpen && 8}>*/}
           <div>
             <div
               style={{
@@ -612,16 +614,6 @@ const Widget = ({ nodes, edges, ...props }) => {
                 onSelectionChange={handleToolbarSelection}
               />
             </div>
-            {/*<div style={{display: 'flex', justifyContent: "flex-end", paddingRight: "40px", paddingTop: '7px'}}>*/}
-            {/*  <div style={{fontFamily: "Arial", fontSize: "14px", paddingBottom: "5px"}}>*/}
-            {/*    {"Graph"}*/}
-            {/*  </div>*/}
-            {/*  <Button  size={'small'} style={{maxWidth: "30px", minWidth: "30px"}} onClick={() => setOpen(true)}>*/}
-            {/*    <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>View fullscreen</div>}>*/}
-            {/*      <ZoomOutMapIcon />*/}
-            {/*    </Tooltip>*/}
-            {/*  </Button>*/}
-            {/*</div>*/}
           </div>
 
           <HypernetxWidgetView
@@ -654,8 +646,9 @@ const Widget = ({ nodes, edges, ...props }) => {
           />
         </Grid>
       </Grid>
+      <HelpMenu state={openHelp} onOpenChange={() => setOpenHelp(false)} />
       <Modal
-        open={open}
+        open={openFullscreen}
         // onClose={() => setOpen(false)}
       >
         <Paper>
