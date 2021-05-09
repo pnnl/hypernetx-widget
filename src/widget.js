@@ -22,6 +22,8 @@ import FontSizeMenu from "./fontSizeMenu";
 import { IconButton, Modal, Paper } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import NodeSizeMenu from "./nodeSizeMenu";
+import { range } from "d3-array";
+import HelpMenu from "./helpMenu";
 
 const createDefaultState = (data, defaultValue) => {
   const mapObj = new Map();
@@ -30,8 +32,6 @@ const createDefaultState = (data, defaultValue) => {
 };
 
 const Widget = ({ nodes, edges, ...props }) => {
-  // console.log(props.nodeData['BM'])
-  // console.log("props", props);
   const classes = accordianStyles();
 
   const nodeDegMap = new Map();
@@ -82,6 +82,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [unpinned, setUnpinned] = React.useState(now());
 
   const [aspect, setAspect] = React.useState(1);
+  const [mode, setMode] = React.useState("");
 
   // update the python model with state
   const { _model } = props;
@@ -204,17 +205,16 @@ const Widget = ({ nodes, edges, ...props }) => {
     edge: "default",
   });
   const [fontSize, setFontSize] = React.useState({ node: 12, edge: 10 });
-  const [nodeSize, setNodeSize] = React.useState(createDefaultState(nodes, 5));
-  const [nodeSizeValue, setNodeSizeValue] = React.useState(5);
+  const [nodeSize, setNodeSize] = React.useState(createDefaultState(nodes, 2));
+  const [nodeSizeGroup, setNodeSizeGroup] = React.useState("None");
+  const [openHelp, setOpenHelp] = React.useState(false);
 
   const handleCurrData = (group, palette, dataType) => {
     setColGroup({ ...colGroup, [dataType]: group });
     setColPalette({ ...colPalette, [dataType]: palette });
-    // setColType(type);
   };
 
   const getClickedNodes = (event, data) => {
-    // const newNodeSelect = new Map();
     if (event.shiftKey) {
       setSelectedNodes({
         ...selectedNodes,
@@ -228,7 +228,6 @@ const Widget = ({ nodes, edges, ...props }) => {
   };
 
   const getClickedEdges = (event, data) => {
-    // const newEdgeSelect = new Map();
     if (event.shiftKey) {
       setSelectedEdges({
         ...selectedEdges,
@@ -264,24 +263,20 @@ const Widget = ({ nodes, edges, ...props }) => {
         Object.entries(selectedNodes).filter(([k, v]) => v)
       );
       setHiddenNodes({ ...hiddenNodes, ...selectedNodesTrue });
-      // setHiddenNodes(selectedNodes);
     } else {
       const selectedEdgesTrue = Object.fromEntries(
         Object.entries(selectedEdges).filter(([k, v]) => v)
       );
       setHiddenEdges({ ...hiddenEdges, ...selectedEdgesTrue });
-      // setHiddenEdges(selectedEdges);
     }
   };
 
   const handleRemoveSelected = (type) => {
     if (type === "node") {
-      // console.log(selectedNodes);
       const selectedNodesTrue = Object.fromEntries(
         Object.entries(selectedNodes).filter(([k, v]) => v)
       );
       setRemovedNodes({ ...removedNodes, ...selectedNodesTrue });
-      // setSelectedNodes(Object.fromEntries(noNodeSelectMap));
     } else {
       const selectedEdgesTrue = Object.fromEntries(
         Object.entries(selectedEdges).filter(([k, v]) => v)
@@ -369,7 +364,7 @@ const Widget = ({ nodes, edges, ...props }) => {
         setSelectedEdges(currSelectedEdges);
       }
     } else if (selectionType === "fullscreen") {
-      setOpen(true);
+      setOpenFullscreen(true);
       setAspect(1.5);
     } else if (selectionType === "bipartite") {
       setBipartite(true);
@@ -378,9 +373,13 @@ const Widget = ({ nodes, edges, ...props }) => {
     } else if (selectionType === "undo") {
       setBipartite(false);
       setCollapseNodes(false);
-    } else {
+    } else if (selectionType === "original") {
       setPinned(false);
       handleOriginal(dataType);
+    } else if (selectionType === "help") {
+      setOpenHelp(true);
+    } else {
+      setMode(selectionType);
     }
   };
 
@@ -423,9 +422,39 @@ const Widget = ({ nodes, edges, ...props }) => {
     }
   };
 
-  const handleNodeSize = (size) => {
-    setNodeSize(createDefaultState(nodes, size));
-    setNodeSizeValue(size);
+  const assignSizeWMeta = (group, metadata) => {
+    const groupObj = {};
+    Object.entries(metadata).map((d) => {
+      groupObj[d[0]] = d[1][group];
+    });
+
+    const sizeDict = {};
+    const values = Object.values(groupObj);
+    const unique = Array.from(new Set(values)).sort();
+    range(unique.length).map((d, i) => {
+      sizeDict[unique[i]] = i + 1;
+    });
+
+    const dataDict = {};
+    Object.entries(groupObj).map((d) => {
+      dataDict[d[0]] = sizeDict[d[1]];
+    });
+    return dataDict;
+  };
+
+  const handleNodeSize = (group, metadata) => {
+    var obj = {};
+    if (group === "None") {
+      obj = createDefaultState(nodes, 2);
+    } else {
+      if (metadata === undefined) {
+        obj = nodeDegList;
+      } else {
+        obj = assignSizeWMeta(group, metadata);
+      }
+    }
+    setNodeSize(obj);
+    setNodeSizeGroup(group);
   };
   const [openAccordian, setOpenAccordian] = React.useState({
     node: true,
@@ -442,23 +471,16 @@ const Widget = ({ nodes, edges, ...props }) => {
     setOpenAccordian(currAccordian);
   };
 
-  const [open, setOpen] = React.useState(false);
+  const [openFullscreen, setOpenFullscreen] = React.useState(false);
   const handleClose = () => {
-    setOpen(false);
+    setOpenFullscreen(false);
     setAspect(1);
   };
-  // console.log(transNodeData);
+
   return (
     <div>
       <Grid container spacing={1}>
         <Grid item xs={12} sm={4}>
-          {/*<div className="colorSetting" style={{ justifyContent: !navOpen ? "flex-start" : "flex-end", }}>*/}
-          {/*  <div>*/}
-          {/*    <Button style={{justifyContent: !navOpen ? "flex-start": "flex-end"}} color="primary" onClick={() => toggleNav()}>*/}
-          {/*      {!navOpen ? <ArrowForwardIos style={{fontSize: "20px"}} /> : <ArrowBackIos style={{fontSize: "20px"}}/>}*/}
-          {/*    </Button>*/}
-          {/*  </div>*/}
-          {/*</div>*/}
           <div className={classes.root}>
             <Accordion
               expanded={openAccordian["node"]}
@@ -508,8 +530,9 @@ const Widget = ({ nodes, edges, ...props }) => {
                     onSizeChange={handleFontSize}
                   />
                   <NodeSizeMenu
-                    currSize={nodeSizeValue}
-                    onSizeChange={handleNodeSize}
+                    currGroup={nodeSizeGroup}
+                    metadata={props.nodeData}
+                    onGroupChange={handleNodeSize}
                   />
                   <Switches dataType={"node"} onSwitchChange={handleSwitch} />
                 </div>
@@ -528,7 +551,6 @@ const Widget = ({ nodes, edges, ...props }) => {
               </AccordionSummary>
               <AccordionDetails>
                 <div style={{ width: "100%" }}>
-                  {/*<Toolbar dataType={"edge"} selectionState={selectedEdges} onSelectionChange={handleToolbarSelection}/>*/}
                   <LoadTable
                     type={"edge"}
                     data={transEdgeData}
@@ -569,7 +591,6 @@ const Widget = ({ nodes, edges, ...props }) => {
         </Grid>
 
         <Grid item xs={12} sm={8}>
-          {/*<Grid item xs={12} sm={navOpen && 8}>*/}
           <div>
             <div
               style={{
@@ -593,16 +614,6 @@ const Widget = ({ nodes, edges, ...props }) => {
                 onSelectionChange={handleToolbarSelection}
               />
             </div>
-            {/*<div style={{display: 'flex', justifyContent: "flex-end", paddingRight: "40px", paddingTop: '7px'}}>*/}
-            {/*  <div style={{fontFamily: "Arial", fontSize: "14px", paddingBottom: "5px"}}>*/}
-            {/*    {"Graph"}*/}
-            {/*  </div>*/}
-            {/*  <Button  size={'small'} style={{maxWidth: "30px", minWidth: "30px"}} onClick={() => setOpen(true)}>*/}
-            {/*    <Tooltip title={<div style={{fontSize: "14px", padding: "3px"}}>View fullscreen</div>}>*/}
-            {/*      <ZoomOutMapIcon />*/}
-            {/*    </Tooltip>*/}
-            {/*  </Button>*/}
-            {/*</div>*/}
           </div>
 
           <HypernetxWidgetView
@@ -628,14 +639,16 @@ const Widget = ({ nodes, edges, ...props }) => {
               nodeSize,
               pinned,
               aspect,
+              mode,
             }}
             onClickNodes={getClickedNodes}
             onClickEdges={getClickedEdges}
           />
         </Grid>
       </Grid>
+      <HelpMenu state={openHelp} onOpenChange={() => setOpenHelp(false)} />
       <Modal
-        open={open}
+        open={openFullscreen}
         // onClose={() => setOpen(false)}
       >
         <Paper>
@@ -699,6 +712,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               nodeSize,
               pinned,
               aspect,
+              mode,
             }}
             onClickNodes={getClickedNodes}
             onClickEdges={getClickedEdges}
