@@ -59,7 +59,6 @@
     "d3-scale": "^3.2.3",
     "d3-scale-chromatic": "^2.0.0",
     "d3-selection": "^2.0.0",
-    "imp-redux": "^1.0.1",
     "js-graph-algorithms": "^1.0.18",
     "lodash": "^4.17.21",
     "react-color": "^2.19.3",
