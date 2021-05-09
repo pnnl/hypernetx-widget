@@ -3,8 +3,6 @@ Installation requires you to first pip install the widget, then install and acti
 
 ```sh
 pip install hnxwidget-<version>.py3-none-any.whl
-jupyter nbextension install hnxwidget
-jupyter nbextension enable hnxwidget
 ```
 
 # Getting Started
@@ -31,7 +29,7 @@ HypernetxWidget(H)
 
 A more in depth demonstration of the widget is found in `/notebooks/example widget.ipynb`.
 
-# Other Installation Methods
+# Other Installation Methods: Install from source
 ## For testers
 This installation is intended for people who want to test `hnx-widget` with the most recent interface (on any branch). Run the following commands.
 ```sh
