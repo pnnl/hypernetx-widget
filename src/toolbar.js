@@ -19,6 +19,8 @@ import ZoomInIcon from "@material-ui/icons/ZoomIn";
 import ZoomOutIcon from "@material-ui/icons/ZoomOut";
 import OpenWithIcon from "@material-ui/icons/OpenWith";
 import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
+import TransformIcon from "@material-ui/icons/Transform";
+import NavigationIcon from "@material-ui/icons/Navigation";
 
 const toggleStyle = makeStyles((theme) => ({
   toggleButton: {
@@ -239,6 +241,20 @@ const Toolbar = ({ dataType, selectionState, onSelectionChange }) => {
         )}
 
         {dataType === "graph" && (
+          <ToggleButton value={"cursor"}>
+            <Tooltip
+              title={
+                <div style={{ fontSize: "14px", padding: "3px" }}>
+                  Mouse cursor select
+                </div>
+              }
+            >
+              <NavigationIcon />
+            </Tooltip>
+          </ToggleButton>
+        )}
+
+        {dataType === "graph" && (
           <ToggleButton value={"zoom in"}>
             <Tooltip
               title={
@@ -270,6 +286,20 @@ const Toolbar = ({ dataType, selectionState, onSelectionChange }) => {
               }
             >
               <OpenWithIcon />
+            </Tooltip>
+          </ToggleButton>
+        )}
+
+        {dataType === "graph" && (
+          <ToggleButton value={"brush"}>
+            <Tooltip
+              title={
+                <div style={{ fontSize: "14px", padding: "3px" }}>
+                  Brush select
+                </div>
+              }
+            >
+              <TransformIcon />
             </Tooltip>
           </ToggleButton>
         )}
