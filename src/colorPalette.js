@@ -156,9 +156,17 @@ const ColorPalette = ({
         let idx = x % getCategoricalScheme(palette).length;
         modifiedScheme.push(getCategoricalScheme(palette)[idx]);
       });
-      Object.entries(dataObj).map((d, i) => {
-        colorObj[d[0]] = modifiedScheme[i];
-      });
+
+      if (getCategoricalScheme(palette).length > bins) {
+        Object.entries(dataObj).map((d, i) => {
+          let idx = unique.indexOf(d[1]);
+          colorObj[d[0]] = modifiedScheme[idx];
+        });
+      } else {
+        Object.entries(dataObj).map((d, i) => {
+          colorObj[d[0]] = modifiedScheme[i];
+        });
+      }
     }
     return colorObj;
   };
@@ -219,7 +227,7 @@ const ColorPalette = ({
       </div>
 
       <FormControl classes={{ root: classes.customSelect }}>
-        <InputLabel>Group by</InputLabel>
+        <InputLabel>Color by</InputLabel>
         <Select value={group} onChange={handleGroup}>
           {columns.map((c) => (
             <MenuItem key={c} value={c}>
