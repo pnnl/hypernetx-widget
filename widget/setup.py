@@ -23,7 +23,7 @@ log.info('setup.py entered')
 log.info('$PATH=%s' % os.environ['PATH'])
 
 name = 'hnxwidget'
-LONG_DESCRIPTION = 'A widget for interractive visualization of the hypernetx package.'
+LONG_DESCRIPTION = 'A widget for interactive visualization of the hypernetx package.'
 
 
 def js_prerelease(command, strict=False):
@@ -152,7 +152,7 @@ setup_args = dict(
     },
     author='Dustin Arendt',
     author_email='dustin.arendt@pnnl.gov',
-    url='https://github.com/PNNL/hnx-widget',
+    url='https://github.com/pnnl/hypernetx-widget',
     keywords=[
         'ipython',
         'jupyter',
