@@ -2,7 +2,7 @@ import React from "react";
 import FormControl from "@material-ui/core/FormControl";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
-import Button from "@material-ui/core/Button";
+import ColorScale from "./colorScale";
 import InputLabel from "@material-ui/core/InputLabel";
 import { makeStyles } from "@material-ui/core/styles";
 import { range } from "d3-array";
@@ -13,7 +13,7 @@ import {
   getCategoricalScheme,
   categoricalPalettes,
 } from "./functions.js";
-import { Colorscale } from "react-colorscales";
+// import { Colorscale } from "react-colorscales";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
@@ -21,11 +21,7 @@ const useStyles = makeStyles((theme) => ({
     // minWidth: 120,
     paddingLeft: "15px",
   },
-  // selectEmpty: {
-  //   marginTop: theme.spacing(2),
-  // },
   customSelect: {
-    // paddingLeft: "15px",
     paddingRight: "5px",
     "& .MuiSelect-root": {
       minWidth: 50,
@@ -39,7 +35,9 @@ const useStyles = makeStyles((theme) => ({
   },
   colorItem: {
     "& .MuiSelect-root": {
-      width: 250,
+      width: 200,
+      maxHeight: 5,
+      // padding: "",
     },
 
     "& .MuiFormLabel-root": {
@@ -49,6 +47,8 @@ const useStyles = makeStyles((theme) => ({
   menuItem: {
     // "& .MuiMenuItem-root": {
     //   padding: "0px",
+    paddingTop: "3px",
+    paddingBottom: "3px",
     paddingLeft: "2px",
     paddingRight: "2px",
     whiteSpace: "normal",
@@ -245,20 +245,16 @@ const ColorPalette = ({
           </MenuItem>
           {myPalette.map((c) => (
             <MenuItem key={c} classes={{ root: classes.menuItem }} value={c}>
-              <Colorscale
-                onClick={() => {}}
-                colorscale={getColorArray(c)}
-                label={c}
-              />
+              {/*<Colorscale*/}
+              {/*  onClick={() => {}}*/}
+              {/*  colorscale={getColorArray(c)}*/}
+              {/*  label={c}*/}
+              {/*/>*/}
+              <ColorScale name={c} colorArray={getColorArray(c)} />
             </MenuItem>
           ))}
         </Select>
       </FormControl>
-
-      {/*<div className="colorButtonCont">*/}
-      {/*  <Button onClick={handleSubmit} type="button" variant="outlined" color="primary">Update</Button>*/}
-      {/*  /!*<Button onClick={handleReset} type="button" variant="outlined" color="primary">Reset</Button>*!/*/}
-      {/*</div>*/}
     </div>
   );
 };
