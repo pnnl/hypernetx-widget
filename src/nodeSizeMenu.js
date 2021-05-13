@@ -5,12 +5,13 @@ import { makeStyles } from "@material-ui/core/styles";
 const useStyles = makeStyles((theme) => ({
   customSelect: {
     "& .MuiFormLabel-root": {
-      fontSize: "15px",
+      fontSize: "13px",
     },
+    // "& .MuiSelect-select.MuiSelect-select": {
+    //   fontSize: "13px",
+    // },
   },
 }));
-
-const sizeArr = [1, 3, 5, 7, 9];
 
 const NodeSizeMenu = ({ currGroup, metadata, onGroupChange }) => {
   const classes = useStyles();
@@ -26,19 +27,19 @@ const NodeSizeMenu = ({ currGroup, metadata, onGroupChange }) => {
       : ["None", "Degree"];
 
   return (
-    <div style={{ padding: "5px", width: "100%" }}>
+    <div style={{ padding: "5px", width: "100%", display: "flex" }}>
       <div
         style={{
           fontFamily: "Arial",
-          fontSize: "15px",
-          paddingTop: "8px",
-          paddingBottom: "8px",
+          fontSize: "13px",
+          padding: "3px",
+          // paddingTop: "8px",
+          paddingRight: "8px",
         }}
       >
         {"Node size"}
       </div>
       <FormControl classes={{ root: classes.customSelect }}>
-        <InputLabel> Group by </InputLabel>
         <Select value={group} onChange={handleSize}>
           {columns.map((c) => (
             <MenuItem key={c} value={c}>
