@@ -4,6 +4,7 @@ import { withSize } from 'react-sizeme'
 
 import {debounce, throttle} from 'lodash'
 
+import {brush} from 'd3-brush'
 import {drag} from 'd3-drag'
 import {group, maxIndex, merge, mean, min, max, range, sum, extent} from 'd3-array'
 import {pack, hierarchy} from 'd3-hierarchy'
@@ -695,7 +696,94 @@ const planarForce = (nodes, edges) => {
   return force;
 }
 
-export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, pinned, size, aspect=1, ignorePlanarForce, pos={}, collapseNodes, nodeSize, ...props}) => {
+const intervalIntersect = (s1, s2, t1, t2) =>
+  !(s2 < t1 || t2 < s1)
+
+const NodeRectangularBrush = ({simulation}) => {
+  const handleBrush = ev => {
+    // because nodes are potentially moving we just do this the slow way
+
+    if (!ev.selection) return;
+
+    const [p1, p2] = ev.selection;
+    const [x1, y1] = p1;
+    const [x2, y2] = p2;
+
+    const selectedNodes = simulation.nodes()
+      .filter(({children, r, x, y}) =>
+        children !== undefined &&
+        intervalIntersect(x - r, x + r, x1, x2) && 
+        intervalIntersect(y - r, y + r, y1, y2)
+      );
+
+    // todo: fire selection event
+    console.log(selectedNodes);
+  }
+
+  return <g className='node-brush' ref={ele => {
+    select(ele)
+      .call(
+        brush()
+          .on('end', handleBrush)
+          // .extent([[0, 0], simulation.size])
+      );
+  }}/>
+}
+
+const EdgeLinearBrush = ({simulation}) => {
+  const getPointerLocation = ev => {
+      const {layerX, layerY} = ev.sourceEvent;
+      return [layerX, layerY];
+  }
+
+  return <g className='edge-brush' ref={ele => {
+    const g = select(ele);
+
+    let start, end;
+
+    const handleStart = ev =>
+      start = getPointerLocation(ev);
+
+    const handleBrush = ev => {
+      end = getPointerLocation(ev);
+
+      g.selectAll('line')
+        .data([[start, end]])
+        .join('line')
+          .attr('x1', d => d[0][0])
+          .attr('y1', d => d[0][1])
+          .attr('x2', d => d[1][0])
+          .attr('y2', d => d[1][1])
+          .style('visibility', 'visible');
+    }
+
+    const handleEnd = ev => {
+      g.select('line')
+        .style('visibility', 'hidden')
+
+      if (!ev.selection) return;
+
+      const selectedEdges = simulation.nodes()
+        .filter(({points}) =>
+          points !== undefined &&
+          (polygonContains(points, start) ^ polygonContains(points, end))
+        );
+
+      // todo: fire selection event
+      console.log(selectedEdges);
+    }
+
+    g.call(
+      brush()
+        .on('start', handleStart)
+        .on('brush', handleBrush)
+        .on('end', handleEnd)
+    );
+  }}/>
+}
+
+
+export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, pinned, size, aspect=1, ignorePlanarForce, pos={}, collapseNodes, nodeSize, selectionMode, ...props}) => {
   let {width, height} = size;
 
   if (height === null) {
@@ -941,6 +1029,15 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, p
       }
 
       <Nodes {...allProps} />
+
+      { selectionMode === 'node-brush' &&
+        <NodeRectangularBrush {...allProps} />
+      }
+
+      { selectionMode === 'edge-brush' &&
+        <EdgeLinearBrush {...allProps} />
+      }
+      
     </svg>
 
   </div>

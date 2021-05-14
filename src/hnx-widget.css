@@ -102,3 +102,13 @@
 .hnx-widget-view .hiddenState {
 	opacity: 0.1;
 }
+
+.hnx-widget-view .edge-brush rect.selection,
+.hnx-widget-view .edge-brush rect.handle {
+	visibility: hidden;
+}
+
+.hnx-widget-view .edge-brush line {
+	stroke: lightgray;
+	stroke-width: 1px;
+}
