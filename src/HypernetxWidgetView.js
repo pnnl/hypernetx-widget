@@ -279,7 +279,7 @@ const Nodes = ({internals, simulation, nodeData, onClickNodes=Object, onChangeTo
     });
   }}/>
 
-const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, edgeStrokeWidth, selectedEdges, hiddenEdges, removedEdges, edgeLabels={}, edgeLabelStyle='callout', edgeFontSize={}, onClickEdges=Object, onChangeTooltip=Object}) =>
+const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nControlPoints=24, withEdgeLabels=true, edgeStroke, edgeStrokeWidth, selectedEdges, hiddenEdges, removedEdges, edgeLabels={}, edgeFontSize={}, onClickEdges=Object, onChangeTooltip=Object}) =>
   <g className='edges' ref={ele => {
     const controlPoints = range(nControlPoints)
       .map(i => {
@@ -299,9 +299,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
 
               const gLabel = g.append('g').classed('label', true);
 
-              if (edgeLabelStyle === 'callout') {
-                gLabel.append('rect')
-              }
+              gLabel.append('line')
 
               gLabel.append('circle');
 
@@ -311,6 +309,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
             }
           )
             .attr('fill', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black')
+            .attr('stroke', d => edgeStroke && d.uid in edgeStroke ? edgeStroke[d.uid] : 'black')
             .on('mouseover', (ev, d) => 
               onChangeTooltip(createTooltipData(ev, d.uid, {labels: edgeLabels, data: edgeData}))
             )
@@ -341,7 +340,47 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
         : points[0];
     }
 
+    const length = ([x1, y1], [x2, y2]) =>
+      Math.sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2))
+
+    const getCandidateLabelAnchors = (points, ranges=[.25, .5, .75], minLength=10, dx=1, r=15) => {
+      const midpoints = [];
+
+      const pointsWithAngle = points
+        .map((point, i, a) => {
+          const [x1, y1] = point;
+          const [x2, y2] = a[(i + 1)%a.length];
+
+          const angle = Math.atan2(y1 - y2, x1 - x2) - Math.PI/2;
+
+          const textPoint = [
+            r*Math.cos(angle),
+            r*Math.sin(angle)
+          ];
+
+          const length = Math.sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2));
+
+          if (length >= minLength && !polygonContains(points, [x1 + dx, y1])) {
+            ranges.forEach(a =>
+              midpoints.push({
+                point: [
+                  a*(x2 - x1) + x1,
+                  a*(y2 - y1) + y1,
+                ],
+                textPoint
+              })
+            );
+          }      
+
+          return {point, textPoint};
+        });
+
+      return midpoints.length ? midpoints : pointsWithAngle;
+    }
+
     simulation.on('tick.hulls', d => {
+      const renderedLabels = [];
+
       internals.forEach(d => d.numBands = 0);
 
       groups.select('path')
@@ -366,64 +405,45 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
           d.points = points;
           d.centroid = polygonCentroid(points);
 
+          const candidatePoints = getCandidateLabelAnchors(points);
 
-          // calculate widest segment
-          const length = points.map((d1, i, a) => {
-            const d0 = i === 0 ? a[a.length - 1] : a[i - 1];
-            const dx = d1[0] - d0[0];
-            const dy = d1[1] - d0[1];
+          const bestPoint = maxIndex(
+            candidatePoints.map(({point}) =>
+              renderedLabels.length === 0
+                ? 0
+                : min(renderedLabels, ([lx, ly]) =>
+                    Math.abs(point[1] - ly)
+                  )
+            )
+          );
 
-            return ((dx*dx + dy*dy) > 1e3) + 1/(d1[0]*d1[1]);
-          });
+          const {point, textPoint} = candidatePoints[bestPoint];
+          d.markerLocation = point;
+          d.textLocation = textPoint;
 
-          const i = maxIndex(length);
-
-          const d1 = points[i];
-          const d0 = i === 0
-            ? points[points.length - 1]
-            : points[i - 1];
-
-          d.markerLocation = [
-            (d0[0] + d1[0])/2,
-            (d0[1] + d1[1])/2, 
-          ];
-
-          d.markerAngle = (Math.atan2(
-            d0[1] - d1[1],
-            d0[0] - d1[0]
-          )*180/Math.PI+ 360)%360;
-
-          if (90 < d.markerAngle && d.markerAngle < 270) {
-            d.markerAngle -= 180;
-          }
+          renderedLabels.push(point);
 
           return 'M' + points.map(d => d.join(',')).join('L') + 'Z'
         });
 
+      groups.select('g.label')
+        .attr('transform', d => `translate(${d.markerLocation[0]},${d.markerLocation[1]})`);
 
-      if (edgeLabelStyle === 'callout') {
+      groups.select('.label circle')
+        .attr('r', 3);
 
-        groups.select('g.label')
-          .attr('transform', d => `translate(${d.markerLocation[0]},${d.markerLocation[1]})`);
+      groups.select('.label line')
+        .attr('x1', d => 0)
+        .attr('y1', d => 0)
+        .attr('x2', d => d.textLocation[0])
+        .attr('y2', d => d.textLocation[1]);
 
-        groups.select('.label circle')
-          .attr('r', 3);
+      groups.select('.label text')
+        .attr('x', d => d.textLocation[0])
+        .attr('y', d => d.textLocation[1])
+        .attr('dx', '.1em')
+        .style('text-anchor', 'start');
 
-        groups.select('.label rect')
-          .attr('y', d => -1)
-          .attr('width', dx)
-          .attr('height', 2);
-
-        groups.select('.label text')
-          .attr('dx', dx + 2)
-          .style('text-anchor', 'start');
-
-      } else {
-        groups.select('text')
-          .attr('transform', 
-            d => `translate(${d.markerLocation[0]},${d.markerLocation[1]}) rotate(${d.markerAngle}) `
-          );
-      }
     });
   }}/>
 

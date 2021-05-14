@@ -52,10 +52,15 @@
 	pointer-events: none;
 }
 
+.hnx-widget-view .edges {
+	stroke-width: 1.5;
+}
+
 .hnx-widget-view .edges text{
 	alignment-baseline: middle;
 	text-anchor: middle;
 	font-style: italic;
+	stroke-width: 0;
 }
 
 .hnx-widget-view .edges path {
