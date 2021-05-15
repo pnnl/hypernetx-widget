@@ -1,9 +1,13 @@
 import React from "react";
-import FormControl from "@material-ui/core/FormControl";
-import MenuItem from "@material-ui/core/MenuItem";
-import Select from "@material-ui/core/Select";
+import {
+  FormControl,
+  MenuItem,
+  Select,
+  InputLabel,
+  IconButton,
+  Tooltip,
+} from "@material-ui/core";
 import ColorScale from "./colorScale";
-import InputLabel from "@material-ui/core/InputLabel";
 import { makeStyles } from "@material-ui/core/styles";
 import { range } from "d3-array";
 import {
@@ -13,12 +17,12 @@ import {
   getCategoricalScheme,
   categoricalPalettes,
 } from "./functions.js";
-// import { Colorscale } from "react-colorscales";
+import { ChromePicker } from "react-color";
+import { Palette, PaletteOutlined } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   formControl: {
     margin: theme.spacing(1),
-    // minWidth: 120,
     paddingLeft: "15px",
   },
   customSelect: {
@@ -36,23 +40,22 @@ const useStyles = makeStyles((theme) => ({
   colorItem: {
     "& .MuiSelect-root": {
       width: 200,
-      maxHeight: 5,
-      // padding: "",
+      maxHeight: "16px",
+      minHeight: "16px",
     },
-
+    "& .MuiSelect-select": {
+      paddingTop: "2px",
+    },
     "& .MuiFormLabel-root": {
       fontSize: "15px",
     },
   },
   menuItem: {
-    // "& .MuiMenuItem-root": {
-    //   padding: "0px",
     paddingTop: "3px",
     paddingBottom: "3px",
     paddingLeft: "2px",
     paddingRight: "2px",
     whiteSpace: "normal",
-    // },
   },
 }));
 
@@ -61,12 +64,15 @@ const ColorPalette = ({
   data,
   metadata,
   defaultColors,
+  currColors,
   onPaletteChange,
   currGroup,
   currPalette,
   onCurrDataChange,
+  onAllColorChange,
+  // colors,
 }) => {
-  // console.log(metadata);
+  const colorsAreSame = new Set(Object.values(currColors)).size === 1;
 
   const columns =
     metadata !== undefined
@@ -110,9 +116,11 @@ const ColorPalette = ({
     }
   };
   const myPalette = isDiscrete(dataObj) ? categoricalPalettes : contPalettes;
-
   const [palette, setPalette] = React.useState(currPalette);
   // console.log(palette);
+
+  const [allPaletteOpen, setAllPaletteOpen] = React.useState(false);
+
   const handlePalette = (event) => {
     setPalette(event.target.value);
     if (event.target.value === "default") {
@@ -129,6 +137,17 @@ const ColorPalette = ({
       }
     }
   };
+
+  const handleClick = () => {
+    setAllPaletteOpen(!allPaletteOpen);
+  };
+
+  const handleClose = () => {
+    setAllPaletteOpen(false);
+  };
+  const [paletteColor, setPaletteColor] = React.useState(
+    colorsAreSame ? Object.values(currColors)[0] : "#000000ff"
+  );
 
   const handleGroup = (event) => {
     setGroup(event.target.value);
@@ -171,37 +190,6 @@ const ColorPalette = ({
     return colorObj;
   };
 
-  // const getEachColors = (group, palette, data) => {
-  //   // console.log(data);
-  //   const colorMap = new Map();
-  //   if (group === "each") {
-  //     const bins = Object.values(data).length;
-  //     console.log("bins", bins);
-  //     var scheme = range(bins).map((x) => getScheme(palette)((x + 1) / bins));
-  //     console.log("scheme", scheme);
-  //     scheme = scheme.map((x) => rgbToHex(x));
-  //     Object.keys(data).map((x, i) => {
-  //       colorMap.set(x, scheme[i]);
-  //     });
-  //   } else {
-  //     const colorPalette = [];
-  //     const uniqueValues = Array.from(new Set(Object.values(data))).sort();
-  //     const bins = uniqueValues.length;
-  //     var scheme = range(bins).map((x) => getScheme(palette)((x + 1) / bins));
-  //     scheme = scheme.map((x) => rgbToHex(x));
-  //     uniqueValues.map((x, i) => {
-  //       colorPalette.push([x, scheme[i]]);
-  //     });
-  //     const idxArr = colorPalette.map((c) => c[0]);
-  //     Object.entries(data).map((x, i) => {
-  //       let idx = idxArr.indexOf(x[1]);
-  //       colorMap.set(x[0], colorPalette[idx][1]);
-  //     });
-  //   }
-  //
-  //   return colorMap;
-  // };
-
   const getColorArray = (name) => {
     if (isDiscrete(dataObj)) {
       return getCategoricalScheme(name);
@@ -213,6 +201,14 @@ const ColorPalette = ({
     }
   };
 
+  const handleChangeColor = (color) => {
+    const RGB = color.rgb;
+    const rgbaStr =
+      "rgba(" + RGB.r + ", " + RGB.g + ", " + RGB.b + ", " + RGB.a + ")";
+    setPaletteColor(rgbToHex(rgbaStr));
+    onAllColorChange(rgbToHex(rgbaStr), type);
+  };
+
   return (
     <div style={{ padding: "5px", width: "100%" }}>
       <div
@@ -221,40 +217,66 @@ const ColorPalette = ({
           fontSize: "15px",
           paddingTop: "8px",
           paddingBottom: "8px",
+          display: "inline-block",
         }}
       >
         {"Colors"}
       </div>
+      <div style={{ display: "inline-block" }}>
+        <Tooltip
+          title={
+            <div style={{ fontSize: "14px", padding: "3px" }}>
+              {"Change colors of all " + type + "s"}
+            </div>
+          }
+        >
+          <IconButton style={{ padding: "2px" }} onClick={handleClick}>
+            {colorsAreSame ? (
+              <Palette style={{ fill: paletteColor, fontSize: "x-large" }} />
+            ) : (
+              <PaletteOutlined
+                style={{ color: "black", fontSize: "x-large" }}
+              />
+            )}
+          </IconButton>
+        </Tooltip>
+      </div>
 
-      <FormControl classes={{ root: classes.customSelect }}>
-        <InputLabel>Color by</InputLabel>
-        <Select value={group} onChange={handleGroup}>
-          {columns.map((c) => (
-            <MenuItem key={c} value={c}>
-              {c}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      {allPaletteOpen ? (
+        <div className="popover-allColors">
+          <div className={"cover"} onClick={handleClose} />
+          <ChromePicker
+            color={paletteColor}
+            onChange={(c) => handleChangeColor(c)}
+          />
+        </div>
+      ) : null}
+      <div>
+        <FormControl classes={{ root: classes.customSelect }}>
+          <InputLabel>Color by</InputLabel>
+          <Select value={group} onChange={handleGroup}>
+            {columns.map((c) => (
+              <MenuItem key={c} value={c}>
+                {c}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
-      <FormControl classes={{ root: classes.colorItem }}>
-        <InputLabel>Color palette</InputLabel>
-        <Select value={palette} onChange={handlePalette}>
-          <MenuItem classes={{ root: classes.menuItem }} value={"default"}>
-            Default
-          </MenuItem>
-          {myPalette.map((c) => (
-            <MenuItem key={c} classes={{ root: classes.menuItem }} value={c}>
-              {/*<Colorscale*/}
-              {/*  onClick={() => {}}*/}
-              {/*  colorscale={getColorArray(c)}*/}
-              {/*  label={c}*/}
-              {/*/>*/}
-              <ColorScale name={c} colorArray={getColorArray(c)} />
+        <FormControl classes={{ root: classes.colorItem }}>
+          <InputLabel>Color palette</InputLabel>
+          <Select value={palette} onChange={handlePalette}>
+            <MenuItem classes={{ root: classes.menuItem }} value={"default"}>
+              <span>Default</span>
             </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+            {myPalette.map((c) => (
+              <MenuItem key={c} classes={{ root: classes.menuItem }} value={c}>
+                <ColorScale name={c} colorArray={getColorArray(c)} />
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </div>
     </div>
   );
 };

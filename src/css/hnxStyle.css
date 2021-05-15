@@ -28,7 +28,7 @@
 
 .hbar{
   min-width: 1px;
-  height: 8px;
+  height: 1em;
   background-color: gray;
 }
 
@@ -51,14 +51,15 @@
   left:310px;
 }
 
-.popover-menu{
+.popover-allColors{
   position: absolute;
-  /*z-index: 999;*/
-  top: 5px;
-  right: 50px;
+  z-index: 999;
 
-
+  bottom: 5px;
+  left: 100px;
+  /*right: 50px;*/
 }
+
 .bar {
   display: inline-block;
   border-width: 0.1mm;
@@ -102,21 +103,12 @@
 
 .box{
   width: 95%;
-  /*height: 100%;*/
-  /*position: relative;*/
-  /*position: absolute;*/
   display: inline-block;
-  /*font-size: 0;*/
   opacity: 0.7;
-  /*text-align: start;*/
 }
 .stack-top{
-  /*z-index: 9;*/
-  /*color: black;*/
   padding: 3px;
-  font-size: 13px;
-  top: 2px;
+  top: 10%;
   position: absolute;
-  /*text-align: center;*/
-  /*margin: 20px; !* for demo purpose  *!*/
+  color: #404040;
 }

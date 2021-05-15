@@ -505,7 +505,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                     onSelectedChange={handleSelectedChange}
                     onRemovedChange={handleRemovedChange}
                     onSelectAllChange={handleSelectAll}
-                    onAllColorChange={handleAllColorChange}
+                    // onAllColorChange={handleAllColorChange}
                   />
                   <Bars
                     type={"node"}
@@ -523,6 +523,8 @@ const Widget = ({ nodes, edges, ...props }) => {
                     currGroup={colGroup.node}
                     currPalette={colPalette.node}
                     onCurrDataChange={handleCurrData}
+                    currColors={nodeFill}
+                    onAllColorChange={handleAllColorChange}
                   />
                   <FontSizeMenu
                     type={"node"}
@@ -559,7 +561,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                     onSelectedChange={handleSelectedChange}
                     onRemovedChange={handleRemovedChange}
                     onSelectAllChange={handleSelectAll}
-                    onAllColorChange={handleAllColorChange}
+                    // onAllColorChange={handleAllColorChange}
                   />
                   <Bars
                     type={"edge"}
@@ -577,6 +579,8 @@ const Widget = ({ nodes, edges, ...props }) => {
                     currGroup={colGroup.edge}
                     currPalette={colPalette.edge}
                     onCurrDataChange={handleCurrData}
+                    currColors={edgeStroke}
+                    onAllColorChange={handleAllColorChange}
                   />
                   <FontSizeMenu
                     type={"edge"}
