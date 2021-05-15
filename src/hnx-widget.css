@@ -52,10 +52,15 @@
 	pointer-events: none;
 }
 
+.hnx-widget-view .edges {
+	stroke-width: 1.5;
+}
+
 .hnx-widget-view .edges text{
 	alignment-baseline: middle;
 	text-anchor: middle;
 	font-style: italic;
+	stroke-width: 0;
 }
 
 .hnx-widget-view .edges path {
@@ -96,4 +101,14 @@
 
 .hnx-widget-view .hiddenState {
 	opacity: 0.1;
+}
+
+.hnx-widget-view .edge-brush rect.selection,
+.hnx-widget-view .edge-brush rect.handle {
+	visibility: hidden;
+}
+
+.hnx-widget-view .edge-brush line {
+	stroke: lightgray;
+	stroke-width: 1px;
 }
