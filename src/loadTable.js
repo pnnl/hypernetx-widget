@@ -291,7 +291,7 @@ const LoadTable = ({
                   <VisibilityButton
                     label={x.uid}
                     visibility={!x.hidden}
-                    sendVisibility={getVisibility}
+                    onVisibilityChange={getVisibility}
                   />
                 </TableCell>
                 <TableCell align="left">

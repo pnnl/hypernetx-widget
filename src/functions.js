@@ -1,6 +1,9 @@
 import * as scale from "d3-scale-chromatic";
 import { makeStyles } from "@material-ui/core/styles";
 
+export const numberRange = (start, end) => {
+  return new Array(end - start).fill().map((d, i) => i + start);
+};
 export const descendingComparator = (a, b, orderBy) => {
   a[orderBy] = a[orderBy] || false;
   b[orderBy] = b[orderBy] || false;
