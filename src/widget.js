@@ -84,7 +84,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [unpinned, setUnpinned] = React.useState(now());
 
   const [aspect, setAspect] = React.useState(1);
-  const [mode, setMode] = React.useState("");
+  const [selectionMode, setSelectionMode] = React.useState("");
 
   // update the python model with state
   const { _model } = props;
@@ -231,28 +231,47 @@ const Widget = ({ nodes, edges, ...props }) => {
   };
 
   const getClickedNodes = (event, data) => {
-    if (event.shiftKey) {
-      setSelectedNodes({
-        ...selectedNodes,
-        [data.data.uid]: !selectedNodes[data.data.uid],
+    if (Array.isArray(data)) {
+      const uidArr = data
+        .map((d) => d.data.elements)
+        .flat()
+        .map((d) => d.uid);
+      const newSelect = {};
+      uidArr.map((uid) => {
+        newSelect[uid] = true;
       });
-    } else if (data === undefined) {
-      setSelectedNodes({});
+      setSelectedNodes({ ...selectedNodes, ...newSelect });
     } else {
-      setSelectedNodes({ [data.data.uid]: true });
+      if (event.shiftKey) {
+        setSelectedNodes({
+          ...selectedNodes,
+          [data.data.uid]: !selectedNodes[data.data.uid],
+        });
+      } else if (data === undefined) {
+        setSelectedNodes({});
+      } else {
+        setSelectedNodes({ [data.data.uid]: true });
+      }
     }
   };
 
   const getClickedEdges = (event, data) => {
-    if (event.shiftKey) {
-      setSelectedEdges({
-        ...selectedEdges,
-        [data.uid]: !selectedEdges[data.uid],
-      });
-    } else if (data === undefined) {
-      setSelectedEdges({});
+    if (Array.isArray(data)) {
+      const uidArr = data.map((d) => d.uid);
+      const newSelect = {};
+      uidArr.map((uid) => (newSelect[uid] = true));
+      setSelectedEdges({ ...selectedEdges, ...newSelect });
     } else {
-      setSelectedEdges({ [data.uid]: true });
+      if (event.shiftKey) {
+        setSelectedEdges({
+          ...selectedEdges,
+          [data.uid]: !selectedEdges[data.uid],
+        });
+      } else if (data === undefined) {
+        setSelectedEdges({});
+      } else {
+        setSelectedEdges({ [data.uid]: true });
+      }
     }
   };
 
@@ -404,8 +423,10 @@ const Widget = ({ nodes, edges, ...props }) => {
       handleOriginal(dataType);
     } else if (selectionType === "help") {
       setOpenHelp(true);
+    } else if (selectionType === "brush") {
+      setSelectionMode(dataType + "-" + selectionType);
     } else {
-      setMode(selectionType);
+      setSelectionMode(selectionType);
     }
   };
 
@@ -670,7 +691,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               nodeSize,
               pinned,
               aspect,
-              mode,
+              selectionMode,
             }}
             onClickNodes={getClickedNodes}
             onClickEdges={getClickedEdges}
@@ -743,7 +764,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               nodeSize,
               pinned,
               aspect,
-              mode,
+              selectionMode,
             }}
             onClickNodes={getClickedNodes}
             onClickEdges={getClickedEdges}

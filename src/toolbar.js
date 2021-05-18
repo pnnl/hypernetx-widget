@@ -290,7 +290,7 @@ const Toolbar = ({ dataType, selectionState, onSelectionChange }) => {
           </ToggleButton>
         )}
 
-        {dataType === "graph" && (
+        {dataType !== "graph" && (
           <ToggleButton value={"brush"}>
             <Tooltip
               title={
