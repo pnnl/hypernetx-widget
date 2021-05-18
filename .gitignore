@@ -12,3 +12,5 @@ hnxwidget/static/
 lib
 es
 widget/js/dist
+widget/dist
+widget/hnxwidget/static
