@@ -699,38 +699,38 @@ const planarForce = (nodes, edges) => {
 const intervalIntersect = (s1, s2, t1, t2) =>
   !(s2 < t1 || t2 < s1)
 
-const NodeRectangularBrush = ({simulation}) => {
-  const handleBrush = ev => {
-    // because nodes are potentially moving we just do this the slow way
-
-    if (!ev.selection) return;
-
-    const [p1, p2] = ev.selection;
-    const [x1, y1] = p1;
-    const [x2, y2] = p2;
-
-    const selectedNodes = simulation.nodes()
-      .filter(({children, r, x, y}) =>
-        children !== undefined &&
-        intervalIntersect(x - r, x + r, x1, x2) && 
-        intervalIntersect(y - r, y + r, y1, y2)
-      );
-
-    // todo: fire selection event
-    console.log(selectedNodes);
-  }
-
+const NodeRectangularBrush = ({simulation, onClickNodes=Object}) => {
   return <g className='node-brush' ref={ele => {
-    select(ele)
+    const handleBrush = ev => {
+      // because nodes are potentially moving we just do this the slow way
+
+      if (!ev.selection) return;
+
+      const [p1, p2] = ev.selection;
+      const [x1, y1] = p1;
+      const [x2, y2] = p2;
+
+      const selectedNodes = simulation.nodes()
+        .filter(({children, r, x, y}) =>
+          children !== undefined &&
+          intervalIntersect(x - r, x + r, x1, x2) && 
+          intervalIntersect(y - r, y + r, y1, y2)
+        );
+
+      g.call(brush().clear);
+
+      onClickNodes(ev, selectedNodes);
+    }
+
+    const g = select(ele)
       .call(
         brush()
           .on('end', handleBrush)
-          // .extent([[0, 0], simulation.size])
       );
   }}/>
 }
 
-const EdgeLinearBrush = ({simulation}) => {
+const EdgeLinearBrush = ({simulation, onClickEdges=Object}) => {
   const getPointerLocation = ev => {
       const {layerX, layerY} = ev.sourceEvent;
       return [layerX, layerY];
@@ -770,7 +770,7 @@ const EdgeLinearBrush = ({simulation}) => {
         );
 
       // todo: fire selection event
-      console.log(selectedEdges);
+      onClickEdges(ev, selectedEdges);
     }
 
     g.call(
