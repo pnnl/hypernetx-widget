@@ -37,12 +37,14 @@ const Widget = ({ nodes, edges, ...props }) => {
   const nodeDegMap = new Map();
   nodes.map((x) => nodeDegMap.set(x.uid, getNodeDegree(nodes, edges, x.uid)));
   const nodeDegList = Object.fromEntries(nodeDegMap);
+  const [nodeDegBar, setNodeDegBar] = React.useState(nodeDegList);
 
   const edgeSizeMap = new Map();
   edges.map((x, i) =>
     edgeSizeMap.set(x.uid.toString(), getEdgeSize(nodes, edges, i))
   );
   const edgeSizeList = Object.fromEntries(edgeSizeMap);
+  const [edgeSizeBar, setEdgeSizeBar] = React.useState(edgeSizeList);
 
   const [withNodeLabels, setWithNodeLabels] = React.useState(true);
   const [withEdgeLabels, setWithEdgeLabels] = React.useState(true);
@@ -127,8 +129,22 @@ const Widget = ({ nodes, edges, ...props }) => {
   const handleRemovedChange = (datatype, uid, removed) => {
     if (datatype === "node") {
       setRemovedNodes({ ...removedNodes, [uid]: removed });
+      let currDegData = { ...nodeDegBar };
+      if (removed) {
+        delete currDegData[uid];
+        setNodeDegBar({ ...currDegData });
+      } else {
+        setNodeDegBar({ ...nodeDegBar, [uid]: nodeDegList[uid] });
+      }
     } else {
       setRemovedEdges({ ...removedEdges, [uid]: removed });
+      let currSizeData = { ...edgeSizeBar };
+      if (removed) {
+        delete currSizeData[uid];
+        setEdgeSizeBar({ ...currSizeData });
+      } else {
+        setEdgeSizeBar({ ...edgeSizeBar, [uid]: edgeSizeList[uid] });
+      }
     }
   };
 
@@ -245,11 +261,13 @@ const Widget = ({ nodes, edges, ...props }) => {
       setSelectedNodes({});
       setHiddenNodes({});
       setRemovedNodes({});
+      setNodeDegBar({ ...nodeDegList });
     }
     if (type === "edge" || type === "graph") {
       setSelectedEdges({});
       setHiddenEdges({});
       setRemovedEdges({});
+      setEdgeSizeBar({ ...edgeSizeList });
     }
     if (type === "graph") {
       setBipartite(false);
@@ -277,11 +295,19 @@ const Widget = ({ nodes, edges, ...props }) => {
         Object.entries(selectedNodes).filter(([k, v]) => v)
       );
       setRemovedNodes({ ...removedNodes, ...selectedNodesTrue });
+
+      let currDegData = { ...nodeDegBar };
+      Object.keys(selectedNodesTrue).map((d) => delete currDegData[d]);
+      setNodeDegBar({ ...currDegData });
     } else {
       const selectedEdgesTrue = Object.fromEntries(
         Object.entries(selectedEdges).filter(([k, v]) => v)
       );
       setRemovedEdges({ ...removedEdges, ...selectedEdgesTrue });
+
+      let currSizeData = { ...edgeSizeBar };
+      Object.keys(selectedEdgesTrue).map((d) => delete currSizeData[d]);
+      setEdgeSizeBar({ ...currSizeData });
     }
   };
 
@@ -477,6 +503,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     setAspect(1);
   };
 
+  // console.log(Object.values(nodeDegList));
   return (
     <div>
       <Grid container spacing={1}>
@@ -495,8 +522,6 @@ const Widget = ({ nodes, edges, ...props }) => {
               </AccordionSummary>
               <AccordionDetails>
                 <div style={{ width: "100%" }}>
-                  {/*<Toolbar dataType={"node"} selectionState={selectedNodes} onSelectionChange={handleToolbarSelection}/>*/}
-
                   <LoadTable
                     type={"node"}
                     data={transNodeData}
@@ -509,7 +534,8 @@ const Widget = ({ nodes, edges, ...props }) => {
                   />
                   <Bars
                     type={"node"}
-                    freqData={getValueFreq(nodeDegList)}
+                    // freqData={getValueFreq(nodeDegList)}
+                    freqData={Object.values(nodeDegBar)}
                     onValueChange={handleBarSelect}
                   />
                   <ColorPalette
@@ -565,7 +591,8 @@ const Widget = ({ nodes, edges, ...props }) => {
                   />
                   <Bars
                     type={"edge"}
-                    freqData={getValueFreq(edgeSizeList)}
+                    // freqData={getValueFreq(edgeSizeList)}
+                    freqData={Object.values(edgeSizeBar)}
                     onValueChange={handleBarSelect}
                   />
                   <ColorPalette
