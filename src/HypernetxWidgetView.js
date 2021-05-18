@@ -725,6 +725,7 @@ const NodeRectangularBrush = ({simulation, onClickNodes=Object}) => {
     const g = select(ele)
       .call(
         brush()
+          .extent([[0, 0], simulation.size])
           .on('end', handleBrush)
       );
   }}/>
@@ -775,6 +776,7 @@ const EdgeLinearBrush = ({simulation, onClickEdges=Object}) => {
 
     g.call(
       brush()
+        .extent([[0, 0], simulation.size])
         .on('start', handleStart)
         .on('brush', handleBrush)
         .on('end', handleEnd)
