@@ -1,42 +1,42 @@
 import React from "react";
-import { max, range, bin, min, filter } from "d3-array";
+import { max, range, min } from "d3-array";
 import {
   VictoryBar,
   VictoryChart,
   VictoryAxis,
-  VictoryHistogram,
   VictorySelectionContainer,
 } from "victory";
 import { Button } from "@material-ui/core";
-import { numberRange } from "./functions";
-// import * as d3 from "d3";
+import { scaleLinear } from "d3-scale";
 
 const Bars = ({ type, freqData, onValueChange }) => {
-  // console.log(freqData);
   const [filterVal, setFilterVal] = React.useState([]);
-  const maxVal = max(freqData);
-  const histData = freqData.map((d) => ({ x: d }));
-  // console.log(histData);
-  const handleBrush = (points) => {
-    let elements = points.data.map((d) => [d.x0, d.x1]).flat();
-    const [brushMin, brushMax] = [min(elements), max(elements)];
-    const brushRange = numberRange(brushMin, brushMax);
+  const maxVal = max(freqData.map((d) => d.x));
 
-    onValueChange(brushRange, type);
-    setFilterVal(brushRange);
+  let myScale = scaleLinear();
+  myScale.domain([0, 5]).rangeRound([0, maxVal]).nice();
+
+  const ticks =
+    maxVal < 11 ? range(maxVal + 1) : range(5).map((x) => myScale(x));
+
+  const handleBrush = (points) => {
+    let elements = points.data.map((d) => d.x);
+    onValueChange(elements, type);
+    setFilterVal(elements);
   };
 
-  const handleSelect = (numRange) => {
-    const clickedState = numRange.every((x) => filterVal.includes(x));
+  const handleSelect = (elem) => {
+    const clickedState = filterVal.includes(elem);
+
     if (clickedState) {
-      setFilterVal([...filterVal].filter((x) => !numRange.includes(x)));
+      setFilterVal([...filterVal].filter((x) => x !== elem));
       onValueChange(
-        [...filterVal].filter((x) => !numRange.includes(x)),
+        [...filterVal].filter((x) => x !== elem),
         type
       );
     } else {
-      setFilterVal([...filterVal, ...numRange]);
-      onValueChange([...filterVal, ...numRange], type);
+      setFilterVal([...filterVal, elem]);
+      onValueChange([...filterVal, elem], type);
     }
   };
 
@@ -44,31 +44,6 @@ const Bars = ({ type, freqData, onValueChange }) => {
     onValueChange([], type);
     setFilterVal([]);
   };
-
-  const binData = (data) => {
-    let xValues = data.map((d) => d.x);
-    const [minVal, maxVal] = [min(xValues), max(xValues)];
-    if (maxVal > 8) {
-      const bin1 = bin()
-        .value((d) => d.x)
-        .domain([0, maxVal + 1])
-        .thresholds(4);
-
-      const binned = [];
-      bin1(data).map((d) => {
-        binned.push(d.x0, d.x1);
-      });
-      return Array.from(new Set(binned));
-    } else {
-      const bin2 = bin()
-        .value((d) => d.x)
-        .domain([0, maxVal + 1])
-        .thresholds(maxVal);
-      const binned2 = bin2(data);
-      return binned2.map((d) => d.x1);
-    }
-  };
-
   return (
     <div style={{ width: "100%" }}>
       <div
@@ -114,15 +89,14 @@ const Bars = ({ type, freqData, onValueChange }) => {
             />
           }
         >
-          <VictoryHistogram
-            data={histData}
+          <VictoryBar
+            data={freqData}
             x="x"
             y="y"
-            bins={binData(histData)}
             style={{
               data: {
                 fill: ({ active, datum }) => {
-                  if (filterVal.flat().includes(datum.x0)) {
+                  if (filterVal.flat().includes(datum.x)) {
                     return "#42a5f5";
                   } else {
                     return "grey";
@@ -140,12 +114,7 @@ const Bars = ({ type, freqData, onValueChange }) => {
                       {
                         target: "data",
                         mutation: (props) => {
-                          const numRange = numberRange(
-                            props.datum.x0,
-                            props.datum.x1
-                          );
-
-                          handleSelect(numRange);
+                          handleSelect(props.datum.x);
                         },
                       },
                     ];
@@ -155,7 +124,8 @@ const Bars = ({ type, freqData, onValueChange }) => {
             ]}
           />
           <VictoryAxis
-            tickValues={range(maxVal + 2)}
+            // tickValues={range(maxVal + 1)}
+            tickValues={ticks}
             label={type === "node" ? "Degree" : "Size"}
             style={{ axisLabel: { fontSize: "14px" } }}
           />

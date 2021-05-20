@@ -1,16 +1,20 @@
-import React, { useState } from "react";
+import React from "react";
 import { FormControlLabel, FormGroup, Switch } from "@material-ui/core";
 
-const Switches = ({ dataType, onSwitchChange }) => {
-  // const [showLabels, setShowLabels] = useState(true);
-  // const [collapseNodes, setCollapseNodes] = useState(false);
-  // const [linegraph, setLinegraph] = useState(false);
-
-  const [state, setState] = useState({
+const Switches = ({ currData, dataType, onSwitchChange }) => {
+  const [state, setState] = React.useState({
     showLabels: true,
-    collapseNodes: false,
-    bipartite: false,
+    collapseNodes: currData.collapseState,
+    bipartite: currData.bipartiteState,
   });
+
+  React.useEffect(() => {
+    setState({ ...state, collapseNodes: currData.collapseState });
+  }, [currData.collapseState]);
+
+  React.useEffect(() => {
+    setState({ ...state, bipartite: currData.bipartiteState });
+  }, [currData.bipartiteState]);
 
   const handleChange = (event) => {
     setState({ ...state, [event.target.name]: event.target.checked });
@@ -19,6 +23,7 @@ const Switches = ({ dataType, onSwitchChange }) => {
       [event.target.name]: event.target.checked,
     });
   };
+
   return (
     <div
       style={{
