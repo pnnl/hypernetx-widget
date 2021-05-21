@@ -8,16 +8,21 @@ import {
 } from "victory";
 import { Button } from "@material-ui/core";
 import { scaleLinear } from "d3-scale";
+import { VictoryTheme } from "victory-core";
 
-const Bars = ({ type, freqData, onValueChange }) => {
+const Bars = ({ type, origMax, freqData, onValueChange }) => {
   const [filterVal, setFilterVal] = React.useState([]);
-  const maxVal = max(freqData.map((d) => d.x));
+  const maxX = max(freqData.map((d) => d.x));
+  const minX = min(freqData.map((d) => d.x));
+  const maxY = max(freqData.map((d) => d.y));
 
-  let myScale = scaleLinear();
-  myScale.domain([0, 5]).rangeRound([0, maxVal]).nice();
+  // console.log(maxX % 2, maxX % 3);
 
-  const ticks =
-    maxVal < 11 ? range(maxVal + 1) : range(5).map((x) => myScale(x));
+  const newScale = scaleLinear()
+    .domain([0, maxX])
+    .nice()
+    .ticks()
+    .filter((x) => x === Math.ceil(x));
 
   const handleBrush = (points) => {
     let elements = points.data.map((d) => d.x);
@@ -75,12 +80,14 @@ const Bars = ({ type, freqData, onValueChange }) => {
           Clear
         </Button>
       </div>
-      <div style={{ height: "125px", width: "100%" }}>
+      <div style={{ height: "140px", width: "100%" }}>
         <VictoryChart
-          domainPadding={17}
-          minDomain={{ x: 0 }}
-          height={135}
-          padding={{ left: 55, bottom: 20, right: 25, top: 5 }}
+          theme={VictoryTheme.material}
+          domain={{ x: [0, maxX], y: [0, origMax] }}
+          domainPadding={{ x: [20, 10] }}
+          // minDomain={{ x: 0 }}
+          height={120}
+          padding={{ left: 55, bottom: 20, right: 25, top: 0 }}
           containerComponent={
             <VictorySelectionContainer
               selectionDimension="x"
@@ -93,6 +100,7 @@ const Bars = ({ type, freqData, onValueChange }) => {
             data={freqData}
             x="x"
             y="y"
+            barRatio={0.7}
             style={{
               data: {
                 fill: ({ active, datum }) => {
@@ -125,14 +133,21 @@ const Bars = ({ type, freqData, onValueChange }) => {
           />
           <VictoryAxis
             // tickValues={range(maxVal + 1)}
-            tickValues={ticks}
+            tickValues={newScale}
             label={type === "node" ? "Degree" : "Size"}
-            style={{ axisLabel: { fontSize: "14px" } }}
+            style={{
+              axisLabel: { fontSize: "12px", padding: 25 },
+              grid: { stroke: "none" },
+            }}
           />
           <VictoryAxis
             dependentAxis
+            // tickCount={3}
             label="Count"
-            style={{ axisLabel: { padding: 35, fontSize: "14px" } }}
+            style={{
+              axisLabel: { padding: 35, fontSize: "12px" },
+              grid: { stroke: "none" },
+            }}
           />
         </VictoryChart>
       </div>

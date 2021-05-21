@@ -224,7 +224,7 @@ const LoadTable = ({
   const getRemove = (label, remove) => {
     onRemovedChange(type, label, remove);
   };
-
+  // console.log(stableSort(data, getComparator(order, orderBy)));
   return (
     <div style={{ margin: "0px", padding: "0px" }}>
       <TableContainer
@@ -271,7 +271,9 @@ const LoadTable = ({
                       />
                     </div>
 
-                    <div style={{ display: "inline-block" }}>{x.value}</div>
+                    <div style={{ display: "inline-block" }}>
+                      {+x.value.toString()}
+                    </div>
                   </div>
                 </TableCell>
                 <TableCell>
