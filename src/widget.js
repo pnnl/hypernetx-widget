@@ -22,7 +22,7 @@ import FontSizeMenu from "./fontSizeMenu";
 import { IconButton, Modal, Paper } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import NodeSizeMenu from "./nodeSizeMenu";
-import { range } from "d3-array";
+import { max, range } from "d3-array";
 import HelpMenu from "./helpMenu";
 
 const createDefaultState = (data, defaultValue) => {
@@ -38,6 +38,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   nodes.map((x) => nodeDegMap.set(x.uid, getNodeDegree(nodes, edges, x.uid)));
   const nodeDegList = Object.fromEntries(nodeDegMap);
   const [nodeDegBar, setNodeDegBar] = React.useState(nodeDegList);
+  const globalMaxDeg = max(getValueFreq(nodeDegList).map((d) => d.y));
 
   const edgeSizeMap = new Map();
   edges.map((x, i) =>
@@ -45,6 +46,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   );
   const edgeSizeList = Object.fromEntries(edgeSizeMap);
   const [edgeSizeBar, setEdgeSizeBar] = React.useState(edgeSizeList);
+  const globalMaxSize = max(getValueFreq(edgeSizeList).map((d) => d.y));
 
   const [withNodeLabels, setWithNodeLabels] = React.useState(true);
   const [withEdgeLabels, setWithEdgeLabels] = React.useState(true);
@@ -240,7 +242,11 @@ const Widget = ({ nodes, edges, ...props }) => {
       uidArr.map((uid) => {
         newSelect[uid] = true;
       });
-      setSelectedNodes({ ...selectedNodes, ...newSelect });
+      if (event.shiftKey) {
+        setSelectedNodes({ ...selectedNodes, ...newSelect });
+      } else {
+        setSelectedNodes({ ...newSelect });
+      }
     } else {
       if (event.shiftKey) {
         setSelectedNodes({
@@ -260,7 +266,11 @@ const Widget = ({ nodes, edges, ...props }) => {
       const uidArr = data.map((d) => d.uid);
       const newSelect = {};
       uidArr.map((uid) => (newSelect[uid] = true));
-      setSelectedEdges({ ...selectedEdges, ...newSelect });
+      if (event.shiftKey) {
+        setSelectedEdges({ ...selectedEdges, ...newSelect });
+      } else {
+        setSelectedEdges({ ...newSelect });
+      }
     } else {
       if (event.shiftKey) {
         setSelectedEdges({
@@ -410,11 +420,11 @@ const Widget = ({ nodes, edges, ...props }) => {
       }
     } else if (selectionType === "fullscreen") {
       setOpenFullscreen(true);
-      setAspect(1.5);
+      setAspect(2);
     } else if (selectionType === "bipartite") {
-      setBipartite(true);
+      setBipartite(!bipartite);
     } else if (selectionType === "collapse") {
-      setCollapseNodes(true);
+      setCollapseNodes(!collapseNodes);
     } else if (selectionType === "undo") {
       setBipartite(false);
       setCollapseNodes(false);
@@ -423,9 +433,11 @@ const Widget = ({ nodes, edges, ...props }) => {
       handleOriginal(dataType);
     } else if (selectionType === "help") {
       setOpenHelp(true);
-    } else if (selectionType === "brush") {
-      setSelectionMode(dataType + "-" + selectionType);
-    } else {
+    }
+    // else if (selectionType === "brush") {
+    //   setSelectionMode(dataType + "-" + selectionType);
+    // }
+    else {
       setSelectionMode(selectionType);
     }
   };
@@ -524,7 +536,11 @@ const Widget = ({ nodes, edges, ...props }) => {
     setAspect(1);
   };
 
-  // console.log(Object.values(nodeDegList));
+  const switchData = {
+    collapseState: collapseNodes,
+    bipartiteState: bipartite,
+  };
+
   return (
     <div>
       <Grid container spacing={1}>
@@ -555,8 +571,9 @@ const Widget = ({ nodes, edges, ...props }) => {
                   />
                   <Bars
                     type={"node"}
-                    // freqData={getValueFreq(nodeDegList)}
-                    freqData={Object.values(nodeDegBar)}
+                    freqData={getValueFreq(nodeDegBar)}
+                    origMax={globalMaxDeg}
+                    // freqData={Object.values(nodeDegBar)}
                     onValueChange={handleBarSelect}
                   />
                   <ColorPalette
@@ -583,7 +600,11 @@ const Widget = ({ nodes, edges, ...props }) => {
                     metadata={props.nodeData}
                     onGroupChange={handleNodeSize}
                   />
-                  <Switches dataType={"node"} onSwitchChange={handleSwitch} />
+                  <Switches
+                    currData={switchData}
+                    dataType={"node"}
+                    onSwitchChange={handleSwitch}
+                  />
                 </div>
               </AccordionDetails>
             </Accordion>
@@ -612,8 +633,9 @@ const Widget = ({ nodes, edges, ...props }) => {
                   />
                   <Bars
                     type={"edge"}
-                    // freqData={getValueFreq(edgeSizeList)}
-                    freqData={Object.values(edgeSizeBar)}
+                    freqData={getValueFreq(edgeSizeBar)}
+                    origMax={globalMaxSize}
+                    // freqData={Object.values(edgeSizeBar)}
                     onValueChange={handleBarSelect}
                   />
                   <ColorPalette
@@ -635,7 +657,11 @@ const Widget = ({ nodes, edges, ...props }) => {
                     currSize={fontSize}
                     onSizeChange={handleFontSize}
                   />
-                  <Switches dataType={"edge"} onSwitchChange={handleSwitch} />
+                  <Switches
+                    currData={switchData}
+                    dataType={"edge"}
+                    onSwitchChange={handleSwitch}
+                  />
                 </div>
               </AccordionDetails>
             </Accordion>
@@ -647,24 +673,38 @@ const Widget = ({ nodes, edges, ...props }) => {
             <div
               style={{
                 display: "flex",
-                justifyContent: "flex-start",
+                justifyContent: "center",
                 flexFlow: "row wrap",
               }}
             >
-              <Toolbar
-                dataType={"node"}
-                selectionState={selectedNodes}
-                onSelectionChange={handleToolbarSelection}
-              />
-              <Toolbar
-                dataType={"edge"}
-                selectionState={selectedEdges}
-                onSelectionChange={handleToolbarSelection}
-              />
-              <Toolbar
-                dataType={"graph"}
-                onSelectionChange={handleToolbarSelection}
-              />
+              <div style={{ display: "flex" }}>
+                <Toolbar
+                  category={"Data"}
+                  dataType={"Nodes"}
+                  selectionState={selectedNodes}
+                  onSelectionChange={handleToolbarSelection}
+                />
+                <Toolbar
+                  category={"Data"}
+                  dataType={"Edges"}
+                  selectionState={selectedEdges}
+                  onSelectionChange={handleToolbarSelection}
+                />
+              </div>
+              <div style={{ display: "flex" }}>
+                <Toolbar
+                  category={"Graph"}
+                  onSelectionChange={handleToolbarSelection}
+                />
+                <Toolbar
+                  category={"Selection"}
+                  onSelectionChange={handleToolbarSelection}
+                />
+                <Toolbar
+                  category={"Navigation"}
+                  onSelectionChange={handleToolbarSelection}
+                />
+              </div>
             </div>
           </div>
 
@@ -720,17 +760,29 @@ const Widget = ({ nodes, edges, ...props }) => {
               }}
             >
               <Toolbar
-                dataType={"node"}
+                category={"Data"}
+                dataType={"Nodes"}
                 selectionState={selectedNodes}
                 onSelectionChange={handleToolbarSelection}
               />
               <Toolbar
-                dataType={"edge"}
+                category={"Data"}
+                dataType={"Edges"}
                 selectionState={selectedEdges}
                 onSelectionChange={handleToolbarSelection}
               />
+            </div>
+            <div style={{ display: "flex" }}>
               <Toolbar
-                dataType={"graph"}
+                category={"Graph"}
+                onSelectionChange={handleToolbarSelection}
+              />
+              <Toolbar
+                category={"Selection"}
+                onSelectionChange={handleToolbarSelection}
+              />
+              <Toolbar
+                category={"Navigation"}
                 onSelectionChange={handleToolbarSelection}
               />
             </div>
