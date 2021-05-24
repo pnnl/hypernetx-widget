@@ -344,7 +344,7 @@ const HyperEdges = ({internals, edges, simulation, edgeData, dx=15, dr=5, nContr
     const length = ([x1, y1], [x2, y2]) =>
       Math.sqrt((x1 - x2)*(x1 - x2) + (y1 - y2)*(y1 - y2))
 
-    const getCandidateLabelAnchors = (points, ranges=[.25, .5, .75], minLength=10, dx=1, r=15) => {
+    const getCandidateLabelAnchors = (points, ranges=[.5, .25, .75], minLength=10, dx=1, r=15) => {
       const midpoints = [];
 
       const pointsWithAngle = points

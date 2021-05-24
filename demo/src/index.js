@@ -1,18 +1,14 @@
-import React, {Component} from 'react'
+import React from 'react'
 import {render} from 'react-dom'
 
-import {Example} from '../../src'
+import {HypernetxWidget} from '../../src/'
 
-class Demo extends Component {
-  render() {
-    return <div>
-      <h1>hnx-widget Demo</h1>
-      <div>
-        A widget for interractive visualization of the hypernetx package.
-      </div>
-      <Example hello='world'/>
-    </div>
-  }
-}
+import props from '../../src/stories/data/props.json'
+
+const Demo = () => 
+  <div>
+    <h1>hnx-widget Demo</h1>
+    <HypernetxWidget {...props} />
+  </div>
 
 render(<Demo/>, document.querySelector('#demo'))
