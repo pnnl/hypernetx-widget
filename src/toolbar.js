@@ -116,7 +116,7 @@ const Toolbar = ({ category, dataType, selectionState, onSelectionChange }) => {
           >
             <IconWithTooltip
               text={
-                dataType === "node"
+                dataType === "Nodes"
                   ? "Select all edges containing selected nodes"
                   : "Select all nodes in selected edges"
               }
@@ -141,7 +141,7 @@ const Toolbar = ({ category, dataType, selectionState, onSelectionChange }) => {
               iconImage={<FlipCameraAndroid />}
             />
           </ToggleButton>
-          {dataType === "node" && (
+          {dataType === "Nodes" && (
             <ToggleButton value={"unpin"}>
               <IconWithTooltip text={"Unpin all"} iconImage={<LocationOff />} />
             </ToggleButton>

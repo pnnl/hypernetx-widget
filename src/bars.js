@@ -84,10 +84,10 @@ const Bars = ({ type, origMax, freqData, onValueChange }) => {
         <VictoryChart
           theme={VictoryTheme.material}
           domain={{ x: [0, maxX], y: [0, origMax] }}
-          domainPadding={{ x: [20, 10] }}
+          domainPadding={{ x: [18, 10] }}
           // minDomain={{ x: 0 }}
           height={120}
-          padding={{ left: 55, bottom: 20, right: 25, top: 0 }}
+          padding={{ left: 55, bottom: 25, right: 25, top: 5 }}
           containerComponent={
             <VictorySelectionContainer
               selectionDimension="x"

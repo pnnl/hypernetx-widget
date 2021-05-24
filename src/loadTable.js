@@ -271,9 +271,7 @@ const LoadTable = ({
                       />
                     </div>
 
-                    <div style={{ display: "inline-block" }}>
-                      {+x.value.toString()}
-                    </div>
+                    <div style={{ display: "inline-block" }}>{+x.value}</div>
                   </div>
                 </TableCell>
                 <TableCell>
