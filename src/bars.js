@@ -19,7 +19,7 @@ const Bars = ({ type, origMax, freqData, onValueChange }) => {
   // console.log(maxX % 2, maxX % 3);
 
   const newScale = scaleLinear()
-    .domain([minX, maxX])
+    .domain([0, maxX])
     .nice()
     .ticks()
     .filter((x) => x === Math.ceil(x));

@@ -44,17 +44,31 @@ const toggleStyle = makeStyles((theme) => ({
     },
   },
 }));
-const Toolbar = ({ category, dataType, selectionState, onSelectionChange }) => {
+const Toolbar = ({
+  category,
+  dataType,
+  currToggle,
+  selectionState,
+  onSelectionChange,
+}) => {
   const classes = toggleStyle();
-  const [selectionType, setSelectionType] = React.useState(
-    category === "Data"
-      ? "original"
-      : category === "Graph"
-      ? "undo"
-      : category === "Selection"
-      ? "cursor"
-      : "zoom in"
-  );
+  // const [selectionType, setSelectionType] = React.useState(
+  //   category === "Data"
+  //     ? "original"
+  //     : category === "Graph"
+  //     ? "undo"
+  //     : category === "Selection"
+  //     ? "cursor"
+  //     : "zoom in"
+  // );
+
+  const [selectionType, setSelectionType] = React.useState(null);
+  React.useEffect(() => {
+    setSelectionType(currToggle);
+  }, [currToggle]);
+
+  // console.log(selectionType, "selectionType");
+  // console.log(selectionType);
 
   const handleSelection = (event, newSelection) => {
     if (newSelection === null) {

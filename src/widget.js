@@ -224,11 +224,11 @@ const Widget = ({ nodes, edges, ...props }) => {
   });
 
   const [toggleSelect, setToggleSelect] = React.useState({
-    nodes: null,
-    edges: null,
-    graph: null,
-    selection: null,
-    navigation: null,
+    Nodes: "original",
+    Edges: "original",
+    Graph: "undo",
+    Selection: "cursor",
+    Navigation: "zoom in",
   });
   const [fontSize, setFontSize] = React.useState({ node: 12, edge: 10 });
   const [nodeSize, setNodeSize] = React.useState(createDefaultState(nodes, 2));
@@ -262,7 +262,9 @@ const Widget = ({ nodes, edges, ...props }) => {
           [data.data.uid]: !selectedNodes[data.data.uid],
         });
       } else if (data === undefined) {
-        setSelectedNodes({});
+        console.log("clear Nodes");
+        // setToggleSelect({ ...toggleSelect, Edges: "hidden" });
+        // setSelectedNodes({});
       } else {
         setSelectedNodes({ [data.data.uid]: true });
       }
@@ -286,7 +288,10 @@ const Widget = ({ nodes, edges, ...props }) => {
           [data.uid]: !selectedEdges[data.uid],
         });
       } else if (data === undefined) {
+        const clearObj = { Nodes: "original", Edges: "original" };
+        setToggleSelect({ ...toggleSelect, ...clearObj });
         setSelectedEdges({});
+        setSelectedNodes({});
       } else {
         setSelectedEdges({ [data.uid]: true });
       }
@@ -378,6 +383,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   };
 
   const handleToolbarSelection = (dataType, selectionType) => {
+    setToggleSelect({ ...toggleSelect, [dataType]: selectionType });
     if (selectionType === "hidden") {
       handleHideSelected(dataType);
       setPinned(false);
@@ -455,9 +461,11 @@ const Widget = ({ nodes, edges, ...props }) => {
     if (dataType === "node") {
       setWithNodeLabels(states.showLabels);
       setCollapseNodes(states.collapseNodes);
+      setToggleSelect({ ...toggleSelect, Graph: "collapse" });
     } else {
       setWithEdgeLabels(states.showLabels);
       setBipartite(states.bipartite);
+      setToggleSelect({ ...toggleSelect, Graph: "bipartite" });
     }
   };
 
@@ -690,12 +698,14 @@ const Widget = ({ nodes, edges, ...props }) => {
                 <Toolbar
                   category={"Data"}
                   dataType={"Nodes"}
+                  currToggle={toggleSelect.Nodes}
                   selectionState={selectedNodes}
                   onSelectionChange={handleToolbarSelection}
                 />
                 <Toolbar
                   category={"Data"}
                   dataType={"Edges"}
+                  currToggle={toggleSelect.Edges}
                   selectionState={selectedEdges}
                   onSelectionChange={handleToolbarSelection}
                 />
@@ -703,14 +713,17 @@ const Widget = ({ nodes, edges, ...props }) => {
               <div style={{ display: "flex" }}>
                 <Toolbar
                   category={"Graph"}
+                  currToggle={toggleSelect.Graph}
                   onSelectionChange={handleToolbarSelection}
                 />
                 <Toolbar
                   category={"Selection"}
+                  currToggle={toggleSelect.Selection}
                   onSelectionChange={handleToolbarSelection}
                 />
                 <Toolbar
                   category={"Navigation"}
+                  currToggle={toggleSelect.Navigation}
                   onSelectionChange={handleToolbarSelection}
                 />
               </div>
@@ -764,34 +777,37 @@ const Widget = ({ nodes, edges, ...props }) => {
             <div
               style={{
                 display: "flex",
-                justifyContent: "flex-start",
-                flexFlow: "row wrap",
+                justifyContent: "center",
+                // flexFlow: "row wrap",
               }}
             >
               <Toolbar
                 category={"Data"}
                 dataType={"Nodes"}
+                currToggle={toggleSelect.Nodes}
                 selectionState={selectedNodes}
                 onSelectionChange={handleToolbarSelection}
               />
               <Toolbar
                 category={"Data"}
                 dataType={"Edges"}
+                currToggle={toggleSelect.Edges}
                 selectionState={selectedEdges}
                 onSelectionChange={handleToolbarSelection}
               />
-            </div>
-            <div style={{ display: "flex" }}>
               <Toolbar
                 category={"Graph"}
+                currToggle={toggleSelect.Graph}
                 onSelectionChange={handleToolbarSelection}
               />
               <Toolbar
                 category={"Selection"}
+                currToggle={toggleSelect.Selection}
                 onSelectionChange={handleToolbarSelection}
               />
               <Toolbar
                 category={"Navigation"}
+                currToggle={toggleSelect.Navigation}
                 onSelectionChange={handleToolbarSelection}
               />
             </div>
