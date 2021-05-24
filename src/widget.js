@@ -286,13 +286,13 @@ const Widget = ({ nodes, edges, ...props }) => {
   };
 
   const handleOriginal = (type) => {
-    if (type === "node" || type === "graph") {
+    if (type === "Nodes" || type === "graph") {
       setSelectedNodes({});
       setHiddenNodes({});
       setRemovedNodes({});
       setNodeDegBar({ ...nodeDegList });
     }
-    if (type === "edge" || type === "graph") {
+    if (type === "Edges" || type === "graph") {
       setSelectedEdges({});
       setHiddenEdges({});
       setRemovedEdges({});
@@ -305,7 +305,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   };
 
   const handleHideSelected = (type) => {
-    if (type === "node") {
+    if (type === "Nodes") {
       const selectedNodesTrue = Object.fromEntries(
         Object.entries(selectedNodes).filter(([k, v]) => v)
       );
@@ -319,7 +319,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   };
 
   const handleRemoveSelected = (type) => {
-    if (type === "node") {
+    if (type === "Nodes") {
       const selectedNodesTrue = Object.fromEntries(
         Object.entries(selectedNodes).filter(([k, v]) => v)
       );
@@ -377,21 +377,21 @@ const Widget = ({ nodes, edges, ...props }) => {
       setPinned(false);
     } else if (selectionType === "other") {
       setPinned(false);
-      if (dataType === "node") {
+      if (dataType === "Nodes") {
         handleOtherSelect("edges in nodes");
       } else {
         handleOtherSelect("nodes in edges");
       }
     } else if (selectionType === "all") {
       setPinned(false);
-      if (dataType === "node") {
+      if (dataType === "Nodes") {
         setSelectedNodes(createDefaultState(nodes, true));
       } else {
         setSelectedEdges(createDefaultState(edges, true));
       }
     } else if (selectionType === "none") {
       setPinned(false);
-      if (dataType === "node") {
+      if (dataType === "Nodes") {
         setSelectedNodes({});
       } else {
         setSelectedEdges({});
@@ -403,7 +403,7 @@ const Widget = ({ nodes, edges, ...props }) => {
       setPinned(true);
     } else if (selectionType === "reverse") {
       setPinned(false);
-      if (dataType === "node") {
+      if (dataType === "Nodes") {
         const currSelectedNodes = { ...selectedNodes };
         const uids = nodes.map((d) => d.uid);
         uids.map((d) => {
