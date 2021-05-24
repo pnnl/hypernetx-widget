@@ -222,6 +222,14 @@ const Widget = ({ nodes, edges, ...props }) => {
     node: "default",
     edge: "default",
   });
+
+  const [toggleSelect, setToggleSelect] = React.useState({
+    nodes: null,
+    edges: null,
+    graph: null,
+    selection: null,
+    navigation: null,
+  });
   const [fontSize, setFontSize] = React.useState({ node: 12, edge: 10 });
   const [nodeSize, setNodeSize] = React.useState(createDefaultState(nodes, 2));
   const [nodeSizeGroup, setNodeSizeGroup] = React.useState("None");
@@ -348,7 +356,7 @@ const Widget = ({ nodes, edges, ...props }) => {
       Object.entries(selectedEdges).map((d) => {
         edges.map((e) => {
           if (d[1] && d[0] === e.uid) {
-            e.elements.map((x) => nodeToSelect.set(x, true));
+            e.elements.map((x) => nodeToSelect.set(x.toString(), true));
           }
         });
       });
@@ -359,7 +367,8 @@ const Widget = ({ nodes, edges, ...props }) => {
       );
       Object.entries(selectedNodes).map((d) => {
         edges.map((e) => {
-          if (d[1] && e.elements.includes(d[0])) {
+          let edgeElems = e.elements.map(String);
+          if (d[1] && edgeElems.includes(d[0])) {
             edgeToSelect.set(e.uid.toString(), true);
           }
         });

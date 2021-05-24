@@ -19,7 +19,7 @@ const Bars = ({ type, origMax, freqData, onValueChange }) => {
   // console.log(maxX % 2, maxX % 3);
 
   const newScale = scaleLinear()
-    .domain([0, maxX])
+    .domain([minX, maxX])
     .nice()
     .ticks()
     .filter((x) => x === Math.ceil(x));
@@ -84,7 +84,7 @@ const Bars = ({ type, origMax, freqData, onValueChange }) => {
         <VictoryChart
           theme={VictoryTheme.material}
           domain={{ x: [0, maxX], y: [0, origMax] }}
-          domainPadding={{ x: [18, 10] }}
+          domainPadding={{ x: [20, 10] }}
           // minDomain={{ x: 0 }}
           height={120}
           padding={{ left: 55, bottom: 25, right: 25, top: 5 }}
