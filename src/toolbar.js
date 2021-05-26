@@ -229,6 +229,12 @@ const Toolbar = ({
           exclusive
           onChange={handleSelection}
         >
+          <ToggleButton value={"no navigation"}>
+            <IconWithTooltip
+              text={"Reset navigation"}
+              iconImage={<SettingsBackupRestore />}
+            />
+          </ToggleButton>
           <ToggleButton value={"zoom in"}>
             <IconWithTooltip text={"Zoom in"} iconImage={<ZoomIn />} />
           </ToggleButton>

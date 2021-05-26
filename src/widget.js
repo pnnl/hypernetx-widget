@@ -24,6 +24,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import NodeSizeMenu from "./nodeSizeMenu";
 import { max, range } from "d3-array";
 import HelpMenu from "./helpMenu";
+import NavigableSVG, { PAN, ZOOM_IN, ZOOM_OUT } from "./NavigableSVG";
 
 const createDefaultState = (data, defaultValue) => {
   const mapObj = new Map();
@@ -86,7 +87,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [unpinned, setUnpinned] = React.useState(now());
 
   const [aspect, setAspect] = React.useState(1);
-  const [selectionMode, setSelectionMode] = React.useState("");
+  const [navigation, setNavigation] = React.useState(undefined);
 
   // update the python model with state
   const { _model } = props;
@@ -228,7 +229,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     Edges: "original",
     Graph: "undo",
     Selection: "cursor",
-    Navigation: "zoom in",
+    Navigation: "no navigation",
   });
   const [fontSize, setFontSize] = React.useState({ node: 12, edge: 10 });
   const [nodeSize, setNodeSize] = React.useState(createDefaultState(nodes, 2));
@@ -262,7 +263,6 @@ const Widget = ({ nodes, edges, ...props }) => {
           [data.data.uid]: !selectedNodes[data.data.uid],
         });
       } else if (data === undefined) {
-        console.log("clear Nodes");
         // setToggleSelect({ ...toggleSelect, Edges: "hidden" });
         // setSelectedNodes({});
       } else {
@@ -453,7 +453,15 @@ const Widget = ({ nodes, edges, ...props }) => {
     //   setSelectionMode(dataType + "-" + selectionType);
     // }
     else {
-      setSelectionMode(selectionType);
+      if (selectionType === "pan") {
+        setNavigation(PAN);
+      } else if (selectionType === "zoom in") {
+        setNavigation(ZOOM_IN);
+      } else if (selectionType === "zoom out") {
+        setNavigation(ZOOM_OUT);
+      } else {
+        setNavigation(undefined);
+      }
     }
   };
 
@@ -753,7 +761,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               nodeSize,
               pinned,
               aspect,
-              selectionMode,
+              navigation,
             }}
             onClickNodes={getClickedNodes}
             onClickEdges={getClickedEdges}
@@ -841,7 +849,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               nodeSize,
               pinned,
               aspect,
-              selectionMode,
+              navigation,
             }}
             onClickNodes={getClickedNodes}
             onClickEdges={getClickedEdges}

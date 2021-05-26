@@ -100,7 +100,7 @@ const Bars = ({ type, origMax, freqData, onValueChange }) => {
             data={freqData}
             x="x"
             y="y"
-            barRatio={0.7}
+            // barRatio={0.7}
             style={{
               data: {
                 fill: ({ active, datum }) => {
