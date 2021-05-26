@@ -1,0 +1,16 @@
+svg.navigable-svg > rect.navigation-handle {
+  fill-opacity: 0;
+  stroke: black;
+}
+
+svg.navigable-svg > rect.navigation-handle.pan {
+	cursor: move;
+}
+
+svg.navigable-svg > rect.navigation-handle.zoom-in {
+	cursor: zoom-in;
+}
+
+svg.navigable-svg > rect.navigation-handle.zoom-out {
+	cursor: zoom-out;
+}
