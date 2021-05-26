@@ -15,6 +15,8 @@ import {quadtree} from 'd3-quadtree'
 
 import {TopologicalSort, DiGraph} from 'js-graph-algorithms'
 
+import {NavigableSVG} from './NavigableSVG'
+
 import './hnx-widget.css'
 
 // export const now = () => +(new Date());
@@ -785,7 +787,7 @@ const EdgeLinearBrush = ({simulation, onClickEdges=Object}) => {
 }
 
 
-export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, pinned, size, aspect=1, ignorePlanarForce, pos={}, collapseNodes, nodeSize, selectionMode, ...props}) => {
+export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, pinned, size, aspect=1, ignorePlanarForce, pos={}, collapseNodes, nodeSize, selectionMode, navigation, ...props}) => {
   let {width, height} = size;
 
   if (height === null) {
@@ -1011,7 +1013,7 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, p
       <Tooltip {...tooltip} />
     }
 
-    <svg style={{width, height}} onClick={handleClearSelection}>
+    <NavigableSVG {...{width, height}} navigation={navigation} onClick={handleClearSelection}>
 
       <defs>
           <pattern id="checkerboard" patternUnits="userSpaceOnUse" 
@@ -1040,7 +1042,7 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, p
         <EdgeLinearBrush {...allProps} />
       }
       
-    </svg>
+    </NavigableSVG>
 
   </div>
 }
