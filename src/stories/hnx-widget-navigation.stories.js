@@ -12,9 +12,10 @@ const props = {
 };
 
 const Pattern = () => <React.Fragment>
-    <circle cx={80} cy={20} r={10} />
-    <circle cx={80} cy={80} r={30} />
-    <circle cx={20} cy={80} r={16} />
+  <circle cx={80} cy={20} r={10} />
+  <circle cx={80} cy={80} r={30} />
+  <circle cx={20} cy={80} r={16} />
+  <text x={150} y={150}>How do we make font size constant?</text>
 </React.Fragment>
 
 export const Default = () =>
