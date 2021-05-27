@@ -80,11 +80,13 @@ export const NavigableSVG = ({children, navigation, scale=2, width, height, ...p
           drag()
             .on('start', handleDragStart)
             .on('drag', handleDrag)
-        )
+        );
       } else if (navigation === ZOOM_IN) {
         rect.on('click', handleZoomIn);
       } else if (navigation === ZOOM_OUT) {
         rect.on('click', handleZoomOut);
+      } else if (navigation === undefined) {
+        svg.attr('viewBox', `0 0 ${width} ${height}`);
       }
     }}
   >
