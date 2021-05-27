@@ -16,8 +16,6 @@ const Bars = ({ type, origMax, freqData, onValueChange }) => {
   const minX = min(freqData.map((d) => d.x));
   const maxY = max(freqData.map((d) => d.y));
 
-  // console.log(maxX % 2, maxX % 3);
-
   const newScale = scaleLinear()
     .domain([0, maxX])
     .nice()
@@ -80,11 +78,17 @@ const Bars = ({ type, origMax, freqData, onValueChange }) => {
           Clear
         </Button>
       </div>
-      <div style={{ height: "140px", width: "100%" }}>
+      <div
+        style={{
+          height: "140px",
+          width: "100%",
+          paddingLeft: minX === 0 ? "5px" : "0px",
+        }}
+      >
         <VictoryChart
           theme={VictoryTheme.material}
           domain={{ x: [0, maxX], y: [0, origMax] }}
-          domainPadding={{ x: [20, 10] }}
+          // domainPadding={{ x: [20, 10] }}
           // minDomain={{ x: 0 }}
           height={120}
           padding={{ left: 55, bottom: 25, right: 25, top: 5 }}
@@ -100,7 +104,7 @@ const Bars = ({ type, origMax, freqData, onValueChange }) => {
             data={freqData}
             x="x"
             y="y"
-            // barRatio={0.7}
+            barRatio={0.5}
             style={{
               data: {
                 fill: ({ active, datum }) => {
@@ -110,6 +114,8 @@ const Bars = ({ type, origMax, freqData, onValueChange }) => {
                     return "grey";
                   }
                 },
+                stroke: "white",
+                strokeWidth: 1,
               },
             }}
             events={[
@@ -133,6 +139,7 @@ const Bars = ({ type, origMax, freqData, onValueChange }) => {
           />
           <VictoryAxis
             // tickValues={range(maxVal + 1)}
+
             tickValues={newScale}
             label={type === "node" ? "Degree" : "Size"}
             style={{
@@ -141,6 +148,8 @@ const Bars = ({ type, origMax, freqData, onValueChange }) => {
             }}
           />
           <VictoryAxis
+            offsetX={minX === 0 ? 47 : 55}
+            // standalone={false}
             dependentAxis
             // tickCount={3}
             label="Count"
