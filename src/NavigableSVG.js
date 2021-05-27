@@ -5,11 +5,15 @@ import {drag} from 'd3-drag'
 
 import './NavigableSVG.css'
 
+export const RESET = 'reset'
 export const PAN = 'pan'
 export const ZOOM_IN = 'zoom-in'
 export const ZOOM_OUT = 'zoom-out'
 
 export const NavigableSVG = ({children, navigation, scale=2, width, height, ...props}) => {
+
+  const drawRect = [PAN, ZOOM_IN, ZOOM_OUT]
+    .indexOf(navigation) !== -1;
 
   return <svg
     viewBox={`0 0 ${width} ${height}`}
@@ -56,8 +60,8 @@ export const NavigableSVG = ({children, navigation, scale=2, width, height, ...p
         const newViewHeight = viewHeight*scale;
 
         // project mouse event into viewBox?
-        const x = viewX + ev.x*viewWidth/width;
-        const y = viewY + ev.y*viewHeight/height;
+        const x = viewX + ev.layerX*viewWidth/width;
+        const y = viewY + ev.layerX*viewHeight/height;
 
         const viewBox = [
           x - newViewWidth/2,
@@ -85,13 +89,13 @@ export const NavigableSVG = ({children, navigation, scale=2, width, height, ...p
         rect.on('click', handleZoomIn);
       } else if (navigation === ZOOM_OUT) {
         rect.on('click', handleZoomOut);
-      } else if (navigation === undefined) {
+      } else if (navigation === RESET) {
         svg.attr('viewBox', `0 0 ${width} ${height}`);
       }
     }}
   >
     { children }
-    { navigation &&
+    { drawRect &&
         <rect
             className={`navigation-handle ${navigation}`}
             {...{width, height}}
