@@ -59,6 +59,11 @@ export const NavigableSVG = ({children, navigation, scale=2, width, height, ...p
         const newViewWidth = viewWidth*scale;
         const newViewHeight = viewHeight*scale;
 
+        // when zooming out, prevent zooming out too far
+        if (newViewWidth >= width) {
+          return svg.attr('viewBox', `0 0 ${width} ${height}`);
+        }
+
         // project mouse event into viewBox?
         const x = viewX + ev.layerX*viewWidth/width;
         const y = viewY + ev.layerX*viewHeight/height;
