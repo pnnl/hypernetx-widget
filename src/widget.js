@@ -24,7 +24,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import NodeSizeMenu from "./nodeSizeMenu";
 import { max, range } from "d3-array";
 import HelpMenu from "./helpMenu";
-import NavigableSVG, { PAN, ZOOM_IN, ZOOM_OUT } from "./NavigableSVG";
+import NavigableSVG, { PAN, ZOOM_IN, ZOOM_OUT, RESET } from "./NavigableSVG";
 
 const createDefaultState = (data, defaultValue) => {
   const mapObj = new Map();
@@ -88,6 +88,7 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const [aspect, setAspect] = React.useState(1);
   const [navigation, setNavigation] = React.useState(undefined);
+  const [selectionMode, setSelectionMode] = React.useState(undefined);
 
   // update the python model with state
   const { _model } = props;
@@ -289,9 +290,11 @@ const Widget = ({ nodes, edges, ...props }) => {
         });
       } else if (data === undefined) {
         const clearObj = { Nodes: "original", Edges: "original" };
-        setToggleSelect({ ...toggleSelect, ...clearObj });
-        setSelectedEdges({});
-        setSelectedNodes({});
+        if (navigation === RESET) {
+          setToggleSelect({ ...toggleSelect, ...clearObj });
+          setSelectedEdges({});
+          setSelectedNodes({});
+        }
       } else {
         setSelectedEdges({ [data.uid]: true });
       }
@@ -448,19 +451,26 @@ const Widget = ({ nodes, edges, ...props }) => {
       handleOriginal(dataType);
     } else if (selectionType === "help") {
       setOpenHelp(true);
-    }
-    // else if (selectionType === "brush") {
-    //   setSelectionMode(dataType + "-" + selectionType);
-    // }
-    else {
+    } else if (
+      selectionType === "node-brush" ||
+      selectionType === "edge-brush" ||
+      selectionType === "cursor"
+    ) {
+      setSelectionMode(selectionType);
+      setNavigation(undefined);
+    } else {
       if (selectionType === "pan") {
         setNavigation(PAN);
+        setSelectionMode(undefined);
       } else if (selectionType === "zoom in") {
         setNavigation(ZOOM_IN);
+        setSelectionMode(undefined);
       } else if (selectionType === "zoom out") {
         setNavigation(ZOOM_OUT);
+        setSelectionMode(undefined);
       } else {
-        setNavigation(undefined);
+        // no navigation
+        setNavigation(RESET);
       }
     }
   };
@@ -761,6 +771,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               nodeSize,
               pinned,
               aspect,
+              selectionMode,
               navigation,
             }}
             onClickNodes={getClickedNodes}
@@ -849,6 +860,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               nodeSize,
               pinned,
               aspect,
+              selectionMode,
               navigation,
             }}
             onClickNodes={getClickedNodes}

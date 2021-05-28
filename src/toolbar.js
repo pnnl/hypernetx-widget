@@ -75,7 +75,11 @@ const Toolbar = ({
       onSelectionChange(dataType, selectionType);
     } else {
       setSelectionType(newSelection);
-      onSelectionChange(dataType, newSelection);
+      if (dataType === undefined) {
+        onSelectionChange(category, newSelection);
+      } else {
+        onSelectionChange(dataType, newSelection);
+      }
     }
   };
 
