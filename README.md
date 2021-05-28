@@ -1,8 +1,11 @@
+# Demo
+An interactive demo of `hnxwidget` is available here: https://pnnl.github.io/hypernetx-widget/
+
 # Installation
-Installation requires you to first pip install the widget, then install and activate the widget in your jupyter environment. Below, `<version>` refers to the version number of package.
+Hypernetx-widget now available on PyPi, simply "pip install" it:
 
 ```sh
-pip install hnxwidget-<version>.py3-none-any.whl
+pip install hnxwidget
 ```
 
 # Getting Started
