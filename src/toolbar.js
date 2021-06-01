@@ -49,7 +49,6 @@ const Toolbar = ({
   dataType,
   currToggle,
   selectionState,
-  disabled,
   onSelectionChange,
 }) => {
   const classes = toggleStyle();
@@ -202,19 +201,19 @@ const Toolbar = ({
           exclusive
           onChange={handleSelection}
         >
-          <ToggleButton value={"cursor"} disabled={disabled}>
+          <ToggleButton value={"cursor"}>
             <IconWithTooltip
               text={"Mouse cursor select"}
               iconImage={<Navigation />}
             />
           </ToggleButton>
-          <ToggleButton value={"node-brush"} disabled={disabled}>
+          <ToggleButton value={"node-brush"}>
             <IconWithTooltip
               text={"Brush select nodes"}
               iconImage={<Transform />}
             />
           </ToggleButton>
-          <ToggleButton value={"edge-brush"} disabled={disabled}>
+          <ToggleButton value={"edge-brush"}>
             <IconWithTooltip
               text={"Brush select edges"}
               iconImage={<CallMadeOutlined />}
