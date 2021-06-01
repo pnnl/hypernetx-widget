@@ -735,14 +735,29 @@ const NodeRectangularBrush = ({simulation, onClickNodes=Object}) => {
 
 const EdgeLinearBrush = ({simulation, onClickEdges=Object}) => {
   const getPointerLocation = ev => {
-      const {layerX, layerY} = ev.sourceEvent;
-      return [layerX, layerY];
+      const {offsetX, offsetY} = ev.sourceEvent;
+      return [offsetX, offsetY];
   }
 
   return <g className='edge-brush' ref={ele => {
     const g = select(ele);
 
     let start, end;
+
+    // The coordiantes of the bounding box are in the right
+    // coordinate system, but are not ordered according to
+    // how the user dragged. So we'll use the start and end
+    // ordering to tease this out.
+    const getBrushLine = ev => {
+      const [sx, sy] = start;
+      const [ex, ey] = end;
+      const [[x0, y0], [x1, y1]] = ev.selection;
+
+      return [
+        [sx > ex ? x0 : x1, sy > ey ? y0 : y1],
+        [sx > ex ? x1 : x0, sy > ey ? y1 : y0]
+      ];
+    }
 
     const handleStart = ev =>
       start = getPointerLocation(ev);
@@ -751,7 +766,7 @@ const EdgeLinearBrush = ({simulation, onClickEdges=Object}) => {
       end = getPointerLocation(ev);
 
       g.selectAll('line')
-        .data([[start, end]])
+        .data([getBrushLine(ev)])
         .join('line')
           .attr('x1', d => d[0][0])
           .attr('y1', d => d[0][1])
@@ -766,22 +781,23 @@ const EdgeLinearBrush = ({simulation, onClickEdges=Object}) => {
 
       if (!ev.selection) return;
 
+      const [pointerStart, pointerEnd] = getBrushLine(ev);
+
       const selectedEdges = simulation.nodes()
         .filter(({points}) =>
           points !== undefined &&
-          (polygonContains(points, start) ^ polygonContains(points, end))
+          (polygonContains(points, pointerStart) ^ polygonContains(points, pointerEnd))
         );
 
-      // todo: fire selection event
       onClickEdges(ev, selectedEdges);
     }
 
     g.call(
       brush()
-        .extent([[0, 0], simulation.size])
-        .on('start', handleStart)
-        .on('brush', handleBrush)
-        .on('end', handleEnd)
+          .extent([[0, 0], simulation.size])
+          .on('start', handleStart)
+          .on('brush', handleBrush)
+          .on('end', handleEnd)
     );
   }}/>
 }
