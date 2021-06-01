@@ -230,7 +230,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     Edges: "original",
     Graph: "undo",
     Selection: "cursor",
-    Navigation: "no navigation",
+    Navigation: undefined,
   });
   const [fontSize, setFontSize] = React.useState({ node: 12, edge: 10 });
   const [nodeSize, setNodeSize] = React.useState(createDefaultState(nodes, 2));
@@ -456,9 +456,14 @@ const Widget = ({ nodes, edges, ...props }) => {
       selectionType === "edge-brush" ||
       selectionType === "cursor"
     ) {
+      let newToggle = { Selection: selectionType, Navigation: undefined };
       setSelectionMode(selectionType);
       setNavigation(undefined);
+      setToggleSelect({ ...toggleSelect, ...newToggle });
     } else {
+      let newToggle = { Selection: undefined, Navigation: selectionType };
+      setToggleSelect({ ...toggleSelect, ...newToggle });
+
       if (selectionType === "pan") {
         setNavigation(PAN);
         setSelectionMode(undefined);
@@ -575,7 +580,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     collapseState: collapseNodes,
     bipartiteState: bipartite,
   };
-
+  // console.log(toggleSelect);
   return (
     <div>
       <Grid container spacing={1}>
@@ -737,7 +742,6 @@ const Widget = ({ nodes, edges, ...props }) => {
                 <Toolbar
                   category={"Selection"}
                   currToggle={toggleSelect.Selection}
-                  disabled={toggleSelect.Navigation !== "no navigation"}
                   onSelectionChange={handleToolbarSelection}
                 />
                 <Toolbar
@@ -823,7 +827,6 @@ const Widget = ({ nodes, edges, ...props }) => {
               <Toolbar
                 category={"Selection"}
                 currToggle={toggleSelect.Selection}
-                disabled={toggleSelect.Navigation !== "no navigation"}
                 onSelectionChange={handleToolbarSelection}
               />
               <Toolbar
