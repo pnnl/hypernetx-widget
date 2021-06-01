@@ -737,6 +737,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                 <Toolbar
                   category={"Selection"}
                   currToggle={toggleSelect.Selection}
+                  disabled={toggleSelect.Navigation !== "no navigation"}
                   onSelectionChange={handleToolbarSelection}
                 />
                 <Toolbar
@@ -822,6 +823,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               <Toolbar
                 category={"Selection"}
                 currToggle={toggleSelect.Selection}
+                disabled={toggleSelect.Navigation !== "no navigation"}
                 onSelectionChange={handleToolbarSelection}
               />
               <Toolbar

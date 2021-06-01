@@ -49,6 +49,7 @@ const Toolbar = ({
   dataType,
   currToggle,
   selectionState,
+  disabled,
   onSelectionChange,
 }) => {
   const classes = toggleStyle();
@@ -66,9 +67,6 @@ const Toolbar = ({
   React.useEffect(() => {
     setSelectionType(currToggle);
   }, [currToggle]);
-
-  // console.log(selectionType, "selectionType");
-  // console.log(selectionType);
 
   const handleSelection = (event, newSelection) => {
     if (newSelection === null) {
@@ -204,19 +202,19 @@ const Toolbar = ({
           exclusive
           onChange={handleSelection}
         >
-          <ToggleButton value={"cursor"}>
+          <ToggleButton value={"cursor"} disabled={disabled}>
             <IconWithTooltip
               text={"Mouse cursor select"}
               iconImage={<Navigation />}
             />
           </ToggleButton>
-          <ToggleButton value={"node-brush"}>
+          <ToggleButton value={"node-brush"} disabled={disabled}>
             <IconWithTooltip
               text={"Brush select nodes"}
               iconImage={<Transform />}
             />
           </ToggleButton>
-          <ToggleButton value={"edge-brush"}>
+          <ToggleButton value={"edge-brush"} disabled={disabled}>
             <IconWithTooltip
               text={"Brush select edges"}
               iconImage={<CallMadeOutlined />}
