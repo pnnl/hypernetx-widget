@@ -65,8 +65,8 @@ export const NavigableSVG = ({children, navigation, scale=2, width, height, ...p
         }
 
         // project mouse event into viewBox?
-        const x = viewX + ev.layerX*viewWidth/width;
-        const y = viewY + ev.layerX*viewHeight/height;
+        const x = viewX + ev.offsetX*viewWidth/width;
+        const y = viewY + ev.offsetY*viewHeight/height;
 
         const viewBox = [
           x - newViewWidth/2,
