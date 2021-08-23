@@ -34,8 +34,8 @@
     "extract-text-webpack-plugin": "^4.0.0-beta.0",
     "nodemon": "^2.0.4",
     "nwb": "^0.25.2",
-    "react": "^16.9.0",
-    "react-dom": "^16.9.0",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
     "react-is": "^16.13.1",
     "webpack": "^4.44.1"
   },
@@ -47,7 +47,7 @@
     "react-component"
   ],
   "dependencies": {
-    "@material-ui/core": "^4.11.0",
+    "@material-ui/core": "^4.12.3",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.57",
     "d3-array": "^2.11.0",
@@ -61,6 +61,7 @@
     "d3-scale-chromatic": "^2.0.0",
     "d3-selection": "^2.0.0",
     "js-graph-algorithms": "^1.0.18",
+    "jsx-runtime": "^1.2.0",
     "lodash": "^4.17.21",
     "react-color": "^2.19.3",
     "react-colorscales": "^0.7.3",
