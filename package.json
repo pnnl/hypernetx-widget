@@ -1,6 +1,6 @@
 {
   "name": "hnx-widget",
-  "version": "1.0.0",
+  "version": "0.1.0-beta.4",
   "main": "lib/index.js",
   "module": "es/index.js",
   "files": [
@@ -41,7 +41,7 @@
   },
   "author": "",
   "homepage": "",
-  "license": "MIT",
+  "license": "BSD",
   "repository": "",
   "keywords": [
     "react-component"
