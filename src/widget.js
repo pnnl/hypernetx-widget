@@ -601,6 +601,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                 <div style={{ width: "100%" }}>
                   <LoadTable
                     type={"node"}
+                    metadata={props.nodeData}
                     data={transNodeData}
                     onColorChange={handleColorChange}
                     onVisibleChange={handleVisibilityChange}
@@ -664,6 +665,7 @@ const Widget = ({ nodes, edges, ...props }) => {
                   <LoadTable
                     type={"edge"}
                     data={transEdgeData}
+                    metadata={props.edgeData}
                     onColorChange={handleColorChange}
                     onVisibleChange={handleVisibilityChange}
                     onSelectedChange={handleSelectedChange}

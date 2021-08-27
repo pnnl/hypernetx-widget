@@ -11,6 +11,8 @@ import {
   Paper,
   Checkbox,
   Tooltip,
+  MenuItem,
+  Select,
 } from "@material-ui/core";
 import CheckboxEl from "./checkboxEl.js";
 import ColorButton from "./colorButton.js";
@@ -69,6 +71,8 @@ function EnhancedTableHead(props) {
   const {
     datatype,
     data,
+    metadata,
+    usercols,
     classes,
     onSelectAllClick,
     order,
@@ -76,6 +80,7 @@ function EnhancedTableHead(props) {
     numSelected,
     rowCount,
     onRequestSort,
+    onUserCol,
   } = props;
 
   const createSortHandler = (property) => (event) => {
@@ -88,7 +93,15 @@ function EnhancedTableHead(props) {
     { id: "hidden", label: "Visibility" },
     { id: "removed", label: "Remove" },
     { id: "color", label: "Color" },
+    { id: "user", label: "UserDefined" },
   ];
+
+  const [userCol, setUserCol] = React.useState(props.usercols[0] || "");
+
+  const handleUserCol = (e) => {
+    setUserCol(e.target.value);
+    onUserCol(e.target.value);
+  };
 
   return (
     <TableHead>
@@ -115,6 +128,21 @@ function EnhancedTableHead(props) {
               direction={orderBy === headCell.id ? order : "asc"}
               onClick={createSortHandler(headCell.id)}
             >
+              {headCell.id === "user" && metadata !== undefined && (
+                <div style={{ textAlign: "center" }}>
+                  <Select
+                    style={{ fontSize: "12px", maxWidth: 80 }}
+                    value={userCol}
+                    onChange={handleUserCol}
+                  >
+                    {usercols.map((c) => (
+                      <MenuItem style={{ fontSize: "12px" }} key={c} value={c}>
+                        {c}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </div>
+              )}
               {(headCell.id === "uid" || headCell.id === "value") && (
                 <div style={{ textAlign: "center" }}>{headCell.label}</div>
               )}
@@ -169,16 +197,20 @@ function EnhancedTableHead(props) {
 EnhancedTableHead.propTypes = {
   datatype: PropTypes.string.isRequired,
   data: PropTypes.array.isRequired,
+  metadata: PropTypes.object.isRequired,
+  usercols: PropTypes.array.isRequired,
   classes: PropTypes.object.isRequired,
   onRequestSort: PropTypes.func.isRequired,
   onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.oneOf(["asc", "desc"]).isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
+  onUserCol: PropTypes.func.isRequired,
 };
 
 const LoadTable = ({
   type,
+  metadata,
   data,
   onColorChange,
   onVisibleChange,
@@ -186,6 +218,25 @@ const LoadTable = ({
   onRemovedChange,
   onSelectAllChange,
 }) => {
+  // columns from metadata to add
+  const addColumns = metadata
+    ? Object.keys(Object.values(metadata)[0]).filter(
+        (d) => d !== "Degree" && d !== "Size"
+      )
+    : [];
+
+  const fullData = [];
+  if (metadata) {
+    Object.entries(metadata).map((m) =>
+      data.map((d) => {
+        if (d.uid === m[0]) {
+          let combinedObj = { ...d, ...m[1] };
+          fullData.push(combinedObj);
+        }
+      })
+    );
+  }
+
   const classes = tableStyles();
   const calcBar = (i) => {
     const values = data.map((x) => x.value);
@@ -200,6 +251,8 @@ const LoadTable = ({
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
+
+  const [userCol, setUserCol] = React.useState(addColumns[0] || "");
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
@@ -224,7 +277,16 @@ const LoadTable = ({
   const getRemove = (label, remove) => {
     onRemovedChange(type, label, remove);
   };
-  // console.log(stableSort(data, getComparator(order, orderBy)));
+
+  const formatData = (value) => {
+    if (typeof value === "number") {
+      if (value % 1 !== 0) {
+        return value.toFixed(2);
+      }
+      return value;
+    }
+    return value;
+  };
   return (
     <div style={{ margin: "0px", padding: "0px" }}>
       <TableContainer
@@ -244,15 +306,21 @@ const LoadTable = ({
           <EnhancedTableHead
             datatype={type}
             data={data}
+            metadata={metadata}
+            usercols={addColumns}
             classes={classes}
             order={order}
             orderBy={orderBy}
             onSelectAllClick={handleSelectAllClick}
             onRequestSort={handleRequestSort}
             rowCount={data.length}
+            onUserCol={(col) => setUserCol(col)}
           />
           <TableBody>
-            {stableSort(data, getComparator(order, orderBy)).map((x, i) => (
+            {stableSort(
+              metadata ? fullData : data,
+              getComparator(order, orderBy)
+            ).map((x, i) => (
               <TableRow key={i}>
                 <TableCell>
                   <CheckboxEl
@@ -308,6 +376,14 @@ const LoadTable = ({
                     onEachColorChange={getColor}
                   />
                 </TableCell>
+                {metadata !== undefined && (
+                  <TableCell
+                    style={{ textOverflow: "ellipsis", width: "40px" }}
+                  >
+                    {formatData(x[userCol])}
+                  </TableCell>
+                )}
+                {/*<TableCell>{x[userCol]}</TableCell>*/}
               </TableRow>
             ))}
           </TableBody>
