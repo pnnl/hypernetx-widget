@@ -10,7 +10,7 @@ export const PAN = 'pan'
 export const ZOOM_IN = 'zoom-in'
 export const ZOOM_OUT = 'zoom-out'
 
-export const NavigableSVG = ({children, navigation, scale=2, width, height, ...props}) => {
+export const NavigableSVG = ({children, navigation, scale=1.5, width, height, ...props}) => {
 
   const drawRect = [PAN, ZOOM_IN, ZOOM_OUT]
     .indexOf(navigation) !== -1;
