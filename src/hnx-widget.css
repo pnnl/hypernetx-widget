@@ -1,3 +1,8 @@
+.hnx-widget-view svg {
+	-webkit-user-select: none;
+	user-select: none;
+}
+
 .hnx-widget-view .nodes .fixed .internal {
 	stroke: gray;
 	stroke-width: 3;
