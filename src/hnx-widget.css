@@ -97,6 +97,20 @@
 	margin: .5em;
 	padding: .5em;
 	max-width: 150px;
+	border-collapse: unset;
+	border-spacing: unset;
+}
+
+.hnx-widget-view table th {
+	text-align: center;
+}
+
+.hnx-widget-view table th, .hnx-widget-view table td {
+	padding:  inherit;
+}
+
+.hnx-widget-view table td:first-child {
+	padding-right: .5em;
 }
 
 .hnx-widget-view .hiddenState {
