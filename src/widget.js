@@ -25,6 +25,8 @@ import NodeSizeMenu from "./nodeSizeMenu";
 import { max, range } from "d3-array";
 import HelpMenu from "./helpMenu";
 import NavigableSVG, { PAN, ZOOM_IN, ZOOM_OUT, RESET } from "./NavigableSVG";
+import { HypernetxWidgetDualView } from "./HypernetxWidgetDualView";
+import props from "./stories/data/props.json";
 
 const createDefaultState = (data, defaultValue) => {
   const mapObj = new Map();
@@ -33,6 +35,7 @@ const createDefaultState = (data, defaultValue) => {
 };
 
 const Widget = ({ nodes, edges, ...props }) => {
+  console.log({ ...props });
   const classes = accordianStyles();
 
   const nodeDegMap = new Map();
@@ -439,6 +442,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     } else if (selectionType === "fullscreen") {
       setOpenFullscreen(true);
       setAspect(2);
+      setNavigation(undefined);
     } else if (selectionType === "bipartite") {
       setBipartite(!bipartite);
     } else if (selectionType === "collapse") {
@@ -473,6 +477,11 @@ const Widget = ({ nodes, edges, ...props }) => {
       } else if (selectionType === "zoom out") {
         setNavigation(ZOOM_OUT);
         setSelectionMode(undefined);
+      } else if (selectionType === "dual") {
+        setNavigation(selectionType);
+        setSelectionMode(undefined);
+        setOpenFullscreen(true);
+        setAspect(1);
       } else {
         // no navigation
         setNavigation(RESET);
@@ -572,6 +581,7 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const [openFullscreen, setOpenFullscreen] = React.useState(false);
   const handleClose = () => {
+    setNavigation(undefined);
     setOpenFullscreen(false);
     setAspect(1);
   };
@@ -580,7 +590,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     collapseState: collapseNodes,
     bipartiteState: bipartite,
   };
-  // console.log(toggleSelect);
+
   return (
     <div>
       <Grid container spacing={1}>
@@ -843,36 +853,101 @@ const Widget = ({ nodes, edges, ...props }) => {
               </IconButton>
             </div>
           </div>
+          {navigation !== "dual" ? (
+            <HypernetxWidgetView
+              {...props}
+              {...{
+                nodes,
+                edges,
+                nodeFill,
+                selectedNodes,
+                hiddenNodes,
+                removedNodes,
+                edgeStroke,
+                selectedEdges,
+                hiddenEdges,
+                removedEdges,
+                withNodeLabels,
+                withEdgeLabels,
+                collapseNodes,
+                bipartite,
+                unpinned,
+                nodeFontSize,
+                edgeFontSize,
+                nodeSize,
+                pinned,
+                aspect,
+                selectionMode,
+                navigation,
+              }}
+              onClickNodes={getClickedNodes}
+              onClickEdges={getClickedEdges}
+            />
+          ) : (
+            <Grid container>
+              <Grid item sm={6}>
+                <HypernetxWidgetView
+                  {...{
+                    nodes,
+                    edges,
+                    nodeFill,
+                    selectedNodes,
+                    hiddenNodes,
+                    removedNodes,
+                    edgeStroke,
+                    selectedEdges,
+                    hiddenEdges,
+                    removedEdges,
+                    withNodeLabels,
+                    withEdgeLabels,
+                    collapseNodes,
+                    bipartite,
+                    unpinned,
+                    nodeFontSize,
+                    edgeFontSize,
+                    nodeSize,
+                    pinned,
+                    aspect,
+                    selectionMode,
+                    navigation,
+                  }}
+                  onClickNodes={getClickedNodes}
+                  onClickEdges={getClickedEdges}
+                />
+              </Grid>
 
-          <HypernetxWidgetView
-            {...props}
-            {...{
-              nodes,
-              edges,
-              nodeFill,
-              selectedNodes,
-              hiddenNodes,
-              removedNodes,
-              edgeStroke,
-              selectedEdges,
-              hiddenEdges,
-              removedEdges,
-              withNodeLabels,
-              withEdgeLabels,
-              collapseNodes,
-              bipartite,
-              unpinned,
-              nodeFontSize,
-              edgeFontSize,
-              nodeSize,
-              pinned,
-              aspect,
-              selectionMode,
-              navigation,
-            }}
-            onClickNodes={getClickedNodes}
-            onClickEdges={getClickedEdges}
-          />
+              <Grid item sm={6}>
+                <HypernetxWidgetDualView
+                  {...{
+                    nodes,
+                    edges,
+                    nodeFill,
+                    selectedNodes,
+                    hiddenNodes,
+                    removedNodes,
+                    edgeStroke,
+                    selectedEdges,
+                    hiddenEdges,
+                    removedEdges,
+                    withNodeLabels,
+                    withEdgeLabels,
+                    collapseNodes,
+                    bipartite,
+                    unpinned,
+                    nodeFontSize,
+                    edgeFontSize,
+                    nodeSize,
+                    pinned,
+                    aspect,
+                    selectionMode,
+                    navigation,
+                  }}
+                  onClickNodes={getClickedNodes}
+                  onClickEdges={getClickedEdges}
+                />
+              </Grid>
+            </Grid>
+          )}
         </Paper>
       </Modal>
     </div>

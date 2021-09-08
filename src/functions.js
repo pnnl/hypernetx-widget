@@ -7,6 +7,7 @@ export const numberRange = (start, end) => {
 export const descendingComparator = (a, b, orderBy) => {
   a[orderBy] = a[orderBy] || false;
   b[orderBy] = b[orderBy] || false;
+
   if (b[orderBy] < a[orderBy]) {
     return -1;
   }
@@ -29,7 +30,6 @@ export const stableSort = (array, comparator) => {
     if (order !== 0) return order;
     return a[1] - b[1];
   });
-
   return stabilizedThis.map((el) => el[0]);
 };
 

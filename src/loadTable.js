@@ -90,10 +90,10 @@ function EnhancedTableHead(props) {
   const headCells = [
     { id: "value", label: datatype === "node" ? "Degree" : "Size" },
     { id: "uid", label: "Label" },
+    { id: "user", label: "UserDefined" },
     { id: "hidden", label: "Visibility" },
     { id: "removed", label: "Remove" },
     { id: "color", label: "Color" },
-    { id: "user", label: "UserDefined" },
   ];
 
   const [userCol, setUserCol] = React.useState(props.usercols[0] || "");
@@ -106,7 +106,7 @@ function EnhancedTableHead(props) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="default">
+        <TableCell padding="normal">
           <Checkbox
             size="small"
             onChange={onSelectAllClick}
@@ -245,14 +245,13 @@ const LoadTable = ({
 
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("label");
+  const [userCol, setUserCol] = React.useState(addColumns[0] || "");
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
-
-  const [userCol, setUserCol] = React.useState(addColumns[0] || "");
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
@@ -281,11 +280,14 @@ const LoadTable = ({
   const formatData = (value) => {
     if (typeof value === "number") {
       if (value % 1 !== 0) {
-        return value.toFixed(2);
+        return Number(value.toFixed(2));
       }
       return value;
+    } else if (typeof value === "boolean") {
+      return +value;
+    } else {
+      return value;
     }
-    return value;
   };
   return (
     <div style={{ margin: "0px", padding: "0px" }}>
@@ -319,7 +321,7 @@ const LoadTable = ({
           <TableBody>
             {stableSort(
               metadata ? fullData : data,
-              getComparator(order, orderBy)
+              getComparator(order, orderBy === "user" ? userCol : orderBy)
             ).map((x, i) => (
               <TableRow key={i}>
                 <TableCell>
@@ -355,6 +357,13 @@ const LoadTable = ({
                     {x.uid}
                   </div>
                 </TableCell>
+                {metadata !== undefined && (
+                  <TableCell
+                    style={{ textOverflow: "ellipsis", width: "40px" }}
+                  >
+                    {formatData(x[userCol])}
+                  </TableCell>
+                )}
                 <TableCell align="left">
                   <VisibilityButton
                     label={x.uid}
@@ -376,13 +385,7 @@ const LoadTable = ({
                     onEachColorChange={getColor}
                   />
                 </TableCell>
-                {metadata !== undefined && (
-                  <TableCell
-                    style={{ textOverflow: "ellipsis", width: "40px" }}
-                  >
-                    {formatData(x[userCol])}
-                  </TableCell>
-                )}
+
                 {/*<TableCell>{x[userCol]}</TableCell>*/}
               </TableRow>
             ))}

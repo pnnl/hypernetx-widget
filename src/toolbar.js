@@ -20,6 +20,7 @@ import {
   LocationOff,
   RemoveCircleOutlineOutlined,
   CallMadeOutlined,
+  Flip,
 } from "@material-ui/icons";
 import Tooltip from "@material-ui/core/Tooltip";
 import { makeStyles } from "@material-ui/core/styles";
@@ -249,6 +250,12 @@ const Toolbar = ({
             <IconWithTooltip
               text={"View fullscreen"}
               iconImage={<ZoomOutMap />}
+            />
+          </ToggleButton>
+          <ToggleButton value={"dual"}>
+            <IconWithTooltip
+              text={"View fullscreen dual"}
+              iconImage={<Flip />}
             />
           </ToggleButton>
           <ToggleButton value={"help"}>
