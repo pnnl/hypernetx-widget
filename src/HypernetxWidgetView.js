@@ -1019,8 +1019,8 @@ export const HypernetxWidgetView = ({nodes, edges, removedNodes, removedEdges, p
 
   const handleClearSelection = ev => {
     if (!(ev.shiftKey || ev.ctrlKey || ev.metaKey)) {
-      onClickNodes(ev);
-      onClickEdges(ev);
+      onClickNodes(ev, []);
+      onClickEdges(ev, []);
     }
   }
 
