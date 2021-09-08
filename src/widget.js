@@ -247,10 +247,18 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const getClickedNodes = (event, data) => {
     if (Array.isArray(data)) {
-      const uidArr = data
-        .map((d) => d.data.elements)
-        .flat()
-        .map((d) => d.uid);
+      var uidArr = [];
+      if (data.length > 0) {
+        if (data[0].data) {
+          uidArr = data
+            .map((d) => d.data.elements)
+            .flat()
+            .map((d) => d.uid);
+        } else {
+          uidArr = data.map((d) => d.uid);
+        }
+      }
+
       const newSelect = {};
       uidArr.map((uid) => {
         newSelect[uid] = true;
@@ -262,15 +270,26 @@ const Widget = ({ nodes, edges, ...props }) => {
       }
     } else {
       if (event.shiftKey) {
-        setSelectedNodes({
-          ...selectedNodes,
-          [data.data.uid]: !selectedNodes[data.data.uid],
-        });
+        if (data.data) {
+          setSelectedNodes({
+            ...selectedNodes,
+            [data.data.uid]: !selectedNodes[data.data.uid],
+          });
+        } else {
+          setSelectedNodes({
+            ...selectedNodes,
+            [data.uid]: !selectedNodes[data.uid],
+          });
+        }
       } else if (data === undefined) {
         // setToggleSelect({ ...toggleSelect, Edges: "hidden" });
         // setSelectedNodes({});
       } else {
-        setSelectedNodes({ [data.data.uid]: true });
+        if (data.data) {
+          setSelectedNodes({ [data.data.uid]: true });
+        } else {
+          setSelectedNodes({ [data.uid]: true });
+        }
       }
     }
   };
@@ -462,7 +481,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     ) {
       let newToggle = { Selection: selectionType, Navigation: undefined };
       setSelectionMode(selectionType);
-      setNavigation(undefined);
+      // setNavigation(undefined);
       setToggleSelect({ ...toggleSelect, ...newToggle });
     } else {
       let newToggle = { Selection: undefined, Navigation: selectionType };
