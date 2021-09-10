@@ -19,7 +19,7 @@ import {
 import Toolbar from "./toolbar";
 import Switches from "./switches";
 import FontSizeMenu from "./fontSizeMenu";
-import { IconButton, Modal, Paper } from "@material-ui/core";
+import { Divider, IconButton, Modal, Paper } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import NodeSizeMenu from "./nodeSizeMenu";
 import { max, range } from "d3-array";
@@ -157,6 +157,7 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const handleSelectAll = (type, value) => {
     if (type === "node") {
+      console.log("CLICKED");
       if (value) {
         setSelectedNodes(createDefaultState(nodes, true));
       } else {
@@ -905,6 +906,17 @@ const Widget = ({ nodes, edges, ...props }) => {
           ) : (
             <Grid container>
               <Grid item sm={6}>
+                <div
+                  style={{
+                    fontSize: "17px",
+                    paddingTop: "10px",
+                    fontFamily: "Arial",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Prime
+                </div>
                 <HypernetxWidgetView
                   {...{
                     nodes,
@@ -934,8 +946,22 @@ const Widget = ({ nodes, edges, ...props }) => {
                   onClickEdges={getClickedEdges}
                 />
               </Grid>
-
-              <Grid item sm={6}>
+              <Divider
+                orientation="vertical"
+                style={{ marginTop: "15px", height: "85vh" }}
+              />
+              <Grid item sm={5}>
+                <div
+                  style={{
+                    fontSize: "17px",
+                    paddingTop: "10px",
+                    fontFamily: "Arial",
+                    fontWeight: "bold",
+                    textAlign: "center",
+                  }}
+                >
+                  Dual
+                </div>
                 <HypernetxWidgetDualView
                   {...{
                     nodes,
