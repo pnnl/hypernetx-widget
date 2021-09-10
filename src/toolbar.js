@@ -64,11 +64,13 @@ const Toolbar = ({
   // );
 
   const [selectionType, setSelectionType] = React.useState(null);
+
   React.useEffect(() => {
     setSelectionType(currToggle);
   }, [currToggle]);
 
   const handleSelection = (event, newSelection) => {
+    console.log(newSelection);
     if (newSelection === null) {
       onSelectionChange(dataType, selectionType);
     } else {
@@ -80,6 +82,8 @@ const Toolbar = ({
       }
     }
   };
+
+  // console.log(selectionType);
 
   return (
     <div style={{ paddingTop: "5px", paddingRight: "7px" }}>

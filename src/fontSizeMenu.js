@@ -9,7 +9,7 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-const sizeArr = [8, 10, 12, 14, 16, 18];
+const sizeArr = [8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48];
 
 const FontSizeMenu = ({ type, currSize, onSizeChange }) => {
   const classes = useStyles();
@@ -29,7 +29,7 @@ const FontSizeMenu = ({ type, currSize, onSizeChange }) => {
           paddingRight: "8px",
         }}
       >
-        {"Font"}
+        Font size
       </div>
       <FormControl classes={{ root: classes.customSelect }}>
         {/*<InputLabel> Size </InputLabel>*/}

@@ -87,7 +87,7 @@ function EnhancedTableHead(props) {
     onRequestSort(event, property);
   };
 
-  const headCells = [
+  const metaHeadCells = [
     { id: "value", label: datatype === "node" ? "Degree" : "Size" },
     { id: "uid", label: "Label" },
     { id: "user", label: "UserDefined" },
@@ -96,7 +96,7 @@ function EnhancedTableHead(props) {
     { id: "color", label: "Color" },
   ];
 
-  const metaHeadCells = [
+  const headCells = [
     { id: "value", label: datatype === "node" ? "Degree" : "Size" },
     { id: "uid", label: "Label" },
     { id: "hidden", label: "Visibility" },
@@ -104,7 +104,7 @@ function EnhancedTableHead(props) {
     { id: "color", label: "Color" },
   ];
 
-  const headers = metadata ? headCells : metaHeadCells;
+  const headers = metadata ? metaHeadCells : headCells;
 
   const [userCol, setUserCol] = React.useState(props.usercols[0] || "");
 
@@ -139,9 +139,9 @@ function EnhancedTableHead(props) {
               onClick={createSortHandler(headCell.id)}
             >
               {headCell.id === "user" && metadata !== undefined && (
-                <div style={{ textAlign: "left", paddingRight: "20px" }}>
+                <div style={{ textAlign: "left", paddingRight: "0px" }}>
                   <Select
-                    style={{ fontSize: "12px", minWidth: 0, maxWidth: 70 }}
+                    style={{ fontSize: "12px", minWidth: 0, maxWidth: 30 }}
                     value={userCol}
                     onChange={handleUserCol}
                   >
@@ -165,8 +165,8 @@ function EnhancedTableHead(props) {
                   }
                 >
                   <VisibilityOutlined
-                    style={{ paddingLeft: "10px" }}
                     size={"small"}
+                    style={{ paddingLeft: "3px" }}
                   />
                 </Tooltip>
               )}
@@ -364,7 +364,7 @@ const LoadTable = ({
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       width: "40px",
-                      textAlign: "center",
+                      textAlign: "left",
                     }}
                   >
                     {x.uid}
