@@ -96,6 +96,16 @@ function EnhancedTableHead(props) {
     { id: "color", label: "Color" },
   ];
 
+  const metaHeadCells = [
+    { id: "value", label: datatype === "node" ? "Degree" : "Size" },
+    { id: "uid", label: "Label" },
+    { id: "hidden", label: "Visibility" },
+    { id: "removed", label: "Remove" },
+    { id: "color", label: "Color" },
+  ];
+
+  const headers = metadata ? headCells : metaHeadCells;
+
   const [userCol, setUserCol] = React.useState(props.usercols[0] || "");
 
   const handleUserCol = (e) => {
@@ -117,7 +127,7 @@ function EnhancedTableHead(props) {
             }
           />
         </TableCell>
-        {headCells.map((headCell) => (
+        {headers.map((headCell) => (
           <TableCell
             key={headCell.id}
             padding="none"
@@ -129,9 +139,9 @@ function EnhancedTableHead(props) {
               onClick={createSortHandler(headCell.id)}
             >
               {headCell.id === "user" && metadata !== undefined && (
-                <div style={{ textAlign: "center" }}>
+                <div style={{ textAlign: "left", paddingRight: "20px" }}>
                   <Select
-                    style={{ fontSize: "12px", maxWidth: 80 }}
+                    style={{ fontSize: "12px", minWidth: 0, maxWidth: 70 }}
                     value={userCol}
                     onChange={handleUserCol}
                   >
@@ -144,7 +154,7 @@ function EnhancedTableHead(props) {
                 </div>
               )}
               {(headCell.id === "uid" || headCell.id === "value") && (
-                <div style={{ textAlign: "center" }}>{headCell.label}</div>
+                <div style={{ textAlign: "right" }}>{headCell.label}</div>
               )}
               {headCell.id === "hidden" && (
                 <Tooltip
@@ -154,7 +164,10 @@ function EnhancedTableHead(props) {
                     </div>
                   }
                 >
-                  <VisibilityOutlined size={"small"} />
+                  <VisibilityOutlined
+                    style={{ paddingLeft: "10px" }}
+                    size={"small"}
+                  />
                 </Tooltip>
               )}
               {headCell.id === "removed" && (
