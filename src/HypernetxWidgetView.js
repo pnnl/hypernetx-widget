@@ -742,7 +742,8 @@ const EdgeLinearBrush = ({simulation, onClickEdges=Object}) => {
   return <g className='edge-brush' ref={ele => {
     const g = select(ele);
 
-    let start, end;
+    let start = [0, 0];
+    let end = [0, 0];
 
     // The coordiantes of the bounding box are in the right
     // coordinate system, but are not ordered according to
@@ -779,7 +780,10 @@ const EdgeLinearBrush = ({simulation, onClickEdges=Object}) => {
       g.select('line')
         .style('visibility', 'hidden')
 
-      if (!ev.selection) return;
+      if (!ev.selection) {
+        onClickEdges(ev, []);
+        return;
+      };
 
       const [pointerStart, pointerEnd] = getBrushLine(ev);
 
