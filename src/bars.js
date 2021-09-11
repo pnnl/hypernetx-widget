@@ -49,19 +49,19 @@ const Bars = ({ type, origMax, freqData, onValueChange }) => {
   };
   return (
     <div style={{ width: "100%" }}>
-      <div
-        style={{
-          fontFamily: "Arial",
-          fontSize: "15px",
-          paddingLeft: "5px",
-          paddingTop: "8px",
-        }}
-      >
-        {type === "node"
-          ? "Node degree distribution"
-          : "Edge Size Distribution"}
-      </div>
-      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <div
+          style={{
+            fontFamily: "Arial",
+            fontSize: "15px",
+            paddingLeft: "5px",
+            paddingTop: "8px",
+          }}
+        >
+          {type === "node"
+            ? "Node degree distribution"
+            : "Edge Size Distribution"}
+        </div>
         <Button
           style={{
             textTransform: "none",

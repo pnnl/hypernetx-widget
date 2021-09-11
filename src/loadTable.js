@@ -210,7 +210,7 @@ function EnhancedTableHead(props) {
 EnhancedTableHead.propTypes = {
   datatype: PropTypes.string.isRequired,
   data: PropTypes.array.isRequired,
-  metadata: PropTypes.object.isRequired,
+  metadata: PropTypes.object,
   usercols: PropTypes.array.isRequired,
   classes: PropTypes.object.isRequired,
   onRequestSort: PropTypes.func.isRequired,
@@ -302,6 +302,7 @@ const LoadTable = ({
       return value;
     }
   };
+
   return (
     <div style={{ margin: "0px", padding: "0px" }}>
       <TableContainer

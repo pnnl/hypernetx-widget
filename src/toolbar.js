@@ -21,6 +21,7 @@ import {
   RemoveCircleOutlineOutlined,
   CallMadeOutlined,
   Flip,
+  BlurOff,
 } from "@material-ui/icons";
 import Tooltip from "@material-ui/core/Tooltip";
 import { makeStyles } from "@material-ui/core/styles";
@@ -53,16 +54,6 @@ const Toolbar = ({
   onSelectionChange,
 }) => {
   const classes = toggleStyle();
-  // const [selectionType, setSelectionType] = React.useState(
-  //   category === "Data"
-  //     ? "original"
-  //     : category === "Graph"
-  //     ? "undo"
-  //     : category === "Selection"
-  //     ? "cursor"
-  //     : "zoom in"
-  // );
-
   const [selectionType, setSelectionType] = React.useState(null);
 
   React.useEffect(() => {
@@ -70,9 +61,14 @@ const Toolbar = ({
   }, [currToggle]);
 
   const handleSelection = (event, newSelection) => {
-    console.log(newSelection);
     if (newSelection === null) {
-      onSelectionChange(dataType, selectionType);
+      if (selectionType === "collapse") {
+        onSelectionChange(dataType, "undo-collapse");
+      } else if (selectionType === "bipartite") {
+        onSelectionChange(dataType, "undo-bipartite");
+      } else {
+        onSelectionChange(dataType, selectionType);
+      }
     } else {
       setSelectionType(newSelection);
       if (dataType === undefined) {
@@ -150,7 +146,7 @@ const Toolbar = ({
             value={"none"}
             disabled={!Object.values(selectionState).includes(true)}
           >
-            <IconWithTooltip text={"Unselect all"} iconImage={<Clear />} />
+            <IconWithTooltip text={"Unselect all"} iconImage={<BlurOff />} />
           </ToggleButton>
           <ToggleButton
             value={"reverse"}
@@ -166,37 +162,54 @@ const Toolbar = ({
               <IconWithTooltip text={"Unpin all"} iconImage={<LocationOff />} />
             </ToggleButton>
           )}
+          {dataType === "Nodes" && (
+            <ToggleButton value={"collapse"}>
+              <IconWithTooltip
+                text={"Collapse nodes"}
+                iconImage={<BubbleChart />}
+              />
+            </ToggleButton>
+          )}
+
+          {dataType === "Edges" && (
+            <ToggleButton value={"bipartite"}>
+              <IconWithTooltip
+                text={"Convert to bipartite"}
+                iconImage={<LinearScale />}
+              />
+            </ToggleButton>
+          )}
         </ToggleButtonGroup>
       )}
 
-      {category === "Graph" && (
-        <ToggleButtonGroup
-          size={"small"}
-          classes={{ root: classes.toggleButton }}
-          value={selectionType}
-          exclusive
-          onChange={handleSelection}
-        >
-          <ToggleButton value={"undo"}>
-            <IconWithTooltip
-              text={"Return to original"}
-              iconImage={<SettingsBackupRestore />}
-            />
-          </ToggleButton>
-          <ToggleButton value={"collapse"}>
-            <IconWithTooltip
-              text={"Collapse nodes"}
-              iconImage={<BubbleChart />}
-            />
-          </ToggleButton>
-          <ToggleButton value={"bipartite"}>
-            <IconWithTooltip
-              text={"Convert to bipartite"}
-              iconImage={<LinearScale />}
-            />
-          </ToggleButton>
-        </ToggleButtonGroup>
-      )}
+      {/*{category === "Graph" && (*/}
+      {/*  <ToggleButtonGroup*/}
+      {/*    size={"small"}*/}
+      {/*    classes={{ root: classes.toggleButton }}*/}
+      {/*    value={selectionType}*/}
+      {/*    exclusive*/}
+      {/*    onChange={handleSelection}*/}
+      {/*  >*/}
+      {/*    <ToggleButton value={"undo"}>*/}
+      {/*      <IconWithTooltip*/}
+      {/*        text={"Return to original"}*/}
+      {/*        iconImage={<SettingsBackupRestore />}*/}
+      {/*      />*/}
+      {/*    </ToggleButton>*/}
+      {/*    <ToggleButton value={"collapse"}>*/}
+      {/*      <IconWithTooltip*/}
+      {/*        text={"Collapse nodes"}*/}
+      {/*        iconImage={<BubbleChart />}*/}
+      {/*      />*/}
+      {/*    </ToggleButton>*/}
+      {/*    <ToggleButton value={"bipartite"}>*/}
+      {/*      <IconWithTooltip*/}
+      {/*        text={"Convert to bipartite"}*/}
+      {/*        iconImage={<LinearScale />}*/}
+      {/*      />*/}
+      {/*    </ToggleButton>*/}
+      {/*  </ToggleButtonGroup>*/}
+      {/*)}*/}
 
       {category === "Selection" && (
         <ToggleButtonGroup
@@ -250,6 +263,17 @@ const Toolbar = ({
           <ToggleButton value={"pan"}>
             <IconWithTooltip text={"Pan"} iconImage={<OpenWith />} />
           </ToggleButton>
+        </ToggleButtonGroup>
+      )}
+
+      {category === "View" && (
+        <ToggleButtonGroup
+          size="small"
+          classes={{ root: classes.toggleButton }}
+          value={selectionType}
+          exclusive
+          onChange={handleSelection}
+        >
           <ToggleButton value={"fullscreen"}>
             <IconWithTooltip
               text={"View fullscreen"}

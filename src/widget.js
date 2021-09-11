@@ -15,6 +15,7 @@ import {
   getEdgeSize,
   getValueFreq,
   accordianStyles,
+  hslToHex,
 } from "./functions.js";
 import Toolbar from "./toolbar";
 import Switches from "./switches";
@@ -35,7 +36,7 @@ const createDefaultState = (data, defaultValue) => {
 };
 
 const Widget = ({ nodes, edges, ...props }) => {
-  console.log({ ...props });
+  // console.log({ ...props });
   const classes = accordianStyles();
 
   const nodeDegMap = new Map();
@@ -58,7 +59,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [bipartite, setBipartite] = React.useState(false);
 
   const [nodeFill, setNodeFill] = React.useState(
-    props.nodeFill || createDefaultState(nodes, "#000000ff")
+    props.nodeFill || createDefaultState(nodes, hslToHex(0, 37, 37))
   );
   const [selectedNodes, setSelectedNodes] = React.useState(
     props.selectedNodes || {}
@@ -69,7 +70,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   );
 
   const [edgeStroke, setEdgeStroke] = React.useState(
-    props.edgeStroke || createDefaultState(edges, "#000000ff")
+    props.edgeStroke || createDefaultState(edges, hslToHex(0, 37, 37))
   );
   const [selectedEdges, setSelectedEdges] = React.useState(
     props.selectedEdges || {}
@@ -110,10 +111,13 @@ const Widget = ({ nodes, edges, ...props }) => {
   }
 
   const handleColorChange = (datatype, uid, color) => {
+    const h = color.h;
+    const s = color.s * 100;
+    const l = color.l * 100;
     if (datatype === "node") {
-      setNodeFill({ ...nodeFill, [uid]: rgbToHex(color) });
+      setNodeFill({ ...nodeFill, [uid]: hslToHex(h, s, l) });
     } else {
-      setEdgeStroke({ ...edgeStroke, [uid]: rgbToHex(color) });
+      setEdgeStroke({ ...edgeStroke, [uid]: hslToHex(h, s, l) });
     }
   };
 
@@ -157,7 +161,6 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const handleSelectAll = (type, value) => {
     if (type === "node") {
-      console.log("CLICKED");
       if (value) {
         setSelectedNodes(createDefaultState(nodes, true));
       } else {
@@ -232,9 +235,10 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [toggleSelect, setToggleSelect] = React.useState({
     Nodes: "original",
     Edges: "original",
-    Graph: "undo",
+    // Graph: "undo",
     Selection: "cursor",
     Navigation: undefined,
+    View: undefined,
   });
   const [fontSize, setFontSize] = React.useState({ node: 12, edge: 10 });
   const [nodeSize, setNodeSize] = React.useState(createDefaultState(nodes, 2));
@@ -325,22 +329,22 @@ const Widget = ({ nodes, edges, ...props }) => {
   };
 
   const handleOriginal = (type) => {
-    if (type === "Nodes" || type === "graph") {
+    if (type === "Nodes") {
       setSelectedNodes({});
       setHiddenNodes({});
       setRemovedNodes({});
       setNodeDegBar({ ...nodeDegList });
     }
-    if (type === "Edges" || type === "graph") {
+    if (type === "Edges") {
       setSelectedEdges({});
       setHiddenEdges({});
       setRemovedEdges({});
       setEdgeSizeBar({ ...edgeSizeList });
     }
-    if (type === "graph") {
-      setBipartite(false);
-      setCollapseNodes(false);
-    }
+    // if (type === "graph") {
+    //   setBipartite(false);
+    //   setCollapseNodes(false);
+    // }
   };
 
   const handleHideSelected = (type) => {
@@ -440,6 +444,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     } else if (selectionType === "unpin") {
       setPinned(false);
       setUnpinned(now());
+      setToggleSelect({ ...toggleSelect, Nodes: undefined });
     } else if (selectionType === "pin") {
       setPinned(true);
     } else if (selectionType === "reverse") {
@@ -462,13 +467,14 @@ const Widget = ({ nodes, edges, ...props }) => {
     } else if (selectionType === "fullscreen") {
       setOpenFullscreen(true);
       setAspect(2);
-      setNavigation(undefined);
+      // setNavigation(undefined);
     } else if (selectionType === "bipartite") {
-      setBipartite(!bipartite);
-    } else if (selectionType === "collapse") {
-      setCollapseNodes(!collapseNodes);
-    } else if (selectionType === "undo") {
+      setBipartite(true);
+    } else if (selectionType === "undo-bipartite") {
       setBipartite(false);
+    } else if (selectionType === "collapse") {
+      setCollapseNodes(true);
+    } else if (selectionType === "undo-collapse") {
       setCollapseNodes(false);
     } else if (selectionType === "original") {
       setPinned(false);
@@ -481,30 +487,33 @@ const Widget = ({ nodes, edges, ...props }) => {
       selectionType === "cursor"
     ) {
       let newToggle = { Selection: selectionType, Navigation: undefined };
-      setSelectionMode(selectionType);
-      // setNavigation(undefined);
       setToggleSelect({ ...toggleSelect, ...newToggle });
+      setSelectionMode(selectionType);
+      setNavigation(undefined);
     } else {
       let newToggle = { Selection: undefined, Navigation: selectionType };
       setToggleSelect({ ...toggleSelect, ...newToggle });
 
       if (selectionType === "pan") {
         setNavigation(PAN);
-        setSelectionMode(undefined);
+        // setSelectionMode(undefined);
       } else if (selectionType === "zoom in") {
         setNavigation(ZOOM_IN);
-        setSelectionMode(undefined);
+        // setSelectionMode(undefined);
       } else if (selectionType === "zoom out") {
         setNavigation(ZOOM_OUT);
-        setSelectionMode(undefined);
+        // setSelectionMode(undefined);
       } else if (selectionType === "dual") {
-        setNavigation(selectionType);
-        setSelectionMode(undefined);
+        // setNavigation(selectionType);
+        setToggleSelect({ ...toggleSelect, View: selectionType });
+        // setSelectionMode(undefined);
         setOpenFullscreen(true);
         setAspect(1);
       } else {
         // no navigation
+
         setNavigation(RESET);
+        setToggleSelect({ ...toggleSelect, Selection: "cursor" });
       }
     }
   };
@@ -513,11 +522,14 @@ const Widget = ({ nodes, edges, ...props }) => {
     if (dataType === "node") {
       setWithNodeLabels(states.showLabels);
       setCollapseNodes(states.collapseNodes);
-      setToggleSelect({ ...toggleSelect, Graph: "collapse" });
+      setToggleSelect({ ...toggleSelect, Nodes: "collapse" });
+
+      // setToggleSelect({ ...toggleSelect, Graph: "collapse" });
     } else {
       setWithEdgeLabels(states.showLabels);
       setBipartite(states.bipartite);
-      setToggleSelect({ ...toggleSelect, Graph: "bipartite" });
+      setToggleSelect({ ...toggleSelect, Edges: "bipartite" });
+      // setToggleSelect({ ...toggleSelect, Graph: "bipartite" });
     }
   };
 
@@ -601,9 +613,10 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const [openFullscreen, setOpenFullscreen] = React.useState(false);
   const handleClose = () => {
-    setNavigation(undefined);
+    // setNavigation(undefined);
     setOpenFullscreen(false);
     setAspect(1);
+    setToggleSelect({ ...toggleSelect, View: undefined });
   };
 
   const switchData = {
@@ -766,11 +779,11 @@ const Widget = ({ nodes, edges, ...props }) => {
                 />
               </div>
               <div style={{ display: "flex" }}>
-                <Toolbar
-                  category={"Graph"}
-                  currToggle={toggleSelect.Graph}
-                  onSelectionChange={handleToolbarSelection}
-                />
+                {/*<Toolbar*/}
+                {/*  category={"Graph"}*/}
+                {/*  currToggle={toggleSelect.Graph}*/}
+                {/*  onSelectionChange={handleToolbarSelection}*/}
+                {/*/>*/}
                 <Toolbar
                   category={"Selection"}
                   currToggle={toggleSelect.Selection}
@@ -779,6 +792,11 @@ const Widget = ({ nodes, edges, ...props }) => {
                 <Toolbar
                   category={"Navigation"}
                   currToggle={toggleSelect.Navigation}
+                  onSelectionChange={handleToolbarSelection}
+                />
+                <Toolbar
+                  category="View"
+                  currToggle={toggleSelect.View}
                   onSelectionChange={handleToolbarSelection}
                 />
               </div>
@@ -816,7 +834,15 @@ const Widget = ({ nodes, edges, ...props }) => {
           />
         </Grid>
       </Grid>
-      <HelpMenu state={openHelp} onOpenChange={() => setOpenHelp(false)} />
+      <HelpMenu
+        state={openHelp}
+        onOpenChange={() => {
+          setOpenHelp(false);
+          openFullscreen
+            ? setToggleSelect({ ...toggleSelect, View: "fullscreen" })
+            : setToggleSelect({ ...toggleSelect, View: undefined });
+        }}
+      />
       <Modal
         open={openFullscreen}
         // onClose={() => setOpen(false)}
@@ -851,11 +877,11 @@ const Widget = ({ nodes, edges, ...props }) => {
                 selectionState={selectedEdges}
                 onSelectionChange={handleToolbarSelection}
               />
-              <Toolbar
-                category={"Graph"}
-                currToggle={toggleSelect.Graph}
-                onSelectionChange={handleToolbarSelection}
-              />
+              {/*<Toolbar*/}
+              {/*  category={"Graph"}*/}
+              {/*  currToggle={toggleSelect.Graph}*/}
+              {/*  onSelectionChange={handleToolbarSelection}*/}
+              {/*/>*/}
               <Toolbar
                 category={"Selection"}
                 currToggle={toggleSelect.Selection}
@@ -866,6 +892,11 @@ const Widget = ({ nodes, edges, ...props }) => {
                 currToggle={toggleSelect.Navigation}
                 onSelectionChange={handleToolbarSelection}
               />
+              <Toolbar
+                category="View"
+                currToggle={toggleSelect.View}
+                onSelectionChange={handleToolbarSelection}
+              />
             </div>
             <div>
               <IconButton onClick={handleClose}>
@@ -873,7 +904,7 @@ const Widget = ({ nodes, edges, ...props }) => {
               </IconButton>
             </div>
           </div>
-          {navigation !== "dual" ? (
+          {toggleSelect.View !== "dual" ? (
             <HypernetxWidgetView
               {...props}
               {...{

@@ -39,7 +39,7 @@ const HelpMenu = ({ state, onOpenChange }) => {
         className={classes.root}
       >
         <DialogTitle>
-          <Typography variant='h3'>Using the tool</Typography>
+          <Typography variant="h3">Using the tool</Typography>
           <span>
             <IconButton size={"small"} onClick={handleClose}>
               <CloseIcon />
@@ -49,11 +49,11 @@ const HelpMenu = ({ state, onOpenChange }) => {
 
         <DialogContent>
           <DialogContentText style={{ color: "black" }}>
-            <Typography  gutterBottom>
+            <Typography gutterBottom>
               The tool has two main interfaces, the hypergraph visualization and
               the nodes & edges panel.
             </Typography>
-            <Typography variant='h5'>Layout</Typography>
+            <Typography variant="h5">Layout</Typography>
             <Typography gutterBottom>
               The hypergraph visualization is an Euler diagram that shows nodes
               as circles and hyper edges as outlines containing the
@@ -66,7 +66,7 @@ const HelpMenu = ({ state, onOpenChange }) => {
               Command (Mac) clicking a node will release a pinned node it to be
               re-positioned by the algorithm.
             </Typography>
-            <Typography variant='h5'>Selection</Typography>
+            <Typography variant="h5">Selection</Typography>
             <Typography gutterBottom>
               Nodes and edges can be selected by clicking them. Nodes and edges
               can be selected independently of each other, i.e., it is possible
@@ -80,19 +80,18 @@ const HelpMenu = ({ state, onOpenChange }) => {
             <Typography>
               Selected nodes can be hidden (having their appearance minimized)
               or removed completely from the visualization. Hiding a node or
-              edge will not cause a change in the layout, wheras removing a node
-              or edge will. The selection can also be expanded. Buttons in the
-              toolbar allow for selecting all nodes contained within selected
-              edges, and selecting all edges containing any selected nodes.
+              edge will not cause a change in the layout, whereas removing a
+              node or edge will. The selection can also be expanded. Buttons in
+              the toolbar allow for selecting all nodes contained within
+              selected edges, and selecting all edges containing any selected
+              nodes.
             </Typography>
             <Typography display="block">
               The toolbar also contains buttons to select all nodes (or edges),
               un-select all nodes (or edges), or reverse the selected nodes (or
               edges). An advanced user might:
             </Typography>
-            <Typography
-              component={"ul"}
-            >
+            <Typography component={"p"}>
               <li>
                 <span
                   style={{
@@ -126,7 +125,7 @@ const HelpMenu = ({ state, onOpenChange }) => {
                 </span>
               </li>
             </Typography>
-            <Typography variant='h5'>Side Panel</Typography>
+            <Typography variant="h5">Side Panel</Typography>
             <Typography>
               Details on nodes and edges are visible in the side panel. For both
               nodes and edges, a table shows the node name, degree (or size for
@@ -135,7 +134,7 @@ const HelpMenu = ({ state, onOpenChange }) => {
               color of nodes and edges can be set in bulk here as well, for
               example, coloring by degree.
             </Typography>
-            <Typography variant='h5'> Other Features</Typography>
+            <Typography variant="h5"> Other Features</Typography>
             <Typography gutterBottom>
               Nodes with identical edge membership can be collapsed into a super
               node, which can be helpful for larger hypergraphs. Dragging any
