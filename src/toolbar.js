@@ -6,7 +6,6 @@ import {
   SettingsBackupRestore,
   PictureInPicture,
   SelectAll,
-  Clear,
   FlipCameraAndroid,
   BubbleChart,
   LinearScale,
@@ -21,28 +20,23 @@ import {
   RemoveCircleOutlineOutlined,
   CallMadeOutlined,
   Flip,
-  BlurOff,
+  Block,
 } from "@material-ui/icons";
-import Tooltip from "@material-ui/core/Tooltip";
 import { makeStyles } from "@material-ui/core/styles";
 import IconWithTooltip from "./iconWithTooltip";
 
 const toggleStyle = makeStyles((theme) => ({
   toggleButton: {
     "& .MuiToggleButton-root": {
-      // color: "#d3d3d3",
-      // border: "1px solid #605f5f",
       fontSize: "9px",
       height: 30,
       maxWidth: 100,
     },
     "& .Mui-selected": {
       color: "black",
-      // backgroundColor: "#ECECEC"
     },
     "& .Mui-disabled": {
       pointerEvents: "auto",
-      // color: "#d3d3d3"
     },
   },
 }));
@@ -146,7 +140,7 @@ const Toolbar = ({
             value={"none"}
             disabled={!Object.values(selectionState).includes(true)}
           >
-            <IconWithTooltip text={"Unselect all"} iconImage={<BlurOff />} />
+            <IconWithTooltip text={"Unselect all"} iconImage={<Block />} />
           </ToggleButton>
           <ToggleButton
             value={"reverse"}

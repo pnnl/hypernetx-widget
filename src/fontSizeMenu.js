@@ -9,7 +9,22 @@ const useStyles = makeStyles((theme) => ({
     },
   },
 }));
-const sizeArr = [8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48];
+const sizeArr = [
+  "hide labels",
+  8,
+  10,
+  12,
+  14,
+  16,
+  18,
+  20,
+  22,
+  24,
+  26,
+  28,
+  36,
+  48,
+];
 
 const FontSizeMenu = ({ type, currSize, onSizeChange }) => {
   const classes = useStyles();

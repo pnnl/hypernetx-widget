@@ -4,7 +4,7 @@ import { Palette } from "@material-ui/icons";
 import { IconButton } from "@material-ui/core";
 import "./css/hnxStyle.css";
 
-import { debounce } from "lodash";
+import { debounce, throttle } from "lodash";
 
 const ColorButton = ({ label, color, onEachColorChange }) => {
   // const [paletteColor, setColor] = React.useState("#000000ff");
@@ -26,7 +26,7 @@ const ColorButton = ({ label, color, onEachColorChange }) => {
   };
 
   const debouncedChangeColor = useMemo(
-    () => debounce(handleChangeColor, 300),
+    () => throttle(handleChangeColor, 200),
     []
   );
   return (

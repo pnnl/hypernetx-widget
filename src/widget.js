@@ -10,7 +10,6 @@ import ColorPalette from "./colorPalette.js";
 import LoadTable from "./loadTable.js";
 import Bars from "./bars.js";
 import {
-  rgbToHex,
   getNodeDegree,
   getEdgeSize,
   getValueFreq,
@@ -244,6 +243,9 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [nodeSize, setNodeSize] = React.useState(createDefaultState(nodes, 2));
   const [nodeSizeGroup, setNodeSizeGroup] = React.useState("None");
   const [openHelp, setOpenHelp] = React.useState(false);
+  const [large, setLarge] = React.useState(false);
+  const [openFullscreen, setOpenFullscreen] = React.useState(false);
+  const [openDualFull, setOpenDualFull] = React.useState(false);
 
   const handleCurrData = (group, palette, dataType) => {
     setColGroup({ ...colGroup, [dataType]: group });
@@ -251,6 +253,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   };
 
   const getClickedNodes = (event, data) => {
+    // setToggleSelect({ ...toggleSelect, Nodes: undefined });
     if (Array.isArray(data)) {
       var uidArr = [];
       if (data.length > 0) {
@@ -300,6 +303,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   };
 
   const getClickedEdges = (event, data) => {
+    // setToggleSelect({ ...toggleSelect, Edges: undefined });
     if (Array.isArray(data)) {
       const uidArr = data.map((d) => d.uid);
       const newSelect = {};
@@ -465,8 +469,11 @@ const Widget = ({ nodes, edges, ...props }) => {
         setSelectedEdges(currSelectedEdges);
       }
     } else if (selectionType === "fullscreen") {
+      setOpenDualFull(false);
+      setLarge(true);
       setOpenFullscreen(true);
       setAspect(2);
+      setToggleSelect({ ...toggleSelect, View: selectionType });
       // setNavigation(undefined);
     } else if (selectionType === "bipartite") {
       setBipartite(true);
@@ -507,7 +514,8 @@ const Widget = ({ nodes, edges, ...props }) => {
         // setNavigation(selectionType);
         setToggleSelect({ ...toggleSelect, View: selectionType });
         // setSelectionMode(undefined);
-        setOpenFullscreen(true);
+        setLarge(true);
+        setOpenDualFull(true);
         setAspect(1);
       } else {
         // no navigation
@@ -520,13 +528,13 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const handleSwitch = (dataType, states) => {
     if (dataType === "node") {
-      setWithNodeLabels(states.showLabels);
+      // setWithNodeLabels(states.showLabels);
       setCollapseNodes(states.collapseNodes);
       setToggleSelect({ ...toggleSelect, Nodes: "collapse" });
 
       // setToggleSelect({ ...toggleSelect, Graph: "collapse" });
     } else {
-      setWithEdgeLabels(states.showLabels);
+      // setWithEdgeLabels(states.showLabels);
       setBipartite(states.bipartite);
       setToggleSelect({ ...toggleSelect, Edges: "bipartite" });
       // setToggleSelect({ ...toggleSelect, Graph: "bipartite" });
@@ -554,11 +562,21 @@ const Widget = ({ nodes, edges, ...props }) => {
 
   const handleFontSize = (type, size) => {
     if (type === "node") {
-      setNodeFontSize(createDefaultState(nodes, size));
-      setFontSize({ ...fontSize, [type]: size });
+      if (size === "hide labels") {
+        setWithNodeLabels(false);
+      } else {
+        setWithNodeLabels(true);
+        setNodeFontSize(createDefaultState(nodes, size));
+        setFontSize({ ...fontSize, [type]: size });
+      }
     } else {
-      setEdgeFontSize(createDefaultState(edges, size));
-      setFontSize({ ...fontSize, [type]: size });
+      if (size === "hide labels") {
+        setWithEdgeLabels(false);
+      } else {
+        setEdgeFontSize(createDefaultState(edges, size));
+        setFontSize({ ...fontSize, [type]: size });
+        setWithEdgeLabels(true);
+      }
     }
   };
 
@@ -611,10 +629,9 @@ const Widget = ({ nodes, edges, ...props }) => {
     setOpenAccordian(currAccordian);
   };
 
-  const [openFullscreen, setOpenFullscreen] = React.useState(false);
   const handleClose = () => {
     // setNavigation(undefined);
-    setOpenFullscreen(false);
+    setLarge(false);
     setAspect(1);
     setToggleSelect({ ...toggleSelect, View: undefined });
   };
@@ -624,6 +641,7 @@ const Widget = ({ nodes, edges, ...props }) => {
     bipartiteState: bipartite,
   };
 
+  // console.log(toggleSelect);
   return (
     <div>
       <Grid container spacing={1}>
@@ -674,16 +692,21 @@ const Widget = ({ nodes, edges, ...props }) => {
                     currColors={nodeFill}
                     onAllColorChange={handleAllColorChange}
                   />
-                  <FontSizeMenu
-                    type={"node"}
-                    currSize={fontSize}
-                    onSizeChange={handleFontSize}
-                  />
-                  <NodeSizeMenu
-                    currGroup={nodeSizeGroup}
-                    metadata={props.nodeData}
-                    onGroupChange={handleNodeSize}
-                  />
+                  <div
+                    style={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <FontSizeMenu
+                      type={"node"}
+                      currSize={fontSize}
+                      onSizeChange={handleFontSize}
+                    />
+                    <NodeSizeMenu
+                      currGroup={nodeSizeGroup}
+                      metadata={props.nodeData}
+                      onGroupChange={handleNodeSize}
+                    />
+                  </div>
+
                   <Switches
                     currData={switchData}
                     dataType={"node"}
@@ -838,13 +861,16 @@ const Widget = ({ nodes, edges, ...props }) => {
         state={openHelp}
         onOpenChange={() => {
           setOpenHelp(false);
-          openFullscreen
+          openDualFull
+            ? setToggleSelect({ ...toggleSelect, View: "dual" })
+            : openFullscreen
             ? setToggleSelect({ ...toggleSelect, View: "fullscreen" })
             : setToggleSelect({ ...toggleSelect, View: undefined });
         }}
       />
       <Modal
-        open={openFullscreen}
+        open={large}
+        onClose={handleClose}
         // onClose={() => setOpen(false)}
       >
         <Paper>
@@ -900,11 +926,11 @@ const Widget = ({ nodes, edges, ...props }) => {
             </div>
             <div>
               <IconButton onClick={handleClose}>
-                <CloseIcon />
+                <CloseIcon size={"large"} />
               </IconButton>
             </div>
           </div>
-          {toggleSelect.View !== "dual" ? (
+          {!openDualFull ? (
             <HypernetxWidgetView
               {...props}
               {...{

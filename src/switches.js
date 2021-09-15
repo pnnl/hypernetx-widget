@@ -3,7 +3,6 @@ import { FormControlLabel, FormGroup, Switch } from "@material-ui/core";
 
 const Switches = ({ currData, dataType, onSwitchChange }) => {
   const [state, setState] = React.useState({
-    showLabels: true,
     collapseNodes: currData.collapseState,
     bipartite: currData.bipartiteState,
   });
@@ -34,18 +33,18 @@ const Switches = ({ currData, dataType, onSwitchChange }) => {
       }}
     >
       {/*<FormGroup>*/}
-      <FormControlLabel
-        control={
-          <Switch
-            checked={state.showLabels}
-            onChange={handleChange}
-            color={"primary"}
-            name={"showLabels"}
-            size={"small"}
-          />
-        }
-        label={<div style={{ fontSize: "13px" }}>Show labels</div>}
-      />
+      {/*<FormControlLabel*/}
+      {/*  control={*/}
+      {/*    <Switch*/}
+      {/*      checked={state.showLabels}*/}
+      {/*      onChange={handleChange}*/}
+      {/*      color={"primary"}*/}
+      {/*      name={"showLabels"}*/}
+      {/*      size={"small"}*/}
+      {/*    />*/}
+      {/*  }*/}
+      {/*  label={<div style={{ fontSize: "13px" }}>Show labels</div>}*/}
+      {/*/>*/}
       {dataType === "node" && (
         <FormControlLabel
           control={

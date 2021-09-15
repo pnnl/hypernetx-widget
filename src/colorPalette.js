@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
   },
   colorItem: {
     "& .MuiSelect-root": {
-      width: 200,
+      width: 100,
       maxHeight: "16px",
       minHeight: "16px",
     },
@@ -47,6 +47,7 @@ const useStyles = makeStyles((theme) => ({
       paddingTop: "2px",
     },
     "& .MuiFormLabel-root": {
+      width: 200,
       fontSize: "15px",
     },
   },
@@ -210,7 +211,7 @@ const ColorPalette = ({
   };
 
   return (
-    <div style={{ padding: "5px", width: "100%" }}>
+    <div style={{ padding: "5px", width: "100%", display: "flex" }}>
       <div
         style={{
           fontFamily: "Arial",

@@ -35,10 +35,10 @@ const HelpMenu = ({ state, onOpenChange }) => {
       <Dialog
         open={state}
         onClose={handleClose}
-        maxWidth={"md"}
+        maxWidth={"lg"}
         className={classes.root}
       >
-        <DialogTitle>
+        <DialogTitle component={"div"}>
           <Typography variant="h3">Using the tool</Typography>
           <span>
             <IconButton size={"small"} onClick={handleClose}>
@@ -48,7 +48,7 @@ const HelpMenu = ({ state, onOpenChange }) => {
         </DialogTitle>
 
         <DialogContent>
-          <DialogContentText style={{ color: "black" }}>
+          <DialogContentText component="div" style={{ color: "black" }}>
             <Typography gutterBottom>
               The tool has two main interfaces, the hypergraph visualization and
               the nodes & edges panel.
@@ -91,7 +91,7 @@ const HelpMenu = ({ state, onOpenChange }) => {
               un-select all nodes (or edges), or reverse the selected nodes (or
               edges). An advanced user might:
             </Typography>
-            <Typography component={"p"}>
+            <Typography component={"ul"}>
               <li>
                 <span
                   style={{
