@@ -58,7 +58,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   const [bipartite, setBipartite] = React.useState(false);
 
   const [nodeFill, setNodeFill] = React.useState(
-    props.nodeFill || createDefaultState(nodes, hslToHex(0, 37, 37))
+    props.nodeFill || createDefaultState(nodes, hslToHex(0, 35, 15.6))
   );
   const [selectedNodes, setSelectedNodes] = React.useState(
     props.selectedNodes || {}
@@ -69,7 +69,7 @@ const Widget = ({ nodes, edges, ...props }) => {
   );
 
   const [edgeStroke, setEdgeStroke] = React.useState(
-    props.edgeStroke || createDefaultState(edges, hslToHex(0, 37, 37))
+    props.edgeStroke || createDefaultState(edges, hslToHex(0, 35, 15.6))
   );
   const [selectedEdges, setSelectedEdges] = React.useState(
     props.selectedEdges || {}
