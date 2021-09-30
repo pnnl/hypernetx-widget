@@ -54,10 +54,12 @@ The hypergraph visualization is an Euler diagram that shows nodes as circles and
 ## Views
 ### Dual
 `hnxwidget` allows you to view the hypergraph and its dual side-by-side. Click the "View fullscreen dual" button in the "View" toolbar to activate this feature. The screenshot below shows an example of the dual view.
+
 ![Screenshot of dual view](screenshots/hnx-dual-view.png)
 
 ### Bipartite
 Instead of an Euler diagram, the hypergraph can be viewed as a bipartite graph. In this case hyper edges are represented as squares (with nodes still being represented as circles). Black lines are drawn between nodes and hyper edges to indicate that node belongs to that hyper edge. Click the "Convert to bipartite" button in the Edges toolbar to display edges this way. The screenshot below shows an example of the bipartite view.
+
 ![Screenshot of bipartite view](screenshots/hnx-bipartite-view.png)
 
 
@@ -66,9 +68,11 @@ Instead of an Euler diagram, the hypergraph can be viewed as a bipartite graph. 
 Nodes and edges can be selected by clicking them. Nodes and edges can be selected independently of each other, i.e., it is possible to select an edge without selecting the nodes it contains. Multiple nodes and edges can be selected, by holding down Shift while clicking. Shift clicking an already selected node will de-select it. Clicking the background will de-select all nodes and edges. Dragging a selected node will drag all selected nodes, keeping their relative placement.
 
 Multiple nodes can be selected using the "Brush select nodes" button in the Selection toolbar. This selects all nodes within the rectangle specified by the user by dragging the brush. The animation below shows rectangular brushing of nodes.
+
 ![Animation of selecting multiple nodes with a rectangular brush](screenshots/hnx-brush-nodes.gif)
 
 Multiple edges can be selected using the "Brush select edges" button in the Selection toolbar. This selects all edges that contain exactly one endpoint of the brush (either the start or the end). This is useful, for example, for selecting all edges that contain a node by dragging the brush from that node to any area outside the hypergraph. The animation below shows linear brushing of edges.
+
 ![Animation of selecting multiple edges with a linear brush](screenshots/hnx-brush-edges.gif)
 
 Selected nodes can be hidden (having their appearance minimized) or removed completely from the visualization. Hiding a node or edge will not cause a change in the layout, wheras removing a node or edge will. The selection can also be expanded. Buttons in the toolbar allow for selecting all nodes contained within selected edges, and selecting all edges containing any selected nodes.
