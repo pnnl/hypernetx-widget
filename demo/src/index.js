@@ -95,6 +95,17 @@ function Demo() {
           github.com/pnnl/hypernetx-widget
         </a>
       </Typography>
+      <Typography>
+      This is hypergraph visualization tool that uses an Euler diagram--nodes
+      are circles and hyper edges are outlines (rubber bands)
+      containing the nodes/circles.
+
+      The input data being visualized in the tool can be edited using
+      the text area on the right. The input is in the same format as the
+      constructor for a <a href='https://github.com/pnnl/hypernetx'>HypernetX</a>
+      object--a dictionary mapping edges to lists of nodes.
+      </Typography>
+
     </Grid>
     
     <Grid item xs={6}>
