@@ -119,7 +119,7 @@ class HypernetxWidgetView(ReactJupyterWidget):
         with_color=True,
         **kwargs
     ):
-        incidence_dict = H.edges.incidence_dict\
+        incidence_dict = {k: list(v) for k, v in H.incidence_dict.items()}\
             if H.__class__.__name__ == 'Hypergraph'\
             else H
 
