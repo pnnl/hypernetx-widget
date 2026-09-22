@@ -31,7 +31,7 @@
     "webpack": "^3.5.5"
   },
   "dependencies": {
-    "@jupyter-widgets/base": "^1.1 || ^2 || ^3",
+    "@jupyter-widgets/base": "^6.0",
     "lodash": "^4.17.4"
   },
   "jupyterlab": {
